@@ -287,7 +287,12 @@ class HTMLDashboardRenderer:
             return (f'{p}%', color)
 
         if isinstance(m, CodeFactorMetric):
-            branch_for_badge = self.feature if branch == 'feature' else branch
+            if branch == 'master':
+                branch_for_badge = self.default_branch
+            elif branch == 'develop':
+                branch_for_badge = self.develop_branch
+            else:
+                branch_for_badge = self.feature
             letter = self._codefactor_grade(branch_for_badge)
             if letter is None:
                 letter = str(value or '').strip().upper()
