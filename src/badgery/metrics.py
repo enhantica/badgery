@@ -315,6 +315,7 @@ class CodeFactorMetric(BaseMetric):
     label = 'Code quality from CodeFactor.io'
 
     def __init__(self, badge_gen: BadgeGenerator, feature=None):
+        """Initialize CodeFactor metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     def read_all(self, args):
@@ -324,9 +325,11 @@ class CodeFactorMetric(BaseMetric):
         self.feature_value = os.environ.get('CI_CODEFACTOR_FEATURE', '')
 
     def badge(self, value):
+        """Return a badge string (unused)."""
         return self.badge_gen.codefactor_badge(value)
 
     def refs(self):
+        """Return CodeFactor overview URLs for branches."""
         cf = self.badge_gen.codefactor
         return {
             'master': self.badge('master'),
@@ -344,9 +347,11 @@ class CodecovMetric(BaseMetric):
     label = 'Unit test coverage from Codecov.io'
 
     def __init__(self, badge_gen: BadgeGenerator, feature=None):
+        """Initialize Codecov coverage metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     def read_all(self, args):
+        """Read coverage values from environment variables."""
         self.master = os.environ.get('CI_CODECOV_MASTER', '')
         self.develop = os.environ.get('CI_CODECOV_DEVELOP', '')
         self.feature_value = os.environ.get('CI_CODECOV_FEATURE', '')
