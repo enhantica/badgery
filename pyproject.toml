@@ -5,7 +5,7 @@
 [project]
 name = 'badgery'
 dynamic = ['version'] # Use versioningit to manage the version
-description = 'Generate sleek HTML dashboards with badges from code metrics and CI results.'
+description = 'Turn code metrics and CI results into sleek, card-based HTML dashboards.'
 authors = [{ name = 'Badgery contributors' }]
 readme = 'README.md'
 license = { text = 'MIT' }
