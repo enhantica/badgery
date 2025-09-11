@@ -1,4 +1,4 @@
-name: Branch Badge Summary
+name: Build and publish dashboard
 
 on:
   push:
@@ -18,7 +18,7 @@ env:
   REPO_NAME: ${{ github.event.repository.name }}
 
 jobs:
-  make-badges:
+  dashboard:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,19 +42,20 @@ jobs:
           for BRANCH in ${{ env.DEFAULT_BRANCH }} ${{ env.DEVELOP_BRANCH }} ${{ env.CI_BRANCH }}; do
             echo "=== Processing branch $BRANCH ==="
             git worktree add ../worktree-$BRANCH origin/$BRANCH
+            mkdir -p reports/$BRANCH
             echo "Docstring coverage for branch $BRANCH"
-            pixi run interrogate -c pyproject.toml --fail-under=0 ../worktree-$BRANCH/src > coverage-docstring-$BRANCH.txt
+            pixi run interrogate -c pyproject.toml --fail-under=0 ../worktree-$BRANCH/src > reports/$BRANCH/coverage-docstring.txt
             echo "Cyclomatic complexity for branch $BRANCH"
-            pixi run radon cc -s -j ../worktree-$BRANCH/src > cyclomatic-complexity-$BRANCH.json
+            pixi run radon cc -s -j ../worktree-$BRANCH/src > reports/$BRANCH/cyclomatic-complexity.json
             echo "Maintainability index for branch $BRANCH"
-            pixi run radon mi -j ../worktree-$BRANCH/src > maintainability-index-$BRANCH.json
+            pixi run radon mi -j ../worktree-$BRANCH/src > reports/$BRANCH/maintainability-index.json
             echo "Raw metrics for branch $BRANCH"
-            pixi run radon raw -s -j ../worktree-$BRANCH/src > raw-metrics-$BRANCH.json
+            pixi run radon raw -s -j ../worktree-$BRANCH/src > reports/$BRANCH/raw-metrics.json
           done
 
       - name: Generate dashboard HTML
         run: >
-          pixi run make-badges  --repo ${{ github.repository }}
+          pixi run badgery --repo ${{ github.repository }}
           --branch ${{ env.CI_BRANCH }} --output index.html
 
       - name: Prepare publish directory
@@ -71,6 +72,6 @@ jobs:
           publish_dir: ./_dashboard_publish
           keep_files: true
 
-      - name: Add dashboard to summary
+      - name: Add dashboard link to summary
         run: |
           echo "[Dashboard link](https://${{ env.REPO_OWNER }}.github.io/dashboard/${{ env.REPO_NAME }}/${{ env.CI_BRANCH }}/index.html)" >> $GITHUB_STEP_SUMMARY

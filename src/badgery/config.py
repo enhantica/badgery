@@ -44,6 +44,20 @@ def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:
             current = {}
             items.append(current)
             current_indent = len(line) - len(line.lstrip())
+            # Support inline mapping after '- ' (e.g., "- group: Tests")
+            rest = line.lstrip()[2:].strip()
+            if rest and ':' in rest:
+                key, val = rest.split(':', 1)
+                key = key.strip()
+                val = val.strip()
+                if val.lower() in ('true', 'false'):
+                    current[key] = (val.lower() == 'true')
+                else:
+                    is_single_quoted = val.startswith("'") and val.endswith("'")
+                    is_double_quoted = val.startswith('"') and val.endswith('"')
+                    if is_single_quoted or is_double_quoted:
+                        val = val[1:-1]
+                    current[key] = val
             continue
         if current is None:
             continue
