@@ -8,7 +8,8 @@ from pathlib import Path
 from typing import Optional
 
 from .badges import BadgeGenerator
-from .config import load_cards_from_yaml, build_metrics_from_config
+from .config import build_metrics_from_config
+from .config import load_cards_from_yaml
 from .render import HTMLDashboardRendererWithSpec
 
 
@@ -94,4 +95,3 @@ def main() -> None:
     renderer = HTMLDashboardRendererWithSpec(metrics, feature, badge_gen, cards_spec)
     html = renderer.render()
     Path(args.output).write_text(html, encoding='utf-8')
-

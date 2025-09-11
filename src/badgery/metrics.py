@@ -4,7 +4,9 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Optional, Tuple
+from typing import Any
+from typing import Optional
+from typing import Tuple
 
 from .badges import BadgeGenerator
 
@@ -387,4 +389,3 @@ class FunctionCountMetric(BaseMetric):
         self.feature_value = self._count_functions(
             getattr(args, 'cyclomatic_complexity_feature', None)
         )
-

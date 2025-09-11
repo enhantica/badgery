@@ -2,21 +2,20 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
+from typing import Optional
 
-from .metrics import (
-    BaseMetric,
-    CodecovMetric,
-    CodeFactorMetric,
-    ComplexityMetric,
-    DocstringCoverageMetric,
-    FileCountMetric,
-    FunctionCountMetric,
-    LinesOfCodeMetric,
-    GithubWorkflowMetric,
-    MaintainabilityMetric,
-)
 from .badges import BadgeGenerator
+from .metrics import BaseMetric
+from .metrics import CodecovMetric
+from .metrics import CodeFactorMetric
+from .metrics import ComplexityMetric
+from .metrics import DocstringCoverageMetric
+from .metrics import FileCountMetric
+from .metrics import FunctionCountMetric
+from .metrics import GithubWorkflowMetric
+from .metrics import LinesOfCodeMetric
+from .metrics import MaintainabilityMetric
 
 
 def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:

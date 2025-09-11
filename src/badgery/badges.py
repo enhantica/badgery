@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 from typing import Dict
 
-
 REPO_DEFAULT = os.environ.get('GITHUB_REPOSITORY', 'easyscience/diffraction-lib')
 
 
@@ -51,4 +50,3 @@ class BadgeGenerator:
 
     def codefactor_badge_link(self, branch: str) -> str:
         return f'https://www.codefactor.io/repository/github/{self.repo}/overview/{branch}'
-

@@ -3,23 +3,24 @@ from __future__ import annotations
 import logging
 import os
 import re
-from typing import List, Optional, Tuple
-from urllib.error import HTTPError, URLError
+from typing import List
+from typing import Optional
+from typing import Tuple
+from urllib.error import HTTPError
+from urllib.error import URLError
 from urllib.request import urlopen
 
 from .badges import BadgeGenerator
-from .metrics import (
-    BaseMetric,
-    CodecovMetric,
-    CodeFactorMetric,
-    ComplexityMetric,
-    DocstringCoverageMetric,
-    FileCountMetric,
-    FunctionCountMetric,
-    LinesOfCodeMetric,
-    GithubWorkflowMetric,
-    MaintainabilityMetric,
-)
+from .metrics import BaseMetric
+from .metrics import CodecovMetric
+from .metrics import CodeFactorMetric
+from .metrics import ComplexityMetric
+from .metrics import DocstringCoverageMetric
+from .metrics import FileCountMetric
+from .metrics import FunctionCountMetric
+from .metrics import GithubWorkflowMetric
+from .metrics import LinesOfCodeMetric
+from .metrics import MaintainabilityMetric
 
 
 class HTMLDashboardRenderer:
