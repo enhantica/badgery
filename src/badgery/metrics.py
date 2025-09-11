@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Badgery contributors <https://github.com/enhantica/badgery>
+# SPDX-License-Identifier: MIT
+
 """Metric readers and adapters used by the dashboard renderer."""
 
 from __future__ import annotations
