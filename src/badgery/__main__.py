@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from . import main
+from badgery import main
 
 if __name__ == '__main__':
     main()

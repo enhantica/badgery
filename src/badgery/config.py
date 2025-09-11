@@ -2,20 +2,22 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
 
-from .badges import BadgeGenerator
-from .metrics import BaseMetric
-from .metrics import CodecovMetric
-from .metrics import CodeFactorMetric
-from .metrics import ComplexityMetric
-from .metrics import DocstringCoverageMetric
-from .metrics import FileCountMetric
-from .metrics import FunctionCountMetric
-from .metrics import GithubWorkflowMetric
-from .metrics import LinesOfCodeMetric
-from .metrics import MaintainabilityMetric
+if TYPE_CHECKING:
+    from badgery.badges import BadgeGenerator
+from badgery.metrics import BaseMetric
+from badgery.metrics import CodecovMetric
+from badgery.metrics import CodeFactorMetric
+from badgery.metrics import ComplexityMetric
+from badgery.metrics import DocstringCoverageMetric
+from badgery.metrics import FileCountMetric
+from badgery.metrics import FunctionCountMetric
+from badgery.metrics import GithubWorkflowMetric
+from badgery.metrics import LinesOfCodeMetric
+from badgery.metrics import MaintainabilityMetric
 
 
 def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:
@@ -55,7 +57,9 @@ def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:
         if val.lower() in ('true', 'false'):
             current[key] = (val.lower() == 'true')
         else:
-            if (val.startswith("'") and val.endswith("'")) or (val.startswith('"') and val.endswith('"')):
+            is_single_quoted = val.startswith("'") and val.endswith("'")
+            is_double_quoted = val.startswith('"') and val.endswith('"')
+            if is_single_quoted or is_double_quoted:
                 val = val[1:-1]
             current[key] = val
     return items
@@ -91,7 +95,11 @@ def group_icon(group: str) -> str:
     return 'fas fa-gauge'
 
 
-def build_metrics_from_config(cards: list[dict[str, Any]], badge_gen: BadgeGenerator, feature: str):
+def build_metrics_from_config(  # noqa: C901 - acceptable complexity for mapping
+    cards: list[dict[str, Any]],
+    badge_gen: 'BadgeGenerator',
+    feature: str,
+):
     metrics: list[BaseMetric] = []
     cards_spec: list[tuple[str, str, str]] = []
 
@@ -134,7 +142,12 @@ def build_metrics_from_config(cards: list[dict[str, Any]], badge_gen: BadgeGener
             if not workflow:
                 logging.debug('Skipping gh_action without workflow/file in card %s', card)
                 continue
-            metric = GithubWorkflowMetric(badge_gen, workflow_filename=str(workflow), label=title, feature=feature)
+            metric = GithubWorkflowMetric(
+                badge_gen,
+                workflow_filename=str(workflow),
+                label=title,
+                feature=feature,
+            )
             metrics.append(metric)
             key = Path(str(workflow)).stem.replace('.', '-').replace('_', '-')
             cards_spec.append((key, title, icon))

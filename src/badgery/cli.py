@@ -7,19 +7,42 @@ from glob import glob
 from pathlib import Path
 from typing import Optional
 
-from .badges import BadgeGenerator
-from .config import build_metrics_from_config
-from .config import load_cards_from_yaml
-from .render import HTMLDashboardRendererWithSpec
+from badgery.badges import BadgeGenerator
+from badgery.config import build_metrics_from_config
+from badgery.config import load_cards_from_yaml
+from badgery.render import HTMLDashboardRendererWithSpec
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description='Generate an HTML dashboard of status badges.')
-    parser.add_argument('--output', default='BADGES.html', help='Output HTML file (default: BADGES.html)')
-    parser.add_argument('--repo', required=True, help='GitHub repository, e.g. org/repo (required)')
-    parser.add_argument('--branch', required=True, help='Feature branch name to display (required)')
-    parser.add_argument('--config', default='.badgery.yaml', help='Path to configuration file (default: .badgery.yaml)')
-    parser.add_argument('--log-level', default=os.environ.get('BADGES_LOG_LEVEL', 'INFO'), choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], help='Logging verbosity (default: INFO)')
+    parser = argparse.ArgumentParser(
+        description='Generate an HTML dashboard of status badges.'
+    )
+    parser.add_argument(
+        '--output',
+        default='BADGES.html',
+        help='Output HTML file (default: BADGES.html)',
+    )
+    parser.add_argument(
+        '--repo',
+        required=True,
+        help='GitHub repository, e.g. org/repo (required)',
+    )
+    parser.add_argument(
+        '--branch',
+        required=True,
+        help='Feature branch name to display (required)',
+    )
+    parser.add_argument(
+        '--config',
+        default='.badgery.yaml',
+        help='Path to configuration file (default: .badgery.yaml)',
+    )
+    parser.add_argument(
+        '--log-level',
+        default=os.environ.get('BADGES_LOG_LEVEL', 'INFO'),
+        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+        help='Logging verbosity (default: INFO)',
+    )
     args = parser.parse_args()
 
     cards = load_cards_from_yaml(args.config)
@@ -59,21 +82,51 @@ def parse_args() -> argparse.Namespace:
             return matches[0]
         return None
 
-    args.cyclomatic_complexity_master = _resolve(complexity_pattern, 'master') or os.environ.get('CI_COMPLEXITY_MASTER')
-    args.cyclomatic_complexity_develop = _resolve(complexity_pattern, 'develop') or os.environ.get('CI_COMPLEXITY_DEVELOP')
-    args.cyclomatic_complexity_feature = _resolve(complexity_pattern, feature_branch) or os.environ.get('CI_COMPLEXITY_FEATURE')
+    args.cyclomatic_complexity_master = (
+        _resolve(complexity_pattern, 'master')
+        or os.environ.get('CI_COMPLEXITY_MASTER')
+    )
+    args.cyclomatic_complexity_develop = (
+        _resolve(complexity_pattern, 'develop')
+        or os.environ.get('CI_COMPLEXITY_DEVELOP')
+    )
+    args.cyclomatic_complexity_feature = (
+        _resolve(complexity_pattern, feature_branch)
+        or os.environ.get('CI_COMPLEXITY_FEATURE')
+    )
 
-    args.maintainability_index_master = _resolve(maintainability_pattern, 'master') or os.environ.get('CI_MAINTAINABILITY_MASTER')
-    args.maintainability_index_develop = _resolve(maintainability_pattern, 'develop') or os.environ.get('CI_MAINTAINABILITY_DEVELOP')
-    args.maintainability_index_feature = _resolve(maintainability_pattern, feature_branch) or os.environ.get('CI_MAINTAINABILITY_FEATURE')
+    args.maintainability_index_master = (
+        _resolve(maintainability_pattern, 'master')
+        or os.environ.get('CI_MAINTAINABILITY_MASTER')
+    )
+    args.maintainability_index_develop = (
+        _resolve(maintainability_pattern, 'develop')
+        or os.environ.get('CI_MAINTAINABILITY_DEVELOP')
+    )
+    args.maintainability_index_feature = (
+        _resolve(maintainability_pattern, feature_branch)
+        or os.environ.get('CI_MAINTAINABILITY_FEATURE')
+    )
 
-    args.raw_metrics_master = _resolve(raw_pattern, 'master') or os.environ.get('CI_RAW_METRICS_MASTER')
-    args.raw_metrics_develop = _resolve(raw_pattern, 'develop') or os.environ.get('CI_RAW_METRICS_DEVELOP')
-    args.raw_metrics_feature = _resolve(raw_pattern, feature_branch) or os.environ.get('CI_RAW_METRICS_FEATURE')
+    args.raw_metrics_master = (
+        _resolve(raw_pattern, 'master') or os.environ.get('CI_RAW_METRICS_MASTER')
+    )
+    args.raw_metrics_develop = (
+        _resolve(raw_pattern, 'develop') or os.environ.get('CI_RAW_METRICS_DEVELOP')
+    )
+    args.raw_metrics_feature = (
+        _resolve(raw_pattern, feature_branch) or os.environ.get('CI_RAW_METRICS_FEATURE')
+    )
 
-    args.coverage_docstring_master = _resolve(docstring_pattern, 'master') or os.environ.get('CI_DOCSTRING_MASTER')
-    args.coverage_docstring_develop = _resolve(docstring_pattern, 'develop') or os.environ.get('CI_DOCSTRING_DEVELOP')
-    args.coverage_docstring_feature = _resolve(docstring_pattern, feature_branch) or os.environ.get('CI_DOCSTRING_FEATURE')
+    args.coverage_docstring_master = (
+        _resolve(docstring_pattern, 'master') or os.environ.get('CI_DOCSTRING_MASTER')
+    )
+    args.coverage_docstring_develop = (
+        _resolve(docstring_pattern, 'develop') or os.environ.get('CI_DOCSTRING_DEVELOP')
+    )
+    args.coverage_docstring_feature = (
+        _resolve(docstring_pattern, feature_branch) or os.environ.get('CI_DOCSTRING_FEATURE')
+    )
 
     return args
 

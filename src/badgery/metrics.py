@@ -4,11 +4,13 @@ import json
 import logging
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
 from typing import Tuple
 
-from .badges import BadgeGenerator
+if TYPE_CHECKING:
+    from badgery.badges import BadgeGenerator
 
 
 def _detect_feature_branch() -> str:
@@ -27,7 +29,13 @@ class BaseMetric:
     reverse: bool = False
     badge_url_func: Any = None
 
-    def __init__(self, badge_gen: BadgeGenerator, key=None, label=None, feature: str | None = None):
+    def __init__(
+        self,
+        badge_gen: 'BadgeGenerator',
+        key=None,
+        label=None,
+        feature: str | None = None,
+    ):
         self.badge_gen = badge_gen
         if key is not None:
             self.key = key
@@ -214,7 +222,13 @@ class DocstringCoverageMetric(BaseMetric):
 
 
 class GithubWorkflowMetric(BaseMetric):
-    def __init__(self, badge_gen: BadgeGenerator, workflow_filename: str, label: str, feature=None):
+    def __init__(
+        self,
+        badge_gen: 'BadgeGenerator',
+        workflow_filename: str,
+        label: str,
+        feature=None,
+    ):
         base = Path(workflow_filename).stem.replace('.', '-').replace('_', '-')
         key = base
         super().__init__(badge_gen, key=key, label=label, feature=feature)

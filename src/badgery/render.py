@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import re
+from typing import TYPE_CHECKING
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -10,17 +11,19 @@ from urllib.error import HTTPError
 from urllib.error import URLError
 from urllib.request import urlopen
 
-from .badges import BadgeGenerator
-from .metrics import BaseMetric
-from .metrics import CodecovMetric
-from .metrics import CodeFactorMetric
-from .metrics import ComplexityMetric
-from .metrics import DocstringCoverageMetric
-from .metrics import FileCountMetric
-from .metrics import FunctionCountMetric
-from .metrics import GithubWorkflowMetric
-from .metrics import LinesOfCodeMetric
-from .metrics import MaintainabilityMetric
+from badgery.metrics import BaseMetric
+from badgery.metrics import CodecovMetric
+from badgery.metrics import CodeFactorMetric
+from badgery.metrics import ComplexityMetric
+from badgery.metrics import DocstringCoverageMetric
+from badgery.metrics import FileCountMetric
+from badgery.metrics import FunctionCountMetric
+from badgery.metrics import GithubWorkflowMetric
+from badgery.metrics import LinesOfCodeMetric
+from badgery.metrics import MaintainabilityMetric
+
+if TYPE_CHECKING:
+    from badgery.badges import BadgeGenerator
 
 
 class HTMLDashboardRenderer:
@@ -202,11 +205,10 @@ class HTMLDashboardRenderer:
         m = self.metric_by_key.get(key)
         if not m:
             return None
-        value = getattr(
-            m,
-            'master' if branch == 'master' else ('develop' if branch == 'develop' else 'feature_value'),
-            None,
+        attr = 'master' if branch == 'master' else (
+            'develop' if branch == 'develop' else 'feature_value'
         )
+        value = getattr(m, attr, None)
 
         if isinstance(m, DocstringCoverageMetric):
             if not value:
@@ -224,15 +226,20 @@ class HTMLDashboardRenderer:
                 return ('unknown', 'gray')
             mi = float(value[0])
             if mi >= 80:
-                grade = 'A'; color = 'green'
+                grade = 'A'
+                color = 'green'
             elif mi >= 60:
-                grade = 'B'; color = 'yellow-green'
+                grade = 'B'
+                color = 'yellow-green'
             elif mi >= 40:
-                grade = 'C'; color = 'yellow'
+                grade = 'C'
+                color = 'yellow'
             elif mi >= 20:
-                grade = 'D'; color = 'orange'
+                grade = 'D'
+                color = 'orange'
             else:
-                grade = 'F'; color = 'red'
+                grade = 'F'
+                color = 'red'
             text = f'{grade} ({int(round(mi))})'
             return (text, color)
 
@@ -366,7 +373,13 @@ class HTMLDashboardRenderer:
 
 
 class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
-    def __init__(self, metrics: List[BaseMetric], feature: str, badge_gen: BadgeGenerator, cards_spec: List[tuple[str, str, str]]):
+    def __init__(
+        self,
+        metrics: List[BaseMetric],
+        feature: str,
+        badge_gen: BadgeGenerator,
+        cards_spec: List[tuple[str, str, str]],
+    ):
         super().__init__(metrics, feature, badge_gen)
         self.cards_spec = cards_spec
 
