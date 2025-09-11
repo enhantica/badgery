@@ -25,31 +25,31 @@ cards:
   - group: Code Quality
     type: radon_mi
     title: Maintainability index with radon
-    report: reports/**/maintainability-index.json
+    report: reports/{branch}/maintainability-index.json
     enabled: true
 
   - group: Code Quality
     type: radon_cc
     title: Cyclomatic complexity with radon
-    report: reports/**/cyclomatic-complexity.json
+    report: reports/{branch}/cyclomatic-complexity.json
     enabled: true
 
   - group: Size
     type: radon_loc
     title: Source/Logical lines of code
-    report: reports/**/raw-metrics.json
+    report: reports/{branch}/raw-metrics.json
     enabled: true
 
   - group: Size
     type: radon_files
     title: Number of files
-    report: reports/**/cyclomatic-complexity.json
+    report: reports/{branch}/cyclomatic-complexity.json
     enabled: true
 
   - group: Size
     type: radon_funcs
     title: Number of functions
-    dir: reports/**/cyclomatic-complexity.json
+    dir: reports/{branch}/cyclomatic-complexity.json
     enabled: true
 
   - group: Coverage
@@ -60,7 +60,7 @@ cards:
   - group: Coverage
     type: interrogate
     title: Docstring coverage with interrogate
-    report: reports/**/coverage-docstring.txt
+    report: reports/{branch}/coverage-docstring.txt
     enabled: true
 
   - group: Security
