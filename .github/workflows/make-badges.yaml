@@ -1,0 +1,76 @@
+name: Branch Badge Summary
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group:
+    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI_BRANCH: ${{ github.head_ref || github.ref_name }}
+  DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+  DEVELOP_BRANCH: develop
+  REPO_OWNER: ${{ github.repository.split('/')[0] }}
+  REPO_NAME: ${{ github.repository.split('/')[1] }}
+
+jobs:
+  make-badges:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up pixi
+        uses: prefix-dev/setup-pixi@v0.9.0
+        with:
+          environments: default
+          activate-environment: default
+          run-install: true
+          frozen: true
+          cache: false
+          post-cleanup: false
+
+      - name: Run docstring coverage and code complexity/maintainability checks
+        run: |
+          for BRANCH in ${{ env.DEFAULT_BRANCH }} ${{ env.DEVELOP_BRANCH }} ${{ env.CI_BRANCH }}; do
+            echo "=== Processing branch $BRANCH ==="
+            git worktree add ../worktree-$BRANCH origin/$BRANCH
+            echo "Docstring coverage for branch $BRANCH"
+            pixi run interrogate -c pyproject.toml --fail-under=0 ../worktree-$BRANCH/src > coverage-docstring-$BRANCH.txt
+            echo "Cyclomatic complexity for branch $BRANCH"
+            pixi run radon cc -s -j ../worktree-$BRANCH/src > cyclomatic-complexity-$BRANCH.json
+            echo "Maintainability index for branch $BRANCH"
+            pixi run radon mi -j ../worktree-$BRANCH/src > maintainability-index-$BRANCH.json
+            echo "Raw metrics for branch $BRANCH"
+            pixi run radon raw -s -j ../worktree-$BRANCH/src > raw-metrics-$BRANCH.json
+          done
+
+      - name: Generate dashboard HTML
+        run: >
+          pixi run make-badges  --repo ${{ github.repository }}
+          --branch ${{ env.CI_BRANCH }} --output index.html
+
+      - name: Prepare publish directory
+        run: |
+          mkdir -p _dashboard_publish/${{ env.REPO_NAME }}/${{ env.CI_BRANCH }}
+          cp index.html _dashboard_publish/${{ env.REPO_NAME }}/${{ env.CI_BRANCH }}
+
+      - name: Publish to main branch of ${{ github.repository }}
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          external_repository: ${{ env.REPO_OWNER }}/dashboard
+          publish_branch: main
+          personal_token: ${{ secrets.GH_API_PERSONAL_ACCSESS_TOKEN }}
+          publish_dir: ./_dashboard_publish
+          keep_files: true
+
+      - name: Add dashboard to summary
+        run: |
+          echo "[Dashboard link](https://${{ env.REPO_OWNER }}.github.io/dashboard/${{ env.REPO_NAME }}/${{ env.CI_BRANCH }}/index.html)" >> $GITHUB_STEP_SUMMARY
