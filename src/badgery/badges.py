@@ -1,6 +1,5 @@
 # SPDX-FileCopyrightText: 2025 Badgery contributors <https://github.com/enhantica/badgery>
 # SPDX-License-Identifier: MIT
-
 """Helpers for constructing external service URLs for badges/links."""
 
 from __future__ import annotations

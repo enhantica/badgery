@@ -1,6 +1,5 @@
 # SPDX-FileCopyrightText: 2025 Badgery contributors <https://github.com/enhantica/badgery>
 # SPDX-License-Identifier: MIT
-
 """HTML rendering for the Badgery dashboard."""
 
 from __future__ import annotations
