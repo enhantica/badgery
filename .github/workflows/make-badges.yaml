@@ -43,13 +43,13 @@ jobs:
             echo "=== Processing branch $BRANCH ==="
             git worktree add ../worktree-$BRANCH origin/$BRANCH
             echo "Docstring coverage for branch $BRANCH"
-            pixi run interrogate -c pyproject.toml --fail-under=0 ../worktree-$BRANCH/src > coverage-docstring-$BRANCH.txt
+            pixi run interrogate -c pyproject.toml --fail-under=0 ../worktree-$BRANCH/src > reports/$BRANCH/coverage-docstring.txt
             echo "Cyclomatic complexity for branch $BRANCH"
-            pixi run radon cc -s -j ../worktree-$BRANCH/src > cyclomatic-complexity-$BRANCH.json
+            pixi run radon cc -s -j ../worktree-$BRANCH/src > reports/$BRANCH/cyclomatic-complexity.json
             echo "Maintainability index for branch $BRANCH"
-            pixi run radon mi -j ../worktree-$BRANCH/src > maintainability-index-$BRANCH.json
+            pixi run radon mi -j ../worktree-$BRANCH/src > reports/$BRANCH/maintainability-index.json
             echo "Raw metrics for branch $BRANCH"
-            pixi run radon raw -s -j ../worktree-$BRANCH/src > raw-metrics-$BRANCH.json
+            pixi run radon raw -s -j ../worktree-$BRANCH/src > reports/$BRANCH/raw-metrics.json
           done
 
       - name: Generate dashboard HTML
