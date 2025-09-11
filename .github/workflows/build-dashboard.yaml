@@ -79,4 +79,4 @@ jobs:
       - name: Add dashboard link to summary
         run: |
           URL="https://${{ env.REPO_OWNER }}.github.io/dashboard/${{ env.REPO_NAME }}/${{ env.CI_BRANCH }}"
-          echo "[Dashboard link $URL]($URL)" >> $GITHUB_STEP_SUMMARY
+          echo "Dashboard link: [$URL]($URL)" >> $GITHUB_STEP_SUMMARY
