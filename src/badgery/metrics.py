@@ -433,7 +433,7 @@ class FileCountMetric(BaseMetric):
         return None
 
     def read_all(self, args):
-        """Populate values for default, develop, and feature branches."""
+        """Populate values for three branches."""
         self.master = self._count_files(getattr(args, 'cyclomatic_complexity_master', None))
         self.develop = self._count_files(getattr(args, 'cyclomatic_complexity_develop', None))
         self.feature_value = self._count_files(
@@ -467,7 +467,7 @@ class FunctionCountMetric(BaseMetric):
         return total if total else None
 
     def read_all(self, args):
-        """Populate values for default, develop, and feature branches."""
+        """Populate values for three branches."""
         self.master = self._count_functions(getattr(args, 'cyclomatic_complexity_master', None))
         self.develop = self._count_functions(getattr(args, 'cyclomatic_complexity_develop', None))
         self.feature_value = self._count_functions(
