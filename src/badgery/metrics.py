@@ -56,6 +56,7 @@ class BaseMetric:
         self.feature_value = None
 
     def read_value(self, path: str):
+        """Read average complexity and item count from JSON file."""
         """Read average maintainability index and file count."""
         """Read a single branch value from a file path."""
         raise NotImplementedError
@@ -178,11 +179,13 @@ class ComplexityMetric(BaseMetric):
         return (None, None)
 
     def read_all(self, args):
+        """Populate complexity values for three branches."""
         self.master = self.read_value(args.cyclomatic_complexity_master)
         self.develop = self.read_value(args.cyclomatic_complexity_develop)
         self.feature_value = self.read_value(args.cyclomatic_complexity_feature)
 
     def format_value(self, value):
+        """Return human-readable average complexity summary."""
         if (
             not value
             or not isinstance(value, tuple)
@@ -195,10 +198,12 @@ class ComplexityMetric(BaseMetric):
         return f'{avg:.1f} over {count} funcs'
 
     def badge(self, value):
+        """Return a badge string (unused)."""
         return ''
 
 
 class DocstringCoverageMetric(BaseMetric):
+    """Docstring coverage percent from interrogate report."""
     key = 'docstring'
     label = 'Docstring coverage with interrogate'
     thresholds = [
@@ -243,6 +248,7 @@ class DocstringCoverageMetric(BaseMetric):
 
 
 class GithubWorkflowMetric(BaseMetric):
+    """Display GitHub Actions workflow status per branch."""
     def __init__(
         self,
         badge_gen: 'BadgeGenerator',
@@ -250,6 +256,7 @@ class GithubWorkflowMetric(BaseMetric):
         label: str,
         feature=None,
     ):
+        """Initialize workflow metric with file name and label."""
         base = Path(workflow_filename).stem.replace('.', '-').replace('_', '-')
         key = base
         super().__init__(badge_gen, key=key, label=label, feature=feature)
@@ -260,12 +267,14 @@ class GithubWorkflowMetric(BaseMetric):
         return f'CI_WORKFLOW_{base.upper().replace("-", "_")}_{branch.upper()}'
 
     def read_all(self, args):
+        """Populate workflow status env vars for three branches."""
         base = self.key
         self.master = os.environ.get(self._env_key(base, 'master'), '')
         self.develop = os.environ.get(self._env_key(base, 'develop'), '')
         self.feature_value = os.environ.get(self._env_key(base, 'feature'), '')
 
     def badge(self, value):
+        """Return a badge string (unused)."""
         return self.badge_gen.github_badge(self.workflow_filename, value)
 
     def refs(self):
