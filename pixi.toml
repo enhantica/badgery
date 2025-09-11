@@ -103,4 +103,4 @@ pre-commit = { depends-on = ["code-quality", "tests"] }
 dist-build = "python -m build --wheel --outdir dist"
 spdx-update = "python tools/update_spdx.py"
 prettier-install = "npm install --no-save --no-audit --no-fund prettier prettier-plugin-toml"
-make-badges = "python src/make_badges.py"
+badgery = "python -m badgery"

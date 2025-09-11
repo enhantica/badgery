@@ -54,7 +54,7 @@ jobs:
 
       - name: Generate dashboard HTML
         run: >
-          pixi run make-badges  --repo ${{ github.repository }}
+          pixi run badgery --repo ${{ github.repository }}
           --branch ${{ env.CI_BRANCH }} --output index.html
 
       - name: Prepare publish directory
