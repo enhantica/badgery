@@ -43,6 +43,9 @@ documentation = 'https://github.com/enhantica/badgery'
 source = 'https://github.com/enhantica/badgery'
 tracker = 'https://github.com/enhantica/badgery/issues'
 
+[project.scripts]
+badgery = 'badgery:main'
+
 ############################
 # Build system configuration
 ############################
