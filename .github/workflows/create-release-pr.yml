@@ -1,0 +1,35 @@
+# This workflow creates an automated release PR from `develop` into `main`.
+#
+# Usage:
+#   - Triggered manually via workflow_dispatch.
+#   - Creates a PR titled "Release: merge develop into master".
+#   - Adds the label "[maintainer] release" so it is excluded from changelogs.
+#   - The PR body makes clear that this is automation only (no review needed).
+
+name: Create release PR
+
+on:
+  workflow_dispatch: # manual trigger only
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Create PR from develop to master
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: develop
+          base: main
+          title: 'Release: merge develop into main'
+          body: |
+            This pull request is created automatically to trigger the release
+            pipeline. It merges the accumulated changes from `develop` into
+            `main`.
+
+            ⚠️ Note: This PR is labeled **[maintainer] release** and is excluded
+            from release notes and version bump logic.
+          labels: '[maintainer] release'
+          draft: false
