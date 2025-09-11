@@ -58,7 +58,7 @@ def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:
                 key = key.strip()
                 val = val.strip()
                 if val.lower() in ('true', 'false'):
-                    current[key] = (val.lower() == 'true')
+                    current[key] = val.lower() == 'true'
                 else:
                     is_single_quoted = val.startswith("'") and val.endswith("'")
                     is_double_quoted = val.startswith('"') and val.endswith('"')
@@ -76,7 +76,7 @@ def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:
         key, val = line.strip().split(':', 1)
         val = val.strip()
         if val.lower() in ('true', 'false'):
-            current[key] = (val.lower() == 'true')
+            current[key] = val.lower() == 'true'
         else:
             is_single_quoted = val.startswith("'") and val.endswith("'")
             is_double_quoted = val.startswith('"') and val.endswith('"')

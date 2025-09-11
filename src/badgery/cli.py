@@ -22,9 +22,7 @@ def parse_args() -> argparse.Namespace:
         argparse.Namespace: Args with paths resolved from the project
         `.badgery.yaml` (cards, branches, report paths).
     """
-    parser = argparse.ArgumentParser(
-        description='Generate an HTML dashboard of status badges.'
-    )
+    parser = argparse.ArgumentParser(description='Generate an HTML dashboard of status badges.')
     parser.add_argument(
         '--output',
         default='BADGES.html',
@@ -93,51 +91,45 @@ def parse_args() -> argparse.Namespace:
             return matches[0]
         return None
 
-    args.cyclomatic_complexity_master = (
-        _resolve(complexity_pattern, args.default_branch)
-        or os.environ.get('CI_COMPLEXITY_MASTER')
+    args.cyclomatic_complexity_master = _resolve(
+        complexity_pattern, args.default_branch
+    ) or os.environ.get('CI_COMPLEXITY_MASTER')
+    args.cyclomatic_complexity_develop = _resolve(
+        complexity_pattern, args.develop_branch
+    ) or os.environ.get('CI_COMPLEXITY_DEVELOP')
+    args.cyclomatic_complexity_feature = _resolve(
+        complexity_pattern, feature_branch
+    ) or os.environ.get('CI_COMPLEXITY_FEATURE')
+
+    args.maintainability_index_master = _resolve(
+        maintainability_pattern, args.default_branch
+    ) or os.environ.get('CI_MAINTAINABILITY_MASTER')
+    args.maintainability_index_develop = _resolve(
+        maintainability_pattern, args.develop_branch
+    ) or os.environ.get('CI_MAINTAINABILITY_DEVELOP')
+    args.maintainability_index_feature = _resolve(
+        maintainability_pattern, feature_branch
+    ) or os.environ.get('CI_MAINTAINABILITY_FEATURE')
+
+    args.raw_metrics_master = _resolve(raw_pattern, args.default_branch) or os.environ.get(
+        'CI_RAW_METRICS_MASTER'
     )
-    args.cyclomatic_complexity_develop = (
-        _resolve(complexity_pattern, args.develop_branch)
-        or os.environ.get('CI_COMPLEXITY_DEVELOP')
+    args.raw_metrics_develop = _resolve(raw_pattern, args.develop_branch) or os.environ.get(
+        'CI_RAW_METRICS_DEVELOP'
     )
-    args.cyclomatic_complexity_feature = (
-        _resolve(complexity_pattern, feature_branch)
-        or os.environ.get('CI_COMPLEXITY_FEATURE')
+    args.raw_metrics_feature = _resolve(raw_pattern, feature_branch) or os.environ.get(
+        'CI_RAW_METRICS_FEATURE'
     )
 
-    args.maintainability_index_master = (
-        _resolve(maintainability_pattern, args.default_branch)
-        or os.environ.get('CI_MAINTAINABILITY_MASTER')
-    )
-    args.maintainability_index_develop = (
-        _resolve(maintainability_pattern, args.develop_branch)
-        or os.environ.get('CI_MAINTAINABILITY_DEVELOP')
-    )
-    args.maintainability_index_feature = (
-        _resolve(maintainability_pattern, feature_branch)
-        or os.environ.get('CI_MAINTAINABILITY_FEATURE')
-    )
-
-    args.raw_metrics_master = (
-        _resolve(raw_pattern, args.default_branch) or os.environ.get('CI_RAW_METRICS_MASTER')
-    )
-    args.raw_metrics_develop = (
-        _resolve(raw_pattern, args.develop_branch) or os.environ.get('CI_RAW_METRICS_DEVELOP')
-    )
-    args.raw_metrics_feature = (
-        _resolve(raw_pattern, feature_branch) or os.environ.get('CI_RAW_METRICS_FEATURE')
-    )
-
-    args.coverage_docstring_master = (
-        _resolve(docstring_pattern, args.default_branch) or os.environ.get('CI_DOCSTRING_MASTER')
-    )
-    args.coverage_docstring_develop = (
-        _resolve(docstring_pattern, args.develop_branch) or os.environ.get('CI_DOCSTRING_DEVELOP')
-    )
-    args.coverage_docstring_feature = (
-        _resolve(docstring_pattern, feature_branch) or os.environ.get('CI_DOCSTRING_FEATURE')
-    )
+    args.coverage_docstring_master = _resolve(
+        docstring_pattern, args.default_branch
+    ) or os.environ.get('CI_DOCSTRING_MASTER')
+    args.coverage_docstring_develop = _resolve(
+        docstring_pattern, args.develop_branch
+    ) or os.environ.get('CI_DOCSTRING_DEVELOP')
+    args.coverage_docstring_feature = _resolve(
+        docstring_pattern, feature_branch
+    ) or os.environ.get('CI_DOCSTRING_FEATURE')
 
     return args
 

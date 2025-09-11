@@ -85,6 +85,7 @@ class BaseMetric:
 
 class MaintainabilityMetric(BaseMetric):
     """Average maintainability index and file count per branch."""
+
     key = 'maintainability'
     label = 'Maintainability index with radon'
     thresholds = [
@@ -150,6 +151,7 @@ class MaintainabilityMetric(BaseMetric):
 
 class ComplexityMetric(BaseMetric):
     """Average cyclomatic complexity and item count per branch."""
+
     key = 'complexity'
     label = 'Cyclomatic complexity with radon'
     thresholds = [
@@ -215,6 +217,7 @@ class ComplexityMetric(BaseMetric):
 
 class DocstringCoverageMetric(BaseMetric):
     """Docstring coverage percent from interrogate report."""
+
     key = 'docstring'
     label = 'Docstring coverage with interrogate'
     thresholds = [
@@ -269,6 +272,7 @@ class DocstringCoverageMetric(BaseMetric):
 
 class GithubWorkflowMetric(BaseMetric):
     """Display GitHub Actions workflow status per branch."""
+
     def __init__(
         self,
         badge_gen: 'BadgeGenerator',
@@ -311,6 +315,7 @@ class GithubWorkflowMetric(BaseMetric):
 
 class CodeFactorMetric(BaseMetric):
     """CodeFactor letter grade per branch (env fallback)."""
+
     key = 'codefactor'
     label = 'Code quality from CodeFactor.io'
 
@@ -343,6 +348,7 @@ class CodeFactorMetric(BaseMetric):
 
 class CodecovMetric(BaseMetric):
     """Codecov unit test coverage percent per branch (from env)."""
+
     key = 'codecov'
     label = 'Unit test coverage from Codecov.io'
 
@@ -359,6 +365,7 @@ class CodecovMetric(BaseMetric):
 
 class LinesOfCodeMetric(BaseMetric):
     """Aggregate SLOC and LLOC from Radon raw metrics report."""
+
     key = 'loc'
     label = 'Source/Logical lines of code'
 

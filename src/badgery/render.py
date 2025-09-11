@@ -219,8 +219,10 @@ class HTMLDashboardRenderer:
         m = self.metric_by_key.get(key)
         if not m:
             return None
-        attr = 'master' if branch == 'master' else (
-            'develop' if branch == 'develop' else 'feature_value'
+        attr = (
+            'master'
+            if branch == 'master'
+            else ('develop' if branch == 'develop' else 'feature_value')
         )
         value = getattr(m, attr, None)
 
@@ -394,6 +396,7 @@ class HTMLDashboardRenderer:
 
 class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
     """Renderer variant that uses an explicit card order spec."""
+
     def __init__(
         self,
         metrics: List[BaseMetric],
