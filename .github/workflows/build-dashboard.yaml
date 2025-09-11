@@ -1,4 +1,4 @@
-name: Branch Badge Summary
+name: Build and publish dashboard
 
 on:
   push:
@@ -42,6 +42,7 @@ jobs:
           for BRANCH in ${{ env.DEFAULT_BRANCH }} ${{ env.DEVELOP_BRANCH }} ${{ env.CI_BRANCH }}; do
             echo "=== Processing branch $BRANCH ==="
             git worktree add ../worktree-$BRANCH origin/$BRANCH
+            mkdir -p reports/$BRANCH
             echo "Docstring coverage for branch $BRANCH"
             pixi run interrogate -c pyproject.toml --fail-under=0 ../worktree-$BRANCH/src > reports/$BRANCH/coverage-docstring.txt
             echo "Cyclomatic complexity for branch $BRANCH"
@@ -71,6 +72,6 @@ jobs:
           publish_dir: ./_dashboard_publish
           keep_files: true
 
-      - name: Add dashboard to summary
+      - name: Add dashboard link to summary
         run: |
           echo "[Dashboard link](https://${{ env.REPO_OWNER }}.github.io/dashboard/${{ env.REPO_NAME }}/${{ env.CI_BRANCH }}/index.html)" >> $GITHUB_STEP_SUMMARY
