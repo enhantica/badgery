@@ -20,7 +20,7 @@ channels = ["conda-forge"]
 # Default feature configuration
 
 [dependencies] # == [feature.default.dependencies]
-pip = "*"        # Required to install from PyPI
+pip = "*" # Required to install from PyPI
 
 # Extra features for different Python versions
 
@@ -28,7 +28,7 @@ pip = "*"        # Required to install from PyPI
 python = "3.13.*"
 
 [feature.badgery-local-editable.pypi-dependencies]
-badgery = { path = ".", editable = true, extras = ["dev"]}
+badgery = { path = ".", editable = true, extras = ["dev"] }
 
 # This feature installs Node.js and Prettier for formatting
 # non-Python files.

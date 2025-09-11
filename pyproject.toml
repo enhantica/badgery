@@ -125,7 +125,7 @@ verbose = 1
 #######################################
 
 [tool.coverage.run]
-branch = true                    # Measure branch coverage as well
+branch = true            # Measure branch coverage as well
 source = ["src/badgery"] # Limit coverage to the source code directory
 
 [tool.coverage.report]
