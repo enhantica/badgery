@@ -5,14 +5,14 @@
 [project]
 name = 'badgery'
 dynamic = ['version'] # Use versioningit to manage the version
-description = 'Turn your code metrics and CI results into a sleek, badge-driven HTML dashboard for your GitHub repo.'
+description = 'Generate sleek HTML dashboards with badges from code metrics and CI results.'
 authors = [{ name = 'Badgery contributors' }]
 readme = 'README.md'
-license = { file = 'LICENSE' }
+license = { text = 'MIT' }
 classifiers = [
-  'Intended Audience :: Science/Research',
-  'Topic :: Scientific/Engineering',
-  'License :: OSI Approved :: BSD License',
+  'Intended Audience :: Developers',
+  'Topic :: Software Development :: Quality Assurance',
+  'License :: OSI Approved :: MIT License',
   'Operating System :: OS Independent',
   'Programming Language :: Python :: 3 :: Only',
   'Programming Language :: Python :: 3',

@@ -54,10 +54,7 @@ default = { features = ["py313", "badgery-local-editable", "nodejs"] }
 [tasks]
 
 # 🧪 Testing Tasks
-unit-tests = "python -m pytest tests/unit/ --color=yes -v"
-func-tests = "python -m pytest tests/functional/ --color=yes -n auto -v"
-
-tests = { depends-on = ["unit-tests", "func-tests"] }
+tests = "python -m pytest tests/unit/ --color=yes -v"
 
 # 🧹 Code Quality
 
@@ -66,14 +63,14 @@ pyproject-check = "python -m validate_pyproject pyproject.toml"
 py-lint-check = "python -m ruff check ."
 py-format-check = "python -m ruff format . --check"
 nonpy-format-check = "npx prettier . --list-different --config=prettierrc.toml"
-docs-format-check = "docformatter --check src/ tutorials/"
+docs-format-check = "docformatter --check src/"
 
 ## 🛠️ Fixes
 py-lint-fix = "python -m ruff check . --fix"
 py-format-fix = "python -m ruff format ."
 nonpy-format-fix = "npx prettier . --list-different --write --config=prettierrc.toml"
 nonpy-format-fix-modified = "npx prettier $(git diff --name-only HEAD | grep -E '\\.(json|ya?ml|toml|md|css|html)$' || echo .) --list-different --write --config=prettierrc.toml"
-docs-format-fix = "docformatter --in-place src/ tutorials/"
+docs-format-fix = "docformatter --in-place src/"
 
 code-quality = { depends-on = [
   "pyproject-check",

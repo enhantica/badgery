@@ -56,8 +56,6 @@ class BaseMetric:
         self.feature_value = None
 
     def read_value(self, path: str):
-        """Read average complexity and item count from JSON file."""
-        """Read average maintainability index and file count."""
         """Read a single branch value from a file path."""
         raise NotImplementedError
 
@@ -103,6 +101,12 @@ class MaintainabilityMetric(BaseMetric):
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     def read_value(self, path: str):
+        """Read average MI and file count.
+
+        Returns:
+            tuple[float | None, int | None]: Average MI and file
+            count, or (None, None) if unavailable.
+        """
         if path and Path(path).exists():
             try:
                 data = json.loads(Path(path).read_text(encoding='utf-8'))
@@ -157,9 +161,16 @@ class ComplexityMetric(BaseMetric):
     reverse = True
 
     def __init__(self, badge_gen: BadgeGenerator, feature=None):
+        """Initialize complexity metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     def read_value(self, path: str):
+        """Read average MI and file count.
+
+        Returns:
+            tuple[float | None, int | None]: Average MI and file
+            count, or (None, None) if unavailable.
+        """
         if path and Path(path).exists():
             try:
                 data = json.loads(Path(path).read_text(encoding='utf-8'))
@@ -215,9 +226,15 @@ class DocstringCoverageMetric(BaseMetric):
     reverse = False
 
     def __init__(self, badge_gen: BadgeGenerator, feature=None):
+        """Initialize docstring coverage metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     def read_value(self, path: str):
+        """Read coverage percent string from text report file.
+
+        Returns:
+            str: Percentage like "85%", or empty string if unknown.
+        """
         if path and Path(path).exists():
             lines = Path(path).read_text(encoding='utf-8').splitlines()
             for line in lines:
@@ -234,16 +251,19 @@ class DocstringCoverageMetric(BaseMetric):
         return ''
 
     def read_all(self, args):
+        """Populate coverage values for three branches."""
         self.master = self.read_value(args.coverage_docstring_master)
         self.develop = self.read_value(args.coverage_docstring_develop)
         self.feature_value = self.read_value(args.coverage_docstring_feature)
 
     def format_value(self, value):
+        """Return a percentage string, defaulting to 0%."""
         if not value:
             return '0%'
         return value
 
     def badge(self, value):
+        """Return a badge string (unused)."""
         return ''
 
 
@@ -278,6 +298,7 @@ class GithubWorkflowMetric(BaseMetric):
         return self.badge_gen.github_badge(self.workflow_filename, value)
 
     def refs(self):
+        """Return workflow badge URLs for branches."""
         return {
             'master': self.badge('master'),
             'master_url': f'{self.badge_gen.github_workflows}/{self.workflow_filename}',
@@ -289,6 +310,7 @@ class GithubWorkflowMetric(BaseMetric):
 
 
 class CodeFactorMetric(BaseMetric):
+    """CodeFactor letter grade per branch (env fallback)."""
     key = 'codefactor'
     label = 'Code quality from CodeFactor.io'
 
@@ -296,6 +318,7 @@ class CodeFactorMetric(BaseMetric):
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     def read_all(self, args):
+        """Read CodeFactor grades from environment variables."""
         self.master = os.environ.get('CI_CODEFACTOR_MASTER', '')
         self.develop = os.environ.get('CI_CODEFACTOR_DEVELOP', '')
         self.feature_value = os.environ.get('CI_CODEFACTOR_FEATURE', '')
@@ -316,6 +339,7 @@ class CodeFactorMetric(BaseMetric):
 
 
 class CodecovMetric(BaseMetric):
+    """Codecov unit test coverage percent per branch (from env)."""
     key = 'codecov'
     label = 'Unit test coverage from Codecov.io'
 
@@ -329,6 +353,7 @@ class CodecovMetric(BaseMetric):
 
 
 class LinesOfCodeMetric(BaseMetric):
+    """Aggregate SLOC and LLOC from Radon raw metrics report."""
     key = 'loc'
     label = 'Source/Logical lines of code'
 
