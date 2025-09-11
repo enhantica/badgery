@@ -1,3 +1,5 @@
+"""Configuration loading and mapping utilities for Badgery."""
+
 from __future__ import annotations
 
 import logging
@@ -21,6 +23,11 @@ from badgery.metrics import MaintainabilityMetric
 
 
 def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:
+    """Load the `cards:` list from `.badgery.yaml`.
+
+    Returns:
+        list[dict[str, Any]]: Card mappings in declaration order.
+    """
     p = Path(path)
     if not p.exists():
         logging.info('Config %s not found; using empty card list', path)
@@ -80,12 +87,11 @@ def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:
 
 
 def load_settings_from_yaml(path: str) -> dict[str, Any]:
-    """Load top-level settings (default/develop branch) and cards.
+    """Load top-level settings (default/develop) and cards.
 
-    Returns a dict with keys:
-    - 'default_branch': str (defaults to 'master')
-    - 'develop_branch': str (defaults to 'develop')
-    - 'cards': list[dict]
+    Returns:
+        dict[str, Any]: Keys `default_branch`, `develop_branch`, and
+        `cards` with parsed values.
     """
     p = Path(path)
     settings: dict[str, Any] = {
@@ -132,6 +138,7 @@ def load_settings_from_yaml(path: str) -> dict[str, Any]:
 
 
 def group_icon(group: str) -> str:
+    """Return a Font Awesome icon class for a group name."""
     g = (group or '').strip().lower()
     mapping = {
         'tests': 'fas fa-vial',
@@ -161,11 +168,17 @@ def group_icon(group: str) -> str:
     return 'fas fa-gauge'
 
 
-def build_metrics_from_config(  # noqa: C901 - acceptable complexity for mapping
+def build_metrics_from_config(  # noqa: C901 - acceptable complexity
     cards: list[dict[str, Any]],
     badge_gen: 'BadgeGenerator',
     feature: str,
 ):
+    """Construct metric instances and an ordered card spec.
+
+    Returns:
+        tuple[list, list[tuple[str, str, str]]]: The metric objects
+        and an ordered card specification.
+    """
     metrics: list[BaseMetric] = []
     cards_spec: list[tuple[str, str, str]] = []
 

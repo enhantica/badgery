@@ -1,3 +1,5 @@
+"""HTML rendering for the Badgery dashboard."""
+
 from __future__ import annotations
 
 import logging
@@ -27,6 +29,8 @@ if TYPE_CHECKING:
 
 
 class HTMLDashboardRenderer:
+    """Render metrics into a compact HTML dashboard."""
+
     CSS = """
     body {
       --base-size: clamp(18px, 1.5vw, 22px);
@@ -100,6 +104,7 @@ class HTMLDashboardRenderer:
         default_branch: str = 'master',
         develop_branch: str = 'develop',
     ):
+        """Initialize renderer with metrics and branch labels."""
         self.metrics = metrics
         self.feature = feature
         self.badge_gen = badge_gen

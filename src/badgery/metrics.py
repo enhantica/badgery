@@ -1,3 +1,5 @@
+"""Metric readers and adapters used by the dashboard renderer."""
+
 from __future__ import annotations
 
 import json
@@ -23,6 +25,12 @@ def _detect_feature_branch() -> str:
 
 
 class BaseMetric:
+    """Base abstraction for a metric rendered on three branches.
+
+    Subclasses should implement `read_value` and `read_all`. They may
+    override `format_value` and `badge` to customize display.
+    """
+
     key: str = ''
     label: str = ''
     thresholds: list = []
@@ -36,6 +44,7 @@ class BaseMetric:
         label=None,
         feature: str | None = None,
     ):
+        """Initialize a metric and its runtime state."""
         self.badge_gen = badge_gen
         if key is not None:
             self.key = key
@@ -47,18 +56,23 @@ class BaseMetric:
         self.feature_value = None
 
     def read_value(self, path: str):
+        """Read a single branch value from a file path."""
         raise NotImplementedError
 
     def read_all(self, args):
+        """Populate values for default, develop, and feature."""
         raise NotImplementedError
 
     def format_value(self, value):
+        """Return a human-readable representation for `value`."""
         return str(value)
 
     def badge(self, value):
+        """Return a badge string for `value` (unused in HTML)."""
         raise NotImplementedError
 
     def refs(self):
+        """Return a mapping of rendered badges per branch."""
         return {
             'master': self.badge(self.master),
             'master_url': '#',
@@ -70,6 +84,7 @@ class BaseMetric:
 
 
 class MaintainabilityMetric(BaseMetric):
+    """Average maintainability index and file count per branch."""
     key = 'maintainability'
     label = 'Maintainability index with radon'
     thresholds = [
@@ -81,7 +96,8 @@ class MaintainabilityMetric(BaseMetric):
     ]
     reverse = False
 
-    def __init__(self, badge_gen: BadgeGenerator, feature=None):
+    def __init__(self, badge_gen: 'BadgeGenerator', feature=None):
+        """Initialize maintainability metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     def read_value(self, path: str):
@@ -349,10 +365,13 @@ class LinesOfCodeMetric(BaseMetric):
 
 
 class FileCountMetric(BaseMetric):
+    """Count files from the Radon complexity JSON report."""
+
     key = 'files'
     label = 'Number of files'
 
-    def __init__(self, badge_gen: BadgeGenerator, feature=None):
+    def __init__(self, badge_gen: 'BadgeGenerator', feature=None):
+        """Initialize metric with badge generator and feature branch."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     @staticmethod
@@ -368,6 +387,7 @@ class FileCountMetric(BaseMetric):
         return None
 
     def read_all(self, args):
+        """Populate values for default, develop, and feature branches."""
         self.master = self._count_files(getattr(args, 'cyclomatic_complexity_master', None))
         self.develop = self._count_files(getattr(args, 'cyclomatic_complexity_develop', None))
         self.feature_value = self._count_files(
@@ -376,10 +396,13 @@ class FileCountMetric(BaseMetric):
 
 
 class FunctionCountMetric(BaseMetric):
+    """Count functions from the Radon complexity JSON report."""
+
     key = 'funcs'
     label = 'Number of functions'
 
-    def __init__(self, badge_gen: BadgeGenerator, feature=None):
+    def __init__(self, badge_gen: 'BadgeGenerator', feature=None):
+        """Initialize metric with badge generator and feature branch."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     @staticmethod
@@ -398,6 +421,7 @@ class FunctionCountMetric(BaseMetric):
         return total if total else None
 
     def read_all(self, args):
+        """Populate values for default, develop, and feature branches."""
         self.master = self._count_functions(getattr(args, 'cyclomatic_complexity_master', None))
         self.develop = self._count_functions(getattr(args, 'cyclomatic_complexity_develop', None))
         self.feature_value = self._count_functions(

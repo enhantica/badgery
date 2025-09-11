@@ -175,23 +175,6 @@ select = [
   #'TRY',   # Tryceratops Try/Except-related issues (e.g., broad exceptions, empty except blocks)
   #'UP',    # Pyupgrade-specific checks
 ]
-# Temporarily disable some docstring checks until we have improved the docstring coverage
-ignore = [
-  'C408',   # Ignore: Unnecessary `dict()` call
-  'C416',   # Ignore: Unnecessary list comprehension
-  'D100',   # Ignore: Missing docstring in public module
-  'D101',   # Ignore: Missing docstring in class
-  'D102',   # Ignore: Missing docstring in public method
-  'D103',   # Ignore: Missing docstring in public function
-  'D104',   # Ignore: Missing docstring in public package
-  'D105',   # Ignore: Missing docstring in magic method
-  'D107',   # Ignore: Missing docstring in __init__
-  'D205',   # Ignore: 1 blank line required between summary and description
-  'DOC201', # Ignore: `return` is not documented in docstring
-  'DOC501', # Ignore: Raised exception `ValueError` missing from docstring
-  'DOC502', # Ignore: Raised exception is not explicitly raised: `TypeError`
-  'DTZ005', # Ignore: `datetime.datetime.now()` called without a `tz` argument
-]
 
 # Temporarily increase McCabe complexity limit to 17 to allow
 # refactoring in smaller steps.

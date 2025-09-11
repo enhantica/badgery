@@ -1,3 +1,5 @@
+"""CLI for generating the Badgery HTML dashboard."""
+
 from __future__ import annotations
 
 import argparse
@@ -14,6 +16,12 @@ from badgery.render import HTMLDashboardRendererWithSpec
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse CLI args and enrich from config.
+
+    Returns:
+        argparse.Namespace: Args with paths resolved from the project
+        `.badgery.yaml` (cards, branches, report paths).
+    """
     parser = argparse.ArgumentParser(
         description='Generate an HTML dashboard of status badges.'
     )
@@ -135,6 +143,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Run the dashboard generation from CLI arguments."""
     args = parse_args()
     logging.basicConfig(level=getattr(logging, args.log_level))
 
