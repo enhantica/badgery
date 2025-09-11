@@ -56,6 +56,7 @@ class BaseMetric:
         self.feature_value = None
 
     def read_value(self, path: str):
+        """Read average maintainability index and file count."""
         """Read a single branch value from a file path."""
         raise NotImplementedError
 
@@ -118,11 +119,13 @@ class MaintainabilityMetric(BaseMetric):
         return (None, None)
 
     def read_all(self, args):
+        """Populate MI values for default, develop, and feature."""
         self.master = self.read_value(args.maintainability_index_master)
         self.develop = self.read_value(args.maintainability_index_develop)
         self.feature_value = self.read_value(args.maintainability_index_feature)
 
     def format_value(self, value):
+        """Return a human-readable MI summary for display."""
         if (
             not value
             or not isinstance(value, tuple)
@@ -136,10 +139,12 @@ class MaintainabilityMetric(BaseMetric):
         return f'{mi_rounded} over {count} files'
 
     def badge(self, value):
+        """Return a badge string (unused in the HTML renderer)."""
         return ''
 
 
 class ComplexityMetric(BaseMetric):
+    """Average cyclomatic complexity and item count per branch."""
     key = 'complexity'
     label = 'Cyclomatic complexity with radon'
     thresholds = [

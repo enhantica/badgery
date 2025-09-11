@@ -388,10 +388,12 @@ class HTMLDashboardRenderer:
         )
 
     def render(self) -> str:
+        """Return the rendered HTML string for the dashboard."""
         return ''
 
 
 class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
+    """Renderer variant that uses an explicit card order spec."""
     def __init__(
         self,
         metrics: List[BaseMetric],
@@ -401,6 +403,7 @@ class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
         default_branch: str = 'master',
         develop_branch: str = 'develop',
     ):
+        """Initialize with context and ordered card spec."""
         super().__init__(
             metrics,
             feature,
@@ -411,6 +414,7 @@ class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
         self.cards_spec = cards_spec
 
     def render(self) -> str:
+        """Return rendered HTML using the card spec order."""
         cards: List[str] = []
         for key, title, icon in self.cards_spec:
             m = self.metric_by_key.get(key)
