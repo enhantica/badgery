@@ -1,0 +1,24 @@
+# Verifies if a pull request has at least one label from a set of valid
+# labels before it can be merged.
+
+name: Verify PR labels
+
+on:
+  # Runs on pull requests to a repository
+  pull_request_target:
+    types: [opened, labeled, unlabeled, synchronize]
+
+jobs:
+  verify-pr-labels:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Verify PR labels
+        uses: jesusvasquez333/verify-pr-label-action@v1.4.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          valid-labels:
+            '[scope] bug, [scope] documentation, [scope] enhancement, [scope]
+            maintenance, [scope] significant, [maintainer] release'
+          pull-request-number: ${{ github.event.pull_request.number }}
+          disable-reviews: false
