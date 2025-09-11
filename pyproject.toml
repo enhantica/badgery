@@ -1,0 +1,219 @@
+###############################
+# Configuration for the project
+###############################
+
+[project]
+name = 'badgery'
+dynamic = ['version'] # Use versioningit to manage the version
+description = 'Turn your code metrics and CI results into a sleek, badge-driven HTML dashboard for your GitHub repo.'
+authors = [{ name = 'Badgery contributors' }]
+readme = 'README.md'
+license = { file = 'LICENSE' }
+classifiers = [
+  'Intended Audience :: Science/Research',
+  'Topic :: Scientific/Engineering',
+  'License :: OSI Approved :: BSD License',
+  'Operating System :: OS Independent',
+  'Programming Language :: Python :: 3 :: Only',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.13',
+]
+requires-python = '>=3.11,<3.14'
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  'build',                   # Building the package
+  'pytest',                  # Testing
+  'pytest-cov',              # Test coverage
+  'pytest-xdist',            # Enable parallel testing
+  'ruff',                    # Linting and formatting code
+  'radon',                   # Code complexity and maintainability
+  'validate-pyproject[all]', # Validate pyproject.toml
+  'versioningit',            # Automatic versioning from git tags
+  'docformatter',            # Code formatter for docstrings
+  'interrogate',             # Check for missing docstrings
+]
+
+[project.urls]
+homepage = 'https://github.com/enhantica/badgery'
+documentation = 'https://github.com/enhantica/badgery'
+source = 'https://github.com/enhantica/badgery'
+tracker = 'https://github.com/enhantica/badgery/issues'
+
+############################
+# Build system configuration
+############################
+
+# Build system 'hatch' -- Python project manager
+# https://hatch.pypa.io/
+
+# Versioning system 'versioningit' -- Versioning from git tags
+# https://versioningit.readthedocs.io/
+
+[build-system]
+build-backend = 'hatchling.build'
+requires = ['hatchling', 'versioningit']
+
+#############################
+# Configuration for hatchling
+#############################
+
+[tool.hatch.build.targets.wheel]
+packages = ['src/badgery']
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+source = 'versioningit' # Use versioningit to manage the version
+
+################################
+# Configuration for versioningit
+################################
+
+# Versioningit generates versions from git tags, so we don't need to
+# either specify them statically in pyproject.toml or save them in the
+# source code. Do not use {distance} in the version format, as it
+# forces a version bump for every commit, which triggers unnecessary
+# pixi.lock update without any changes to the source code.
+
+[tool.versioningit.format]
+distance = '{base_version}+dev'            # example: 0.5.8+dev, 1.2.3.post4+dev
+dirty = '{base_version}+dirty'             # example: 0.5.8+dirty, 1.2.3.post4+dirty
+distance-dirty = '{base_version}+devdirty' # example: 0.5.8+devdirty
+
+# Configure how versioningit detects versions from Git
+# - 'match' ensures it only considers tags starting with 'v'
+# - 'default-tag' is used as a fallback when no matching tag is found
+[tool.versioningit.vcs]
+method = 'git'
+match = ['v*']
+default-tag = 'v999.0.0'
+
+################################
+# Configuration for docformatter
+################################
+
+# 'docformatter' -- Code formatter for docstrings
+# https://docformatter.readthedocs.io/en/latest/
+
+[tool.docformatter]
+recursive = true
+wrap-summaries = 72
+wrap-descriptions = 72
+close-quotes-on-newline = true
+
+################################
+# Configuration for interrogate
+################################
+
+# 'interrogate' -- Check for missing docstrings
+# https://interrogate.readthedocs.io/en/latest/
+
+[tool.interrogate]
+fail-under = 80
+verbose = 1
+
+#######################################
+# Configuration for coverage/pytest-cov
+#######################################
+
+[tool.coverage.run]
+branch = true                    # Measure branch coverage as well
+source = ["src/badgery"] # Limit coverage to the source code directory
+
+[tool.coverage.report]
+show_missing = true # Show missing lines
+skip_covered = true # Skip files with 100% coverage in the report
+fail_under = 80     # Minimum coverage percentage to pass
+
+########################
+# Configuration for ruff
+########################
+
+# 'ruff' -- Python linter and code formatter
+# https://docs.astral.sh/ruff/rules/
+
+[tool.ruff]
+# Temporarily exclude some directories until we have improved the code quality there
+exclude = ['tests', 'tools']
+indent-width = 4
+line-length = 99
+# Enable new rules that are not yet stable, like DOC
+preview = true
+
+# https://docs.astral.sh/ruff/rules/
+[tool.ruff.lint]
+select = [
+  'B',      # Bugbear-specific checks (e.g., likely bugs, bad patterns)
+  'C',      # Complexity-related issues (e.g., high McCabe complexity)
+  'D',      # Docstring formatting issues (old rules)
+  'DOC',    # Docstring formatting issues (new rules)
+  'DTZ',    # Docstring timezone issues (e.g., inconsistent timezone formats)
+  'E',      # General PEP 8 style errors
+  'F',      # Pyflakes-specific checks (e.g., unused variables, imports)
+  'FLY',    # Flynt-specific checks (e.g., enforcing f-strings)
+  'G',      # Type annotation issues (e.g., missing or incorrect type hints)
+  'I',      # Import sorting issues (e.g., unsorted imports)
+  'N',      # Naming convention issues (e.g., variable names, function names)
+  'NPY',    # NumPy-specific checks (e.g., array operations, broadcasting)
+  'S',      # Security-related issues (e.g., use of insecure functions or libraries)
+  'TCH',    # Type checking issues (e.g., incompatible types, missing type annotations)
+  'TID252', # Enforces absolute imports over relative imports
+  'W',      # General PEP 8 warnings (e.g., lines too long, trailing whitespace)
+  #'ARG',   # Argument-related issues (e.g., unused arguments)
+  #'PGH',   # Misc text patterns checks
+  #'PTH',   # Encourages using pathlib over os.path
+  #'RUF',   # Ruff-specific checks (e.g., enforcing best practices)
+  #'SIM',   # Simplification issues (e.g., redundant code, unnecessary constructs)
+  #'TRY',   # Tryceratops Try/Except-related issues (e.g., broad exceptions, empty except blocks)
+  #'UP',    # Pyupgrade-specific checks
+]
+# Temporarily disable some docstring checks until we have improved the docstring coverage
+ignore = [
+  'C408',   # Ignore: Unnecessary `dict()` call
+  'C416',   # Ignore: Unnecessary list comprehension
+  'D100',   # Ignore: Missing docstring in public module
+  'D101',   # Ignore: Missing docstring in class
+  'D102',   # Ignore: Missing docstring in public method
+  'D103',   # Ignore: Missing docstring in public function
+  'D104',   # Ignore: Missing docstring in public package
+  'D105',   # Ignore: Missing docstring in magic method
+  'D107',   # Ignore: Missing docstring in __init__
+  'D205',   # Ignore: 1 blank line required between summary and description
+  'DOC201', # Ignore: `return` is not documented in docstring
+  'DOC501', # Ignore: Raised exception `ValueError` missing from docstring
+  'DOC502', # Ignore: Raised exception is not explicitly raised: `TypeError`
+  'DTZ005', # Ignore: `datetime.datetime.now()` called without a `tz` argument
+]
+
+# Temporarily increase McCabe complexity limit to 17 to allow
+# refactoring in smaller steps.
+[tool.ruff.lint.mccabe]
+max-complexity = 17 # default is 10
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = 'all'
+
+[tool.ruff.lint.isort]
+force-single-line = true
+
+[tool.ruff.lint.per-file-ignores]
+'*test_*.py' = ['S101'] # allow asserts in test files
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 99 # https://peps.python.org/pep-0008/#maximum-line-length
+max-doc-length = 72  # https://peps.python.org/pep-0008/#maximum-line-length
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+docstring-code-format = true    # Whether to format code snippets in docstrings
+docstring-code-line-length = 72 # Line length for code snippets in docstrings
+indent-style = 'space'          # PEP 8 recommends using spaces over tabs
+line-ending = 'lf'              # Line endings will be converted to \n
+quote-style = 'single'          # But double quotes in docstrings (PEP 8, PEP 257)

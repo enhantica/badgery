@@ -1,0 +1,106 @@
+[activation.env]
+PYTHONIOENCODING = "utf-8"
+# The following is needed to resolve issues installing easydiffraction
+# from a local path in editable mode in the default environment. With src/
+# included in PYTHONPATH, we use the source code directly in the first place,
+# instead of the installed package.
+PYTHONPATH = "$(pwd)/src${PYTHONPATH:+:$PYTHONPATH}"
+
+[workspace]
+# Platforms supported for the lock file (pixi.lock)
+platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+
+# Channels used to fetch packages
+channels = ["conda-forge"]
+
+##########
+# FEATURES
+##########
+
+# Default feature configuration
+
+[dependencies] # == [feature.default.dependencies]
+pip = "*"        # Required to install from PyPI
+
+# Extra features for different Python versions
+
+[feature.py313.dependencies]
+python = "3.13.*"
+
+[feature.badgery-local-editable.pypi-dependencies]
+badgery = { path = ".", editable = true, extras = ["dev"]}
+
+# This feature installs Node.js and Prettier for formatting
+# non-Python files.
+
+[feature.nodejs.dependencies]
+nodejs = ">=20,<21" # Required for prettier; pinned to a stable LTS
+
+##############
+# ENVIRONMENTS
+##############
+
+[environments]
+
+# The `default` environment is always included in the lock file, so it does not
+# need to be specified explicitly in the environments section.
+
+default = { features = ["py313", "badgery-local-editable", "nodejs"] }
+
+#######
+# TASKS
+#######
+
+[tasks]
+
+# 🧪 Testing Tasks
+unit-tests = "python -m pytest tests/unit/ --color=yes -v"
+func-tests = "python -m pytest tests/functional/ --color=yes -n auto -v"
+
+tests = { depends-on = ["unit-tests", "func-tests"] }
+
+# 🧹 Code Quality
+
+## ✔️ Checks
+pyproject-check = "python -m validate_pyproject pyproject.toml"
+py-lint-check = "python -m ruff check ."
+py-format-check = "python -m ruff format . --check"
+nonpy-format-check = "npx prettier . --list-different --config=prettierrc.toml"
+docs-format-check = "docformatter --check src/ tutorials/"
+
+## 🛠️ Fixes
+py-lint-fix = "python -m ruff check . --fix"
+py-format-fix = "python -m ruff format ."
+nonpy-format-fix = "npx prettier . --list-different --write --config=prettierrc.toml"
+nonpy-format-fix-modified = "npx prettier $(git diff --name-only HEAD | grep -E '\\.(json|ya?ml|toml|md|css|html)$' || echo .) --list-different --write --config=prettierrc.toml"
+docs-format-fix = "docformatter --in-place src/ tutorials/"
+
+code-quality = { depends-on = [
+  "pyproject-check",
+  "py-format-fix",
+  "docs-format-fix",
+  "py-lint-fix",
+  "nonpy-format-fix-modified",
+] }
+
+# 🧮 Code Complexity
+complexity-check = "radon cc -s src/"
+complexity-check-json = "radon cc -s -j src/"
+maintainability-check = "radon mi src/"
+maintainability-check-json = "radon mi -j src/"
+raw-metrics = "radon raw -s src/"
+raw-metrics-json = "radon raw -s -j src/"
+
+# 📊 Coverage
+unit-tests-coverage = "pixi run unit-tests --cov=src/badgery --cov-report=term-missing"
+func-tests-coverage = "pixi run func-tests --cov=src/badgery --cov-report=term-missing"
+docstring-coverage = "interrogate -c pyproject.toml src/"
+
+coverage = "pixi run docstring-coverage || true; pixi run unit-tests-coverage || true"
+
+# 🚀 Development & Build Tasks
+pre-commit = { depends-on = ["code-quality", "tests"] }
+dist-build = "python -m build --wheel --outdir dist"
+spdx-update = "python tools/update_spdx.py"
+prettier-install = "npm install --no-save --no-audit --no-fund prettier prettier-plugin-toml"
+make-badges = "python src/make_badges.py"
