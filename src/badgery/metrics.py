@@ -363,6 +363,7 @@ class LinesOfCodeMetric(BaseMetric):
     label = 'Source/Logical lines of code'
 
     def __init__(self, badge_gen: BadgeGenerator, feature=None):
+        """Initialize line count metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     @staticmethod
@@ -403,6 +404,7 @@ class LinesOfCodeMetric(BaseMetric):
         return (sloc, lloc)
 
     def read_all(self, args):
+        """Populate SLOC/LLOC tuples for three branches."""
         self.master = self._sum_raw_metrics(getattr(args, 'raw_metrics_master', None))
         self.develop = self._sum_raw_metrics(getattr(args, 'raw_metrics_develop', None))
         self.feature_value = self._sum_raw_metrics(getattr(args, 'raw_metrics_feature', None))
