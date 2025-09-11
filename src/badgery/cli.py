@@ -9,7 +9,7 @@ from typing import Optional
 
 from badgery.badges import BadgeGenerator
 from badgery.config import build_metrics_from_config
-from badgery.config import load_cards_from_yaml
+from badgery.config import load_settings_from_yaml
 from badgery.render import HTMLDashboardRendererWithSpec
 
 
@@ -45,8 +45,11 @@ def parse_args() -> argparse.Namespace:
     )
     args = parser.parse_args()
 
-    cards = load_cards_from_yaml(args.config)
+    settings = load_settings_from_yaml(args.config)
+    cards = settings.get('cards', [])
     args.cards_config = cards
+    args.default_branch = str(settings.get('default_branch', 'master'))
+    args.develop_branch = str(settings.get('develop_branch', 'develop'))
 
     feature_branch = args.branch
     complexity_pattern = None
@@ -83,11 +86,11 @@ def parse_args() -> argparse.Namespace:
         return None
 
     args.cyclomatic_complexity_master = (
-        _resolve(complexity_pattern, 'master')
+        _resolve(complexity_pattern, args.default_branch)
         or os.environ.get('CI_COMPLEXITY_MASTER')
     )
     args.cyclomatic_complexity_develop = (
-        _resolve(complexity_pattern, 'develop')
+        _resolve(complexity_pattern, args.develop_branch)
         or os.environ.get('CI_COMPLEXITY_DEVELOP')
     )
     args.cyclomatic_complexity_feature = (
@@ -96,11 +99,11 @@ def parse_args() -> argparse.Namespace:
     )
 
     args.maintainability_index_master = (
-        _resolve(maintainability_pattern, 'master')
+        _resolve(maintainability_pattern, args.default_branch)
         or os.environ.get('CI_MAINTAINABILITY_MASTER')
     )
     args.maintainability_index_develop = (
-        _resolve(maintainability_pattern, 'develop')
+        _resolve(maintainability_pattern, args.develop_branch)
         or os.environ.get('CI_MAINTAINABILITY_DEVELOP')
     )
     args.maintainability_index_feature = (
@@ -109,20 +112,20 @@ def parse_args() -> argparse.Namespace:
     )
 
     args.raw_metrics_master = (
-        _resolve(raw_pattern, 'master') or os.environ.get('CI_RAW_METRICS_MASTER')
+        _resolve(raw_pattern, args.default_branch) or os.environ.get('CI_RAW_METRICS_MASTER')
     )
     args.raw_metrics_develop = (
-        _resolve(raw_pattern, 'develop') or os.environ.get('CI_RAW_METRICS_DEVELOP')
+        _resolve(raw_pattern, args.develop_branch) or os.environ.get('CI_RAW_METRICS_DEVELOP')
     )
     args.raw_metrics_feature = (
         _resolve(raw_pattern, feature_branch) or os.environ.get('CI_RAW_METRICS_FEATURE')
     )
 
     args.coverage_docstring_master = (
-        _resolve(docstring_pattern, 'master') or os.environ.get('CI_DOCSTRING_MASTER')
+        _resolve(docstring_pattern, args.default_branch) or os.environ.get('CI_DOCSTRING_MASTER')
     )
     args.coverage_docstring_develop = (
-        _resolve(docstring_pattern, 'develop') or os.environ.get('CI_DOCSTRING_DEVELOP')
+        _resolve(docstring_pattern, args.develop_branch) or os.environ.get('CI_DOCSTRING_DEVELOP')
     )
     args.coverage_docstring_feature = (
         _resolve(docstring_pattern, feature_branch) or os.environ.get('CI_DOCSTRING_FEATURE')
@@ -145,6 +148,13 @@ def main() -> None:
         except Exception as exc:
             logging.debug('Metric read failed for %s: %s', getattr(metric, 'key', '?'), exc)
 
-    renderer = HTMLDashboardRendererWithSpec(metrics, feature, badge_gen, cards_spec)
+    renderer = HTMLDashboardRendererWithSpec(
+        metrics,
+        feature,
+        badge_gen,
+        cards_spec,
+        default_branch=args.default_branch,
+        develop_branch=args.develop_branch,
+    )
     html = renderer.render()
     Path(args.output).write_text(html, encoding='utf-8')

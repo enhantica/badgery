@@ -65,6 +65,58 @@ def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:
     return items
 
 
+def load_settings_from_yaml(path: str) -> dict[str, Any]:
+    """Load top-level settings (default/develop branch) and cards.
+
+    Returns a dict with keys:
+    - 'default_branch': str (defaults to 'master')
+    - 'develop_branch': str (defaults to 'develop')
+    - 'cards': list[dict]
+    """
+    p = Path(path)
+    settings: dict[str, Any] = {
+        'default_branch': 'master',
+        'develop_branch': 'develop',
+        'cards': [],
+    }
+    if not p.exists():
+        logging.info('Config %s not found; using defaults and empty card list', path)
+        return settings
+
+    lines = p.read_text(encoding='utf-8').splitlines()
+    # Parse top-level settings until 'cards:'
+    in_cards = False
+    for raw in lines:
+        line = raw.rstrip()
+        if not line.strip() or line.lstrip().startswith('#'):
+            continue
+        if not in_cards:
+            if line.strip() == 'cards:':
+                in_cards = True
+                break
+            if ':' in line and not line.startswith(' '):
+                key, val = line.split(':', 1)
+                key = key.strip()
+                val = val.strip()
+                if val.lower() in ('true', 'false'):
+                    parsed = val.lower() == 'true'
+                else:
+                    if (val.startswith("'") and val.endswith("'")) or (
+                        val.startswith('"') and val.endswith('"')
+                    ):
+                        parsed = val[1:-1]
+                    else:
+                        parsed = val
+                if key in ('default_branch', 'develop_branch'):
+                    settings[key] = parsed
+        else:
+            break
+
+    # Parse cards list using existing helper
+    settings['cards'] = load_cards_from_yaml(path)
+    return settings
+
+
 def group_icon(group: str) -> str:
     g = (group or '').strip().lower()
     mapping = {

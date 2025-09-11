@@ -92,11 +92,20 @@ class HTMLDashboardRenderer:
     a { color: inherit; text-decoration: none; }
     """
 
-    def __init__(self, metrics: List[BaseMetric], feature: str, badge_gen: BadgeGenerator):
+    def __init__(
+        self,
+        metrics: List[BaseMetric],
+        feature: str,
+        badge_gen: 'BadgeGenerator',
+        default_branch: str = 'master',
+        develop_branch: str = 'develop',
+    ):
         self.metrics = metrics
         self.feature = feature
         self.badge_gen = badge_gen
         self.metric_by_key = {m.key: m for m in metrics}
+        self.default_branch = default_branch
+        self.develop_branch = develop_branch
 
     @staticmethod
     def _fetch(url: str, timeout: float = 8.0) -> Optional[str]:
@@ -292,7 +301,7 @@ class HTMLDashboardRenderer:
             elif branch == 'feature':
                 branch_for_badge = self.feature
             else:
-                branch_for_badge = 'develop'
+                branch_for_badge = self.develop_branch
             status = self._github_badge_status(m.workflow_filename, branch_for_badge)
             if status is None:
                 status = str(value or '').strip().lower()
@@ -357,8 +366,8 @@ class HTMLDashboardRenderer:
     def _card_html(self, title: str, icon_class: str, key: str) -> str:
         feature_label = self.feature
         values_html = '\n'.join([
-            self._value_item_html(key, 'master', 'master'),
-            self._value_item_html(key, 'develop', 'develop'),
+            self._value_item_html(key, 'master', self.default_branch),
+            self._value_item_html(key, 'develop', self.develop_branch),
             self._value_item_html(key, 'feature', feature_label),
         ])
         return (
@@ -377,10 +386,18 @@ class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
         self,
         metrics: List[BaseMetric],
         feature: str,
-        badge_gen: BadgeGenerator,
+        badge_gen: 'BadgeGenerator',
         cards_spec: List[tuple[str, str, str]],
+        default_branch: str = 'master',
+        develop_branch: str = 'develop',
     ):
-        super().__init__(metrics, feature, badge_gen)
+        super().__init__(
+            metrics,
+            feature,
+            badge_gen,
+            default_branch=default_branch,
+            develop_branch=develop_branch,
+        )
         self.cards_spec = cards_spec
 
     def render(self) -> str:
