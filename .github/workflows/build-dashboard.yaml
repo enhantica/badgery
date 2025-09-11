@@ -41,6 +41,10 @@ jobs:
         run: |
           for BRANCH in ${{ env.DEFAULT_BRANCH }} ${{ env.DEVELOP_BRANCH }} ${{ env.CI_BRANCH }}; do
             echo "=== Processing branch $BRANCH ==="
+            if [ -d "../worktree-$BRANCH" ]; then
+              echo "Branch $BRANCH already processed, skipping"
+              continue
+            fi
             git worktree add ../worktree-$BRANCH origin/$BRANCH
             mkdir -p reports/$BRANCH
             echo "Docstring coverage for branch $BRANCH"
