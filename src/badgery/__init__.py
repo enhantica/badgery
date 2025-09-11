@@ -758,7 +758,7 @@ class HTMLDashboardRenderer:
         # Docstring coverage: expects like "35%"
         if isinstance(m, DocstringCoverageMetric):
             if not value:
-                return ('no status yet', 'gray')
+                return ('unknown', 'gray')
             try:
                 p = float(str(value).strip().rstrip('%'))
             except Exception:
@@ -809,7 +809,7 @@ class HTMLDashboardRenderer:
             if branch in ('master', 'develop'):
                 val = value
                 if not val:
-                    return ('no status yet', 'gray')
+                    return ('unknown', 'gray')
                 try:
                     p = int(round(float(str(val).strip().rstrip('%'))))
                 except Exception:
@@ -858,7 +858,7 @@ class HTMLDashboardRenderer:
             if status in ('fail', 'failed', 'failing', 'error', 'cancelled'):
                 return ('failed', 'red')
             if status in ('-', '', 'unknown', 'no status', 'no status yet'):
-                return ('no status yet', 'gray')
+                return ('unknown', 'gray')
             return (status, 'gray')
 
         # Size metrics: always blue, formatted with thousands separators
@@ -919,7 +919,7 @@ class HTMLDashboardRenderer:
             return f'<span class="{color}">{branch_label}: {text}</span>'
 
         # Fallback to unknown
-        return f'<span class="gray">{branch_label}: no status yet</span>'
+        return f'<span class="gray">{branch_label}: unknown</span>'
 
     def _card_html(self, title: str, icon_class: str, key: str) -> str:
         # Feature branch label
@@ -1123,8 +1123,11 @@ def parse_args() -> argparse.Namespace:
     def _resolve(pattern: Optional[str], branch: str) -> Optional[str]:
         if not pattern:
             return None
-        # If pattern contains the special "**" placeholder, treat it as the branch name placeholder.
-        candidate = pattern.replace('**', branch)
+        # Support either {branch} or ** placeholder for the branch name.
+        if '{branch}' in pattern:
+            candidate = pattern.replace('{branch}', branch)
+        else:
+            candidate = pattern.replace('**', branch)
         p = Path(candidate)
         if p.exists():
             return str(p)
