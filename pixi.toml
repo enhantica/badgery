@@ -1,6 +1,6 @@
 [activation.env]
 PYTHONIOENCODING = "utf-8"
-# The following is needed to resolve issues installing easydiffraction
+# The following is needed to resolve issues installing package
 # from a local path in editable mode in the default environment. With src/
 # included in PYTHONPATH, we use the source code directly in the first place,
 # instead of the installed package.

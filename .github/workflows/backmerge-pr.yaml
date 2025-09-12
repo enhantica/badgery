@@ -37,4 +37,4 @@ jobs:
 
             ⚠️ Note: This PR is labeled \`[maintainer] auto-pull-request\` and is excluded from release notes and version bump logic."
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_API_PERSONAL_ACCSESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_API_PERSONAL_ACCESS_TOKEN }}
