@@ -27,9 +27,6 @@ pip = "*" # Required to install from PyPI
 [feature.py313.dependencies]
 python = "3.13.*"
 
-[feature.badgery-local-editable.pypi-dependencies]
-badgery = { path = ".", editable = true, extras = ["dev"] }
-
 # This feature installs Node.js and Prettier for formatting
 # non-Python files.
 
@@ -45,7 +42,7 @@ nodejs = ">=20,<21" # Required for prettier; pinned to a stable LTS
 # The `default` environment is always included in the lock file, so it does not
 # need to be specified explicitly in the environments section.
 
-default = { features = ["py313", "badgery-local-editable", "nodejs"] }
+default = { features = ["py313", "nodejs"] }
 wheel = { features = ["py313"] }
 
 #######
