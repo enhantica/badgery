@@ -151,42 +151,41 @@ preview = true
 # https://docs.astral.sh/ruff/rules/
 [tool.ruff.lint]
 select = [
-  'ANN',
+  'ANN',    # Missing or incorrect type annotations
   'ARG',    # Argument-related issues (e.g., unused arguments)
   'B',      # Bugbear-specific checks (e.g., likely bugs, bad patterns)
   'C',      # Complexity-related issues (e.g., high McCabe complexity)
-  'COM',
+  'COM',    # Comment formatting issues
   'D',      # Docstring formatting issues (old rules)
   'DOC',    # Docstring formatting issues (new rules)
-  'DTZ',    # Docstring timezone issues (e.g., inconsistent timezone formats)
+  'DTZ',    # Datetime timezone issues (e.g., inconsistent timezone formats)
   'E',      # General PEP 8 style errors
+  #'ERA',    # Commented-out or dead code issues
   'F',      # Pyflakes-specific checks (e.g., unused variables, imports)
   'FLY',    # Flynt-specific checks (e.g., enforcing f-strings)
   'G',      # Type annotation issues (e.g., missing or incorrect type hints)
+  'ICN',    # Import conventions (e.g., enforce aliasing like import numpy as np)
   'I',      # Import sorting issues (e.g., unsorted imports)
   'N',      # Naming convention issues (e.g., variable names, function names)
   'NPY',    # NumPy-specific checks (e.g., array operations, broadcasting)
   'PERF',   # Performance-related issues (e.g., inefficient code patterns)
-  'PGH',    # Misc text patterns checks
-  'PIE',
+  'PGH',    # Miscellaneous text pattern checks
+  'PIE',    # Potentially problematic idioms and errors
   'PL',     # PyLint-specific checks (e.g., code smells, potential errors)
   'PT',     # Pytest-related issues
   'PTH',    # Encourages using pathlib over os.path
-  'RET',
+  'RET',    # Return statement issues (e.g., inconsistent returns)
   'RUF',    # Ruff-specific checks (e.g., enforcing best practices)
   'S',      # Security-related issues (e.g., use of insecure functions or libraries)
   'SIM',    # Simplification issues (e.g., redundant code, unnecessary constructs)
-  'SLF',
+  'SLF',    # Self argument-related issues (e.g., missing or misused self)
   'T20',    # Flake8-print-specific checks (e.g., print statements left in code) 
   'TCH',    # Type checking issues (e.g., incompatible types, missing type annotations)
-  'TD',
+  'TD',     # Type definition issues (e.g., incorrect or missing type definitions)
   'TID252', # Enforces absolute imports over relative imports
   'TRY',    # Tryceratops Try/Except-related issues (e.g., broad exceptions, empty except blocks)
   'UP',     # Pyupgrade-specific checks
   'W',      # General PEP 8 warnings (e.g., lines too long, trailing whitespace)
-]
-ignore = [
-  'COM812', # Conflicts with the Ruff formatter (trailing commas)
 ]
 
 # Temporarily increase McCabe complexity limit to 17 to allow
@@ -202,21 +201,14 @@ force-single-line = true
 
 [tool.ruff.lint.per-file-ignores]
 'tests/**/*.py' = [
-  'S101',   # allow asserts in test files
-  'D100',   # do not require docstrings in tests
-  'D101',   # do not require docstrings in tests
-  'D102',   # do not require docstrings in tests
-  'D103',   # do not require docstrings in tests
-  'D104',   # do not require docstrings in tests
-  'TCH',    # do not enforce type-checking import blocks in tests
-  'W505',   # ignore doc line length in tests
-  'SLF001', # allow access to private members in tests
-  'ANN001',
-  'ANN201',
-  'ANN202',
-  'ANN204',
-  'ANN205',
-  'ANN401', # ignore annotations in tests
+  'S101', # allow asserts in test files
+  'D100', # do not require docstrings in tests
+  'D101', # do not require docstrings in tests
+  'D102', # do not require docstrings in tests
+  'D103', # do not require docstrings in tests
+  'D104', # do not require docstrings in tests
+  'TCH',  # do not enforce type-checking import blocks in tests
+  'W505', # ignore doc line length in tests
 ]
 
 [tool.ruff.lint.pycodestyle]

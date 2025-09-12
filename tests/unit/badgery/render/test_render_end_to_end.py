@@ -74,7 +74,7 @@ def test_html_render_end_to_end_smoke():
 
     # Status lines include branch labels and values (split into label/value spans)
     labels = re.findall(
-        r'<span class="item-label(?: [^"]+)?">(?:\s*<i[^>]*></i>\s*)?([^<]+)</span>', html
+        r'<span class="item-label(?: [^"]+)?">(?:\s*<i[^>]*></i>\s*)?([^<]+)</span>', html,
     )
     assert 'main' in labels
     assert 'develop' in labels

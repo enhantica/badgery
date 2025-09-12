@@ -13,7 +13,7 @@ def test_value_item_html_unknown_metric():
     html = r._value_item_html('nope', 'master', 'main')
 
     assert re.search(
-        r'<span class="item-label(?: [^"]+)?">(?:\s*<i[^>]*></i>\s*)?main</span>', html
+        r'<span class="item-label(?: [^"]+)?">(?:\s*<i[^>]*></i>\s*)?main</span>', html,
     )
     assert 'item-value gray">unknown' in html
 
