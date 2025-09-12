@@ -93,5 +93,3 @@ jobs:
               workflow_id: "dashboard.yaml",
               ref: "${{ env.CI_BRANCH }}"
             });
-
-    
