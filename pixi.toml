@@ -23,7 +23,6 @@ channels = ["conda-forge"]
 pip = "*" # Required to install from PyPI
 
 [pypi-dependencies] # == [feature.default.pypi-dependencies]
-#badgery = { path = ".", editable = true, extras = ["dev"] }
 badgery = { git = "https://github.com/enhantica/badgery", extras = ["dev"] }
 
 # Extra features for different Python versions
@@ -35,7 +34,7 @@ python = "3.13.*"
 # non-Python files.
 
 [feature.nodejs.dependencies]
-nodejs = ">=20,<21" # Required for prettier; pinned to a stable LTS
+nodejs = "*" # Required for prettier; pinned to a stable LTS
 
 ##############
 # ENVIRONMENTS
