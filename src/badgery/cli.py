@@ -17,6 +17,49 @@ from badgery.config import load_settings_from_yaml
 from badgery.render import HTMLDashboardRendererWithSpec
 
 
+def _collect_report_patterns(
+    cards: list[dict],
+) -> tuple[str | None, str | None, str | None, str | None]:
+    """Return patterns for complexity, MI, raw, and docstring reports.
+
+    The function inspects enabled cards and extracts the first matching
+    pattern per metric type.
+    """
+    complexity_pattern = None
+    maintainability_pattern = None
+    raw_pattern = None
+    docstring_pattern = None
+    for card in cards:
+        if not card.get('enabled', True):
+            continue
+        ctype = str(card.get('type', '')).strip().lower()
+        if ctype in {'radon_cc', 'radon_files', 'radon_funcs'}:
+            complexity_pattern = card.get('report') or card.get('dir') or complexity_pattern
+        elif ctype == 'radon_mi':
+            maintainability_pattern = card.get('report') or maintainability_pattern
+        elif ctype == 'radon_loc':
+            raw_pattern = card.get('report') or raw_pattern
+        elif ctype == 'interrogate':
+            docstring_pattern = card.get('report') or docstring_pattern
+    return complexity_pattern, maintainability_pattern, raw_pattern, docstring_pattern
+
+
+def _resolve_pattern(pattern: Optional[str], branch: str) -> Optional[str]:
+    if not pattern:
+        return None
+    if '{branch}' in pattern:
+        candidate = pattern.replace('{branch}', branch)
+    else:
+        candidate = pattern.replace('**', branch)
+    p = Path(candidate)
+    if p.exists():
+        return str(p)
+    matches = glob(candidate)
+    if matches:
+        return matches[0]
+    return None
+
+
 def parse_args() -> argparse.Namespace:
     """Parse CLI args and enrich from config.
 
@@ -60,76 +103,52 @@ def parse_args() -> argparse.Namespace:
     args.develop_branch = str(settings.get('develop_branch', 'develop'))
 
     feature_branch = args.branch
-    complexity_pattern = None
-    maintainability_pattern = None
-    raw_pattern = None
-    docstring_pattern = None
+    (
+        complexity_pattern,
+        maintainability_pattern,
+        raw_pattern,
+        docstring_pattern,
+    ) = _collect_report_patterns(cards)
 
-    for card in cards:
-        if not card.get('enabled', True):
-            continue
-        ctype = str(card.get('type', '')).strip().lower()
-        if ctype in {'radon_cc', 'radon_files', 'radon_funcs'}:
-            complexity_pattern = card.get('report') or card.get('dir') or complexity_pattern
-        if ctype in {'radon_mi'}:
-            maintainability_pattern = card.get('report') or maintainability_pattern
-        if ctype in {'radon_loc'}:
-            raw_pattern = card.get('report') or raw_pattern
-        if ctype in {'interrogate'}:
-            docstring_pattern = card.get('report') or docstring_pattern
-
-    def _resolve(pattern: Optional[str], branch: str) -> Optional[str]:
-        if not pattern:
-            return None
-        if '{branch}' in pattern:
-            candidate = pattern.replace('{branch}', branch)
-        else:
-            candidate = pattern.replace('**', branch)
-        p = Path(candidate)
-        if p.exists():
-            return str(p)
-        matches = glob(candidate)
-        if matches:
-            return matches[0]
-        return None
-
-    args.cyclomatic_complexity_master = _resolve(
+    args.cyclomatic_complexity_master = _resolve_pattern(
         complexity_pattern, args.default_branch
     ) or os.environ.get('CI_COMPLEXITY_MASTER')
-    args.cyclomatic_complexity_develop = _resolve(
+    args.cyclomatic_complexity_develop = _resolve_pattern(
         complexity_pattern, args.develop_branch
     ) or os.environ.get('CI_COMPLEXITY_DEVELOP')
-    args.cyclomatic_complexity_feature = _resolve(
+    args.cyclomatic_complexity_feature = _resolve_pattern(
         complexity_pattern, feature_branch
     ) or os.environ.get('CI_COMPLEXITY_FEATURE')
 
-    args.maintainability_index_master = _resolve(
+    args.maintainability_index_master = _resolve_pattern(
         maintainability_pattern, args.default_branch
     ) or os.environ.get('CI_MAINTAINABILITY_MASTER')
-    args.maintainability_index_develop = _resolve(
+    args.maintainability_index_develop = _resolve_pattern(
         maintainability_pattern, args.develop_branch
     ) or os.environ.get('CI_MAINTAINABILITY_DEVELOP')
-    args.maintainability_index_feature = _resolve(
+    args.maintainability_index_feature = _resolve_pattern(
         maintainability_pattern, feature_branch
     ) or os.environ.get('CI_MAINTAINABILITY_FEATURE')
 
-    args.raw_metrics_master = _resolve(raw_pattern, args.default_branch) or os.environ.get(
+    args.raw_metrics_master = _resolve_pattern(raw_pattern, args.default_branch) or os.environ.get(
         'CI_RAW_METRICS_MASTER'
     )
-    args.raw_metrics_develop = _resolve(raw_pattern, args.develop_branch) or os.environ.get(
+    args.raw_metrics_develop = _resolve_pattern(
+        raw_pattern, args.develop_branch
+    ) or os.environ.get(
         'CI_RAW_METRICS_DEVELOP'
     )
-    args.raw_metrics_feature = _resolve(raw_pattern, feature_branch) or os.environ.get(
+    args.raw_metrics_feature = _resolve_pattern(raw_pattern, feature_branch) or os.environ.get(
         'CI_RAW_METRICS_FEATURE'
     )
 
-    args.coverage_docstring_master = _resolve(
+    args.coverage_docstring_master = _resolve_pattern(
         docstring_pattern, args.default_branch
     ) or os.environ.get('CI_DOCSTRING_MASTER')
-    args.coverage_docstring_develop = _resolve(
+    args.coverage_docstring_develop = _resolve_pattern(
         docstring_pattern, args.develop_branch
     ) or os.environ.get('CI_DOCSTRING_DEVELOP')
-    args.coverage_docstring_feature = _resolve(
+    args.coverage_docstring_feature = _resolve_pattern(
         docstring_pattern, feature_branch
     ) or os.environ.get('CI_DOCSTRING_FEATURE')
 
