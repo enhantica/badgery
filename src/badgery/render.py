@@ -104,9 +104,10 @@ class HTMLDashboardRenderer:
     .values .item-label.yellow { color: #e8b745; }
     .values .item-label.orange { color: #f39c12; }
     .values .item-label.red { color: #e46259; }
+    .values .item-label.blue { color: #71b2f0; }
     .values .item-label.gray { color: #757575; }
-    /* Keep branch icons neutral, not colorized by label color */
-    .values .item-label .icon { color: #9a9a9a; margin-right: 0.5em; }
+    /* Icons inherit label color so they colorize accordingly */
+    .values .item-label .icon { color: currentColor; margin-right: 0.5em; }
     .values .item-value {
       white-space: nowrap;
     }
