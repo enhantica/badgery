@@ -247,6 +247,6 @@ jobs:
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: "dashboard.yaml",
+              workflow_id: "Build and publish dashboard",
               ref: "${{ env.CI_BRANCH }}"
             });
