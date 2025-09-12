@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import runpy
+from pathlib import Path
 
 import pytest
 
@@ -11,7 +11,8 @@ from badgery import render as render_mod
 
 
 def test_package_main_invokes_cli_and_writes_output(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ):
     # Patch parse_args to control arguments provided to main()
 

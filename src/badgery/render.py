@@ -326,16 +326,16 @@ class HTMLDashboardRenderer:
             if not value or not isinstance(value, tuple) or value[0] is None:
                 return ('unknown', 'gray')
             mi = float(value[0])
-            if mi >= 80:
+            if mi >= HTMLDashboardRenderer.MI_A:
                 grade = 'A'
                 color = 'green'
-            elif mi >= 60:
+            elif mi >= HTMLDashboardRenderer.MI_B:
                 grade = 'B'
                 color = 'yellow-green'
-            elif mi >= 40:
+            elif mi >= HTMLDashboardRenderer.MI_C:
                 grade = 'C'
                 color = 'yellow'
-            elif mi >= 20:
+            elif mi >= HTMLDashboardRenderer.MI_D:
                 grade = 'D'
                 color = 'orange'
             else:
@@ -497,7 +497,7 @@ class HTMLDashboardRenderer:
 class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
     """Renderer variant that uses an explicit card order spec."""
 
-    def __init__(
+    def __init__(  # noqa: PLR0913, PLR0917
         self,
         metrics: list[BaseMetric],
         feature: str,
@@ -505,7 +505,7 @@ class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
         cards_spec: list[tuple[str, str, str]],
         default_branch: str = 'master',
         develop_branch: str = 'develop',
-    ):
+    ) -> None:
         """Initialize with context and ordered card spec."""
         super().__init__(
             metrics,
@@ -527,7 +527,7 @@ class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
 
         cards_html = '\n'.join(cards)
 
-        html = f"""<!DOCTYPE html>
+        return f"""<!DOCTYPE html>
 <html lang=\"en\">
 <head>
   <meta charset=\"UTF-8\">
@@ -547,4 +547,3 @@ class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
   </body>
   </html>
 """
-        return html
