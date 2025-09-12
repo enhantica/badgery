@@ -46,6 +46,7 @@ nodejs = ">=20,<21" # Required for prettier; pinned to a stable LTS
 # need to be specified explicitly in the environments section.
 
 default = { features = ["py313", "badgery-local-editable", "nodejs"] }
+wheel = { features = ["py313"] }
 
 #######
 # TASKS
