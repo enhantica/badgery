@@ -93,7 +93,7 @@ raw-metrics-json = "radon raw -s -j src/"
 tests-cov = "pixi run tests --cov=src/badgery --cov-report=term-missing"
 docstring-cov = "interrogate -c pyproject.toml src/"
 
-coverage = "pixi run docstring-coverage || true; pixi run unit-tests-coverage || true"
+coverage = "pixi run docstring-cov || true; pixi run tests-cov || true"
 
 # 🚀 Development & Build Tasks
 pre-commit = { depends-on = ["code-quality", "tests"] }
