@@ -40,8 +40,6 @@ concurrency:
 
 # Set the environment variables to be used in all jobs defined in this workflow
 env:
-  # CI_BRANCH - the branch name (used in mkdocs.yml)
-  # NOTEBOOKS_DIR - the directory containing the Jupyter notebooks (used in mkdocs.yml)
   CI_BRANCH: ${{ github.head_ref || github.ref_name }}
 
 jobs:
@@ -231,3 +229,24 @@ jobs:
       - name: Run unit tests
         shell: bash
         run: pixi run tests
+
+  trigger-dashboard-build:
+    needs: [code-quality, test-source, test-package]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check-out repository
+        uses: actions/checkout@v5
+
+      - name: Trigger dashboard build
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "dashboard.yaml",
+              ref: "${{ env.CI_BRANCH }}"
+            });

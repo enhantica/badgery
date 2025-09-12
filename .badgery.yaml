@@ -5,7 +5,7 @@ cards:
   - group: Tests
     type: gh_action
     title: Test code and package
-    file: test-code.yaml
+    file: code.yaml
     enabled: true
 
   - group: Tests
@@ -63,7 +63,7 @@ cards:
   - group: Security
     type: gh_action
     title: Scan security
-    workflow: scan-security.yaml
+    workflow: security.yaml
     enabled: true
 
   - group: Build & Release

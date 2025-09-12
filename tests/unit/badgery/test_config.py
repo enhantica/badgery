@@ -30,7 +30,7 @@ cards:
   - group: Tests
     type: gh_action
     title: Test code and package
-    workflow: test-code.yaml
+    workflow: code.yaml
     enabled: true
         """.strip(),
     )
@@ -40,7 +40,7 @@ cards:
     assert settings['develop_branch'] == 'develop'
     assert isinstance(settings['cards'], list)
     assert settings['cards'][0]['group'] == 'Code Quality'
-    assert settings['cards'][1]['workflow'] == 'test-code.yaml'
+    assert settings['cards'][1]['workflow'] == 'code.yaml'
 
 
 def test_group_icon_mapping_basic():
