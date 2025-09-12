@@ -1,20 +1,3 @@
-# This is the main workflow for testing the code before and after
-# packaging it.
-# The workflow is divided into three jobs:
-# 1. code-quality:
-#    - Check the validity of pyproject.toml
-#    - Check code linting
-#    - Check code formatting
-#    - Check formatting of Markdown, YAML, TOML, etc. files
-# 2. test-source:
-#    - Test the code base against the latest code in the repository
-#    - Create the Python package
-#    - Upload the Python package for the next job
-# 3. test-package:
-#    - Download the Python package (including extra files) from the previous job
-#    - Install the downloaded Python package
-#    - Test the code base against the installed package
-
 name: Test code and package
 
 on:
@@ -43,97 +26,8 @@ env:
   CI_BRANCH: ${{ github.head_ref || github.ref_name }}
 
 jobs:
-  # Job 1: Check code quality and consistency
-  code-quality:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-
-    runs-on: ${{ matrix.os }}
-
-    outputs:
-      pytest-marks: ${{ steps.set-mark.outputs.pytest_marks }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Set up pixi
-        uses: prefix-dev/setup-pixi@v0.9.0
-        with:
-          environments: default
-          activate-environment: default
-          run-install: true
-          frozen: true
-          cache: false
-          post-cleanup: false
-
-      - name: Install extra tools (Prettier)
-        shell: bash
-        run: |
-          pixi run npm config set registry https://registry.npmjs.org/
-          pixi run prettier-install
-
-      # Check the validity of pyproject.toml
-      - name: Check validity of pyproject.toml
-        id: check_pyproject
-        continue-on-error: true
-        shell: bash
-        run: pixi run pyproject-check
-
-      # Check code linting with Ruff in the project root
-      - name: Check code linting
-        id: check_code_linting
-        continue-on-error: true
-        shell: bash
-        run: pixi run py-lint-check
-
-      - name: Suggestion to fix code linting issues (*.py files)
-        if: steps.check_code_linting.outcome == 'failure'
-        shell: bash
-        run:
-          echo "In project root run 'pixi run py-lint-fix' and commit changes"
-
-      # Check code formatting with Ruff in the project root
-      - name: Check code formatting
-        id: check_code_formatting
-        continue-on-error: true
-        shell: bash
-        run: pixi run py-format-check
-
-      - name: Suggestion to fix code formatting issues (*.py files)
-        if: steps.check_code_formatting.outcome == 'failure'
-        shell: bash
-        run:
-          echo "In project root run 'pixi run py-format-fix' and commit changes"
-
-      # Check formatting of Markdown, YAML, TOML, etc. files with Prettier in
-      # the project root
-      - name: Check formatting of Markdown, YAML, TOML, etc. files
-        id: check_others_formatting
-        continue-on-error: true
-        shell: bash
-        run: pixi run nonpy-format-check
-
-      - name: Suggestion to fix non-code formatting issues (*.md, *.yml, etc.)
-        if: steps.check_others_formatting.outcome == 'failure'
-        shell: bash
-        run:
-          echo "In project root run 'pixi run nonpy-format-fix' and commit
-          changes"
-
-      - name: Force fail if any of the previous steps failed
-        if: |
-          steps.check_pyproject.outcome == 'failure' ||
-          steps.check_code_linting.outcome == 'failure' ||
-          steps.check_code_formatting.outcome == 'failure' ||
-          steps.check_others_formatting.outcome == 'failure'
-        run: exit 0
-
-  # Job 2: Test code
+  # Job 1: Test code
   test-source:
-    needs: code-quality # previous job needs to be finished first
-
     strategy:
       fail-fast: false
       matrix:
@@ -190,9 +84,9 @@ jobs:
           if-no-files-found: 'error'
           compression-level: 0
 
-  # Job 3: Test the package
+  # Job 2: Test the package
   test-package:
-    needs: [code-quality, test-source] # depend on both previous jobs
+    needs: [test-source] # depend on previous job
 
     strategy:
       fail-fast: false
@@ -230,8 +124,9 @@ jobs:
         shell: bash
         run: pixi run tests
 
+  # Job 3: Trigger dashboard build
   trigger-dashboard-build:
-    needs: [code-quality, test-source, test-package]
+    needs: [test-source, test-package] # depend on previous jobs
 
     runs-on: ubuntu-latest
 
