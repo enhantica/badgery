@@ -3,7 +3,7 @@
 # Usage:
 #   - Triggered manually via workflow_dispatch.
 #   - Creates a PR titled "Release: merge develop into master".
-#   - Adds the label "[maintainer] release" so it is excluded from changelogs.
+#   - Adds the label "[maintainer] auto-pull-request" so it is excluded from changelogs.
 #   - The PR body makes clear that this is automation only (no review needed).
 
 name: Release PR creation

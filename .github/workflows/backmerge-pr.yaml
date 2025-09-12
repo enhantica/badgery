@@ -4,7 +4,7 @@
 # Usage:
 #   - Triggered automatically on tag push (v*).
 #   - Creates a PR titled "Backmerge: main into develop".
-#   - Adds the label "[maintainer] release" so it is excluded from changelogs.
+#   - Adds the label "[maintainer] auto-pull-request" so it is excluded from changelogs.
 
 name: Backmerge PR creation
 
