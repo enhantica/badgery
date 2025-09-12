@@ -5,13 +5,13 @@ cards:
   - group: Tests
     type: gh_action
     title: Test code and package
-    file: code.yaml
+    file: test.yaml
     enabled: true
 
   - group: Tests
     type: gh_action
     title: Test package on PyPI
-    file: test-package-pypi.yaml
+    file: test-pypi.yaml
     enabled: true
 
   - group: Code Quality
