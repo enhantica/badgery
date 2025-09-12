@@ -7,7 +7,7 @@ from badgery.badges import BadgeGenerator
 from badgery.metrics import LinesOfCodeMetric
 
 
-def test_loc_nested_raw_fields_and_invalid_values(tmp_path: Path):
+def test_loc_nested_raw_fields_and_invalid_values(tmp_path: Path) -> None:
     # Nested dictionaries with raw and direct sloc/lloc and some invalid values
     data = {
         'pkg': {

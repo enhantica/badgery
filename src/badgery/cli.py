@@ -7,6 +7,7 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+from importlib import metadata as importlib_metadata
 from pathlib import Path
 
 from badgery.badges import BadgeGenerator
@@ -72,6 +73,22 @@ def parse_args() -> argparse.Namespace:
         `.badgery.yaml` (cards, branches, report paths).
     """
     parser = argparse.ArgumentParser(description='Generate an HTML dashboard of status badges.')
+    # Provide installed version or 'unknown'.
+
+    def _get_version() -> str:
+        try:
+            return importlib_metadata.version('badgery')
+        except importlib_metadata.PackageNotFoundError:
+            return 'unknown'
+        except Exception:
+            return 'unknown'
+
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=f'badgery {_get_version()}',
+        help='Show installed version and exit',
+    )
     parser.add_argument(
         '--output',
         default='BADGES.html',
@@ -174,7 +191,7 @@ def main() -> None:
     cfg_file = getattr(args, 'config', '.badgery.yaml')
     cfg_path = Path(cfg_file)
     if cfg_path.exists():
-        logging.info('Using config %s', cfg_file)
+        logging.info(' Using config %s', cfg_file)
 
     feature = args.branch
     badge_gen = BadgeGenerator(repo=args.repo)

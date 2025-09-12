@@ -8,7 +8,10 @@ import pytest
 from badgery.cli import parse_args
 
 
-def test_parse_args_uses_glob_for_first_match(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_parse_args_uses_glob_for_first_match(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # Prepare reports with wildcard pattern in config
     reports = tmp_path / 'reports' / 'main'
     reports.mkdir(parents=True)

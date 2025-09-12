@@ -16,7 +16,7 @@ from badgery.metrics import LinesOfCodeMetric
 from badgery.metrics import MaintainabilityMetric
 
 
-def test_maintainability_read_value_and_format(tmp_path: Path):
+def test_maintainability_read_value_and_format(tmp_path: Path) -> None:
     data = {'a.py': {'mi': 80}, 'b.py': {'mi': 50}, 'c.py': {'mi': 70}}
     p = tmp_path / 'mi.json'
     p.write_text(json.dumps(data), encoding='utf-8')
@@ -30,7 +30,7 @@ def test_maintainability_read_value_and_format(tmp_path: Path):
     assert m.format_value((66.6, 3)).endswith('over 3 files')
 
 
-def test_complexity_read_value(tmp_path: Path):
+def test_complexity_read_value(tmp_path: Path) -> None:
     data = {
         'a.py': [{'complexity': 3}, {'complexity': 8}],
         'b.py': [{'complexity': 10}],
@@ -44,7 +44,7 @@ def test_complexity_read_value(tmp_path: Path):
     assert count == expected_three
 
 
-def test_lines_of_code_sum_raw_metrics(tmp_path: Path):
+def test_lines_of_code_sum_raw_metrics(tmp_path: Path) -> None:
     # Use flat keys to align with current aggregation behavior
     data = {
         'x': {'sloc': 10, 'lloc': 5},
@@ -53,14 +53,14 @@ def test_lines_of_code_sum_raw_metrics(tmp_path: Path):
     p = tmp_path / 'raw.json'
     p.write_text(json.dumps(data), encoding='utf-8')
     loc = LinesOfCodeMetric(BadgeGenerator('r/x'))
-    sloc, lloc = loc._sum_raw_metrics(str(p))
+    sloc, lloc = loc._sum_raw_metrics(str(p))  # noqa: SLF001
     expected_sloc = 30
     expected_lloc = 15
     assert sloc == expected_sloc
     assert lloc == expected_lloc
 
 
-def test_file_and_function_counts(tmp_path: Path):
+def test_file_and_function_counts(tmp_path: Path) -> None:
     data = {
         'a.py': [{'n': 1}, {'n': 2}, {'n': 3}],
         'b.py': [{'n': 1}],
@@ -74,11 +74,11 @@ def test_file_and_function_counts(tmp_path: Path):
     # Private helpers used via read_all; call directly for clarity
     expected_files = 2
     expected_funcs = 4
-    assert files._count_files(str(p)) == expected_files
-    assert funcs._count_functions(str(p)) == expected_funcs
+    assert files._count_files(str(p)) == expected_files  # noqa: SLF001
+    assert funcs._count_functions(str(p)) == expected_funcs  # noqa: SLF001
 
 
-def test_docstring_coverage_read_value_from_table_and_fallback(tmp_path: Path):
+def test_docstring_coverage_read_value_from_table_and_fallback(tmp_path: Path) -> None:
     t = tmp_path / 'doc.txt'
     t.write_text('header\n| TOTAL | 10 | 30% |', encoding='utf-8')
     d = DocstringCoverageMetric(BadgeGenerator('r/x'))
@@ -90,7 +90,7 @@ def test_docstring_coverage_read_value_from_table_and_fallback(tmp_path: Path):
     assert d.read_value(str(t2)) == '45%'
 
 
-def test_codecov_and_codefactor_read_all_from_env(monkeypatch):
+def test_codecov_and_codefactor_read_all_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv('CI_CODECOV_MASTER', '80%')
     monkeypatch.setenv('CI_CODECOV_DEVELOP', '82%')
     monkeypatch.setenv('CI_CODECOV_FEATURE', '70%')
