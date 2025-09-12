@@ -11,6 +11,11 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+# Need permissions to trigger the dashboard build workflow
+permissions:
+  actions: write
+  contents: read
+
 # Allow only one concurrent workflow, skipping runs queued between the run
 # in-progress and latest queued. And cancel in-progress runs.
 concurrency:
@@ -79,8 +84,6 @@ jobs:
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          retries: 10
-          retry-exempt-status-codes: 403
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
