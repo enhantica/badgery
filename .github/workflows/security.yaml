@@ -2,7 +2,7 @@
 # GitHub code scanning.
 # https://github.com/github/ossar-action
 
-name: Scan security (static analysis)
+name: Scan security
 
 on:
   # Trigger the workflow on pull request
