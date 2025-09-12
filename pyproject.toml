@@ -188,7 +188,16 @@ ban-relative-imports = 'all'
 force-single-line = true
 
 [tool.ruff.lint.per-file-ignores]
-'*test_*.py' = ['S101'] # allow asserts in test files
+'tests/**/*.py' = [
+  'S101', # allow asserts in test files
+  'D100', # do not require docstrings in tests
+  'D101', # do not require docstrings in tests
+  'D102', # do not require docstrings in tests
+  'D103', # do not require docstrings in tests
+  'D104', # do not require docstrings in tests
+  'TCH',  # do not enforce type-checking import blocks in tests
+  'W505', # ignore doc line length in tests
+]
 
 [tool.ruff.lint.pycodestyle]
 max-line-length = 99 # https://peps.python.org/pep-0008/#maximum-line-length

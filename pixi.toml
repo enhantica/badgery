@@ -73,7 +73,7 @@ nonpy-format-fix = "npx prettier . --list-different --write --config=prettierrc.
 nonpy-format-fix-modified = "npx prettier $(git diff --name-only HEAD | grep -E '\\.(json|ya?ml|toml|md|css|html)$' || echo .) --list-different --write --config=prettierrc.toml"
 docs-format-fix = "docformatter --in-place src/"
 
-code-quality = { depends-on = [
+quality = { depends-on = [
   "pyproject-check",
   "py-format-fix",
   "docs-format-fix",
