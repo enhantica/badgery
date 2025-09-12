@@ -70,7 +70,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           external_repository: ${{ env.REPO_OWNER }}/dashboard
-          publish_branch: main
+          publish_branch: ${{ env.DEFAULT_BRANCH}}
           personal_token: ${{ secrets.GH_API_PERSONAL_ACCSESS_TOKEN }}
           publish_dir: ./_dashboard_publish
           keep_files: true

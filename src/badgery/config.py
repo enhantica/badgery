@@ -18,6 +18,7 @@ from badgery.metrics import ComplexityMetric
 from badgery.metrics import DocstringCoverageMetric
 from badgery.metrics import FileCountMetric
 from badgery.metrics import FunctionCountMetric
+from badgery.metrics import FunctionsPerFileMetric
 from badgery.metrics import GithubWorkflowMetric
 from badgery.metrics import LinesOfCodeMetric
 from badgery.metrics import MaintainabilityMetric
@@ -216,6 +217,8 @@ def build_metrics_from_config(  # noqa: C901 - acceptable complexity
             'radon_loc': LinesOfCodeMetric,
             'radon_files': FileCountMetric,
             'radon_funcs': FunctionCountMetric,
+            'radon_funcs_per_file': FunctionsPerFileMetric,
+            'radon_ff': FunctionsPerFileMetric,  # short alias
             'interrogate': DocstringCoverageMetric,
         }
         cls = mapping.get(ctype)

@@ -34,7 +34,7 @@ def _collect_report_patterns(
         if not card.get('enabled', True):
             continue
         ctype = str(card.get('type', '')).strip().lower()
-        if ctype in {'radon_cc', 'radon_files', 'radon_funcs'}:
+        if ctype in {'radon_cc', 'radon_files', 'radon_funcs', 'radon_funcs_per_file', 'radon_ff'}:
             complexity_pattern = card.get('report') or card.get('dir') or complexity_pattern
         elif ctype == 'radon_mi':
             maintainability_pattern = card.get('report') or maintainability_pattern
