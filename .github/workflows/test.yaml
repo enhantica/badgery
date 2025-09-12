@@ -135,4 +135,4 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Trigger dashboard build
-        uses: ./.github/workflows/dashboard.yaml
+        uses: enhantica/badgery/.github/workflows/dashboard.yaml@{{ env.CI_BRANCH }}
