@@ -32,7 +32,9 @@ def test_cli_main_handles_metric_read_exception(tmp_path: Path, monkeypatch: pyt
 
     # build_metrics_from_config returns the raising metric and a simple spec
     monkeypatch.setattr(
-        cli_mod, 'build_metrics_from_config', lambda _cards, _bg, _f: ([RaisingMetric()], [('raising', 'R', 'i')])
+        cli_mod,
+        'build_metrics_from_config',
+        lambda _cards, _bg, _f: ([RaisingMetric()], [('raising', 'R', 'i')]),
     )
 
     # Render returns deterministic output
@@ -42,4 +44,3 @@ def test_cli_main_handles_metric_read_exception(tmp_path: Path, monkeypatch: pyt
     cli_mod.main()
     assert Path(args.output).exists()
     assert Path(args.output).read_text(encoding='utf-8') == 'HTML'
-

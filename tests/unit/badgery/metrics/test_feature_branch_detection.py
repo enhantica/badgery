@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-
 from badgery.badges import BadgeGenerator
 from badgery.metrics import ComplexityMetric
 
@@ -36,4 +34,3 @@ def test_detect_feature_branch_unknown(monkeypatch):
     monkeypatch.delenv('GITHUB_HEAD_REF', raising=False)
     m = ComplexityMetric(BadgeGenerator('x/y'), feature=None)
     assert m.feature == 'unknown'
-

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
@@ -13,7 +12,9 @@ def _write_yaml(path: Path, text: str) -> None:
     path.write_text(text, encoding='utf-8')
 
 
-def test_parse_args_resolves_report_paths_with_branch_placeholders(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_parse_args_resolves_report_paths_with_branch_placeholders(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
     # Prepare temp repo layout with reports per branch
     repo_root = tmp_path
     reports = repo_root / 'reports'
@@ -83,24 +84,53 @@ def test_parse_args_resolves_report_paths_with_branch_placeholders(tmp_path: Pat
     args = parse_args()
 
     # Complexity report paths
-    assert Path(args.cyclomatic_complexity_master).resolve() == (reports / 'main' / 'cc.json').resolve()
-    assert Path(args.cyclomatic_complexity_develop).resolve() == (reports / 'develop' / 'cc.json').resolve()
-    assert Path(args.cyclomatic_complexity_feature).resolve() == (reports / 'feature-x' / 'cc.json').resolve()
+    assert (
+        Path(args.cyclomatic_complexity_master).resolve()
+        == (reports / 'main' / 'cc.json').resolve()
+    )
+    assert (
+        Path(args.cyclomatic_complexity_develop).resolve()
+        == (reports / 'develop' / 'cc.json').resolve()
+    )
+    assert (
+        Path(args.cyclomatic_complexity_feature).resolve()
+        == (reports / 'feature-x' / 'cc.json').resolve()
+    )
 
     # MI report paths
-    assert Path(args.maintainability_index_master).resolve() == (reports / 'main' / 'mi.json').resolve()
-    assert Path(args.maintainability_index_develop).resolve() == (reports / 'develop' / 'mi.json').resolve()
-    assert Path(args.maintainability_index_feature).resolve() == (reports / 'feature-x' / 'mi.json').resolve()
+    assert (
+        Path(args.maintainability_index_master).resolve()
+        == (reports / 'main' / 'mi.json').resolve()
+    )
+    assert (
+        Path(args.maintainability_index_develop).resolve()
+        == (reports / 'develop' / 'mi.json').resolve()
+    )
+    assert (
+        Path(args.maintainability_index_feature).resolve()
+        == (reports / 'feature-x' / 'mi.json').resolve()
+    )
 
     # Raw metrics paths
     assert Path(args.raw_metrics_master).resolve() == (reports / 'main' / 'raw.json').resolve()
     assert Path(args.raw_metrics_develop).resolve() == (reports / 'develop' / 'raw.json').resolve()
-    assert Path(args.raw_metrics_feature).resolve() == (reports / 'feature-x' / 'raw.json').resolve()
+    assert (
+        Path(args.raw_metrics_feature).resolve() == (reports / 'feature-x' / 'raw.json').resolve()
+    )
 
     # Docstring coverage paths
-    assert Path(args.coverage_docstring_master).resolve() == (reports / 'main' / 'interrogate.txt').resolve()
-    assert Path(args.coverage_docstring_develop).resolve() == (reports / 'develop' / 'interrogate.txt').resolve()
-    assert Path(args.coverage_docstring_feature).resolve() == (reports / 'feature-x' / 'interrogate.txt').resolve()
+    assert (
+        Path(args.coverage_docstring_master).resolve()
+        == (reports / 'main' / 'interrogate.txt').resolve()
+    )
+    assert (
+        Path(args.coverage_docstring_develop).resolve()
+        == (reports / 'develop' / 'interrogate.txt').resolve()
+    )
+    assert (
+        Path(args.coverage_docstring_feature).resolve()
+        == (reports / 'feature-x' / 'interrogate.txt').resolve()
+    )
 
 
 def test_parse_args_dir_pattern_with_double_star(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
@@ -144,6 +174,15 @@ def test_parse_args_dir_pattern_with_double_star(tmp_path: Path, monkeypatch: py
     args = parse_args()
 
     # The code replaces "**" with branch name verbatim
-    assert Path(args.cyclomatic_complexity_master).resolve() == (reports / 'main' / 'cc.json').resolve()
-    assert Path(args.cyclomatic_complexity_develop).resolve() == (reports / 'develop' / 'cc.json').resolve()
-    assert Path(args.cyclomatic_complexity_feature).resolve() == (reports / 'feature-x' / 'cc.json').resolve()
+    assert (
+        Path(args.cyclomatic_complexity_master).resolve()
+        == (reports / 'main' / 'cc.json').resolve()
+    )
+    assert (
+        Path(args.cyclomatic_complexity_develop).resolve()
+        == (reports / 'develop' / 'cc.json').resolve()
+    )
+    assert (
+        Path(args.cyclomatic_complexity_feature).resolve()
+        == (reports / 'feature-x' / 'cc.json').resolve()
+    )

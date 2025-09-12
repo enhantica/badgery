@@ -8,18 +8,14 @@ from badgery.badges import BadgeGenerator
 def test_badge_generator_github_workflow_badge_img_master_branch():
     bg = BadgeGenerator(repo='org/repo')
     url = bg.github_workflow_badge_img('ci.yml', None)
-    assert (
-        url
-        == 'https://github.com/org/repo/actions/workflows/ci.yml/badge.svg'
-    )
+    assert url == 'https://github.com/org/repo/actions/workflows/ci.yml/badge.svg'
 
 
 def test_badge_generator_github_workflow_badge_img_specific_branch():
     bg = BadgeGenerator(repo='org/repo')
     url = bg.github_workflow_badge_img('ci.yml', 'feature-x')
     assert url == (
-        'https://github.com/org/repo/actions/workflows/ci.yml/badge.svg'
-        '?branch=feature-x'
+        'https://github.com/org/repo/actions/workflows/ci.yml/badge.svg?branch=feature-x'
     )
 
 
@@ -32,9 +28,7 @@ def test_badge_generator_links_codecov_and_codefactor(monkeypatch):
     # Codecov badge image for branch
     token = os.environ.get('CODECOV_TOKEN', 'qtsB5Q5BXO')
     u = bg.codecov_badge_img('dev')
-    assert u == (
-        f'https://codecov.io/gh/acme/radar/branch/dev/graph/badge.svg?token={token}'
-    )
+    assert u == (f'https://codecov.io/gh/acme/radar/branch/dev/graph/badge.svg?token={token}')
 
     # CodeFactor link and badge
     assert (
@@ -60,9 +54,15 @@ def test_codecov_badge_img_default_and_master(monkeypatch):
     token = os.environ.get('CODECOV_TOKEN', 'qtsB5Q5BXO')
     bg = BadgeGenerator(repo='org/repo')
     # Default (no branch) uses repository graph URL
-    assert bg.codecov_badge_img(None) == f'https://codecov.io/gh/org/repo/graph/badge.svg?token={token}'
+    assert (
+        bg.codecov_badge_img(None)
+        == f'https://codecov.io/gh/org/repo/graph/badge.svg?token={token}'
+    )
     # Master also uses repository graph URL (no branch path)
-    assert bg.codecov_badge_img('master') == f'https://codecov.io/gh/org/repo/graph/badge.svg?token={token}'
+    assert (
+        bg.codecov_badge_img('master')
+        == f'https://codecov.io/gh/org/repo/graph/badge.svg?token={token}'
+    )
 
 
 def test_private_badge_helpers_return_empty_strings():

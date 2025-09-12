@@ -8,7 +8,9 @@ import pytest
 from badgery.cli import parse_args
 
 
-def test_parse_args_env_fallbacks_used_when_reports_missing(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_parse_args_env_fallbacks_used_when_reports_missing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
     # Config points to non-existent files; args should fall back to env vars
     yml = tmp_path / '.badgery.yaml'
     yml.write_text(
@@ -72,4 +74,3 @@ def test_parse_args_env_fallbacks_used_when_reports_missing(tmp_path: Path, monk
     assert args.coverage_docstring_master == '/env/ds-main.txt'
     assert args.coverage_docstring_develop == '/env/ds-develop.txt'
     assert args.coverage_docstring_feature == '/env/ds-feature.txt'
-

@@ -41,4 +41,3 @@ def test_load_cards_from_yaml_supports_inline_mapping_and_booleans(tmp_path: Pat
     assert 'maintainability' not in keys
     # gh_action present
     assert any(s[0] == 'ci' for s in spec)
-

@@ -37,5 +37,7 @@ def test_parse_args_skips_disabled_cards(tmp_path: Path, monkeypatch: pytest.Mon
     monkeypatch.chdir(tmp_path)
 
     args = parse_args()
-    assert Path(args.cyclomatic_complexity_feature).resolve() == (reports / 'feat' / 'cc.json').resolve()
-
+    assert (
+        Path(args.cyclomatic_complexity_feature).resolve()
+        == (reports / 'feat' / 'cc.json').resolve()
+    )

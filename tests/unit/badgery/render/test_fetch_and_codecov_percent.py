@@ -36,4 +36,3 @@ def test_codecov_percent_chooses_last_and_rounds(monkeypatch: pytest.MonkeyPatch
 
     monkeypatch.setattr(r, '_fetch', fake_fetch)
     assert r._codecov_percent('dev') == 81
-

@@ -39,10 +39,10 @@ def test_load_settings_top_level_parsing_with_quotes(tmp_path: Path):
 
 def test_build_metrics_skips_unknown_and_missing_workflow(tmp_path: Path):
     cards = [
-        {"group": 'X', 'type': 'unknown', 'title': 'U'},  # unknown type
-        {"group": 'Build & Release', 'type': 'gh_action', 'title': 'Build'},  # no workflow
-        {"group": 'Size', 'type': 'radon_files', 'title': 'Files'},
-        {"group": 'Size', 'type': 'radon_funcs', 'title': 'Funcs'},
+        {'group': 'X', 'type': 'unknown', 'title': 'U'},  # unknown type
+        {'group': 'Build & Release', 'type': 'gh_action', 'title': 'Build'},  # no workflow
+        {'group': 'Size', 'type': 'radon_files', 'title': 'Files'},
+        {'group': 'Size', 'type': 'radon_funcs', 'title': 'Funcs'},
     ]
     bg = BadgeGenerator('org/repo')
     metrics, spec = build_metrics_from_config(cards, bg, feature='f')

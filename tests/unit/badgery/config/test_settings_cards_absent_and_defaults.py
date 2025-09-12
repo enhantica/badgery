@@ -17,4 +17,3 @@ def test_load_settings_without_cards_section(tmp_path: Path):
 
 def test_group_icon_default_fallback():
     assert group_icon('unknown-group') == 'fas fa-gauge'
-

@@ -17,4 +17,3 @@ def test_loc_ratio_color_thresholds_orange_and_yellow():
     assert _status((125, 100))[1] == 'yellow'
     # Orange when 1.5 >= ratio > 1.25
     assert _status((140, 100))[1] == 'orange'
-

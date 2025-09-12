@@ -6,7 +6,9 @@ from pathlib import Path
 import pytest
 
 
-def test_package_main_invokes_cli_and_writes_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_package_main_invokes_cli_and_writes_output(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
     # Patch parse_args to control arguments provided to main()
     from badgery import cli as cli_mod
     from badgery import config as cfg_mod

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from types import SimpleNamespace
-
 from badgery.badges import BadgeGenerator
 from badgery.render import HTMLDashboardRenderer
 
@@ -24,7 +22,9 @@ def test_fetch_success_path_and_status_variants(monkeypatch):
         def read(self):
             return self._payload
 
-    monkeypatch.setattr('badgery.render.urlopen', lambda url, timeout=8.0: DummyResp(200, b'<svg>ok</svg>'))
+    monkeypatch.setattr(
+        'badgery.render.urlopen', lambda url, timeout=8.0: DummyResp(200, b'<svg>ok</svg>')
+    )
     assert r._fetch('https://example.com/x.svg') == '<svg>ok</svg>'
 
     # Status variants mapping
@@ -34,4 +34,3 @@ def test_fetch_success_path_and_status_variants(monkeypatch):
     # in progress should map verbatim (lowercased)
     monkeypatch.setattr(r, '_fetch', fake_fetch_status('in progress'))
     assert r._github_badge_status('ci.yml', 'dev') == 'in progress'
-

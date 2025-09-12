@@ -73,15 +73,7 @@ def test_file_and_function_counts(tmp_path: Path):
 
 def test_docstring_coverage_read_value_from_table_and_fallback(tmp_path: Path):
     t = tmp_path / 'doc.txt'
-    t.write_text(
-        "\n".join(
-            [
-                'header',
-                '| TOTAL | 10 | 30% |',
-            ]
-        ),
-        encoding='utf-8',
-    )
+    t.write_text('header\n| TOTAL | 10 | 30% |', encoding='utf-8')
     d = DocstringCoverageMetric(BadgeGenerator('r/x'))
     assert d.read_value(str(t)) == '30%'
 

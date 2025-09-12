@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import os
-
 import pytest
 
 from badgery.badges import BadgeGenerator
-from badgery.metrics import CodeFactorMetric
 from badgery.metrics import CodecovMetric
+from badgery.metrics import CodeFactorMetric
 from badgery.metrics import GithubWorkflowMetric
 from badgery.render import HTMLDashboardRenderer
 

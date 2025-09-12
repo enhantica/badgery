@@ -87,4 +87,3 @@ def test_html_render_end_to_end_smoke():
     # Counts are formatted as blue text values (class color asserted indirectly via presence)
     assert 'Files' in html and 'main: 12' in html
     assert 'Functions' in html and 'develop: 110' in html
-

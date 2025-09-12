@@ -10,15 +10,15 @@ from badgery.metrics import LinesOfCodeMetric
 def test_loc_nested_raw_fields_and_invalid_values(tmp_path: Path):
     # Nested dictionaries with raw and direct sloc/lloc and some invalid values
     data = {
-        "pkg": {
-            "module": {
-                "file1": {"raw": {"sloc": 10, "lloc": 5}},
-                "file2": {"sloc": 3, "lloc": 2},
-                "file3": {"raw": {"sloc": "bad", "lloc": 7}},  # invalid sloc ignored
+        'pkg': {
+            'module': {
+                'file1': {'raw': {'sloc': 10, 'lloc': 5}},
+                'file2': {'sloc': 3, 'lloc': 2},
+                'file3': {'raw': {'sloc': 'bad', 'lloc': 7}},  # invalid sloc ignored
             },
-            "list": [
-                {"raw": {"sloc": 4, "lloc": 4}},
-                {"sloc": 1, "lloc": 1},
+            'list': [
+                {'raw': {'sloc': 4, 'lloc': 4}},
+                {'sloc': 1, 'lloc': 1},
             ],
         }
     }
