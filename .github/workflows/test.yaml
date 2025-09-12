@@ -127,4 +127,21 @@ jobs:
   # Job 3: Trigger dashboard build
   trigger-dashboard-build:
     needs: [test-source, test-package] # depend on previous jobs
-    uses: enhantica/badgery/.github/workflows/dashboard.yaml@{{ env.CI_BRANCH }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check-out repository
+        uses: actions/checkout@v5
+
+      - name: Trigger dashboard build
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "dashboard.yaml",
+              ref: "${{ env.CI_BRANCH }}"
+            });
