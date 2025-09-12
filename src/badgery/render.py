@@ -525,19 +525,15 @@ class HTMLDashboardRenderer:
         if HTMLDashboardRenderer.FPF_A_MIN <= ratio <= HTMLDashboardRenderer.FPF_A_MAX:
             color = 'green'
         elif (
-            (HTMLDashboardRenderer.FPF_B_LOW_MIN <= ratio < HTMLDashboardRenderer.FPF_B_LOW_MAX)
-            or (
-                HTMLDashboardRenderer.FPF_B_HIGH_MIN < ratio
-                <= HTMLDashboardRenderer.FPF_B_HIGH_MAX
-            )
+            HTMLDashboardRenderer.FPF_B_LOW_MIN <= ratio < HTMLDashboardRenderer.FPF_B_LOW_MAX
+        ) or (
+            HTMLDashboardRenderer.FPF_B_HIGH_MIN < ratio <= HTMLDashboardRenderer.FPF_B_HIGH_MAX
         ):
             color = 'yellow-green'
         elif (
-            (HTMLDashboardRenderer.FPF_C_LOW_MIN <= ratio < HTMLDashboardRenderer.FPF_C_LOW_MAX)
-            or (
-                HTMLDashboardRenderer.FPF_C_HIGH_MIN < ratio
-                <= HTMLDashboardRenderer.FPF_C_HIGH_MAX
-            )
+            HTMLDashboardRenderer.FPF_C_LOW_MIN <= ratio < HTMLDashboardRenderer.FPF_C_LOW_MAX
+        ) or (
+            HTMLDashboardRenderer.FPF_C_HIGH_MIN < ratio <= HTMLDashboardRenderer.FPF_C_HIGH_MAX
         ):
             color = 'yellow'
         elif ratio > HTMLDashboardRenderer.FPF_D_MIN:
