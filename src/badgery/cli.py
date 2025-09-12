@@ -174,7 +174,7 @@ def main() -> None:
     cfg_file = getattr(args, 'config', '.badgery.yaml')
     cfg_path = Path(cfg_file)
     if cfg_path.exists():
-        logging.info('Using config %s', cfg_file)
+        logging.info(' Using config %s', cfg_file)
 
     feature = args.branch
     badge_gen = BadgeGenerator(repo=args.repo)
