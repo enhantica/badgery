@@ -11,7 +11,7 @@ name: Backmerge PR creation
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 permissions:
   contents: write
