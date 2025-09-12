@@ -486,7 +486,7 @@ packages:
 - pypi: ./
   name: badgery
   version: 0.1.1+devdirty
-  sha256: f70004e2ed3c169cb276967ccbed98cd8856f69908c23537eaf1b283cc4df7cc
+  sha256: c6343aa8a16238cec356ee104fc4ecb4bbcc4983d75774258f05e03bb94d32f2
   requires_dist:
   - build ; extra == 'dev'
   - docformatter ; extra == 'dev'

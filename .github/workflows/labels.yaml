@@ -28,8 +28,7 @@ jobs:
             contains(github.event.pull_request.labels.*.name, '[scope]
           maintenance') ||
             contains(github.event.pull_request.labels.*.name, '[scope]
-          significant')
-          )
+          significant') )
         run: |
           echo "::error::PR must have at least one of: [maintainer] release, [scope] bug, documentation, enhancement, maintenance, significant"
           exit 1
