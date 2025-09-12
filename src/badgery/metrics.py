@@ -11,8 +11,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import ClassVar
-from typing import Optional
-from typing import Tuple
 
 if TYPE_CHECKING:
     from badgery.badges import BadgeGenerator
@@ -47,7 +45,7 @@ class BaseMetric:
 
     def __init__(
         self,
-        badge_gen: 'BadgeGenerator',
+        badge_gen: BadgeGenerator,
         key=None,
         label=None,
         feature: str | None = None,
@@ -105,7 +103,7 @@ class MaintainabilityMetric(BaseMetric):
     ]
     reverse = False
 
-    def __init__(self, badge_gen: 'BadgeGenerator', feature=None):
+    def __init__(self, badge_gen: BadgeGenerator, feature=None):
         """Initialize maintainability metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
@@ -283,7 +281,7 @@ class GithubWorkflowMetric(BaseMetric):
 
     def __init__(
         self,
-        badge_gen: 'BadgeGenerator',
+        badge_gen: BadgeGenerator,
         workflow_filename: str,
         label: str,
         feature=None,
@@ -391,7 +389,7 @@ class LinesOfCodeMetric(BaseMetric):
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     @staticmethod
-    def _extract_sloc_lloc(obj: Any) -> Tuple[int, int]:
+    def _extract_sloc_lloc(obj: Any) -> tuple[int, int]:
         """Recursively extract SLOC/LLOC from a JSON-like object.
 
         Returns:
@@ -426,7 +424,7 @@ class LinesOfCodeMetric(BaseMetric):
         return (sloc, lloc)
 
     @staticmethod
-    def _sum_raw_metrics(path: Optional[str]) -> Optional[Tuple[int, int]]:
+    def _sum_raw_metrics(path: str | None) -> tuple[int, int] | None:
         if not path or not Path(path).exists():
             return None
         try:
@@ -448,12 +446,12 @@ class FileCountMetric(BaseMetric):
     key = 'files'
     label = 'Number of files'
 
-    def __init__(self, badge_gen: 'BadgeGenerator', feature=None):
+    def __init__(self, badge_gen: BadgeGenerator, feature=None):
         """Initialize metric with badge generator and feature branch."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     @staticmethod
-    def _count_files(path: Optional[str]) -> Optional[int]:
+    def _count_files(path: str | None) -> int | None:
         if not path or not Path(path).exists():
             return None
         try:
@@ -479,12 +477,12 @@ class FunctionCountMetric(BaseMetric):
     key = 'funcs'
     label = 'Number of functions'
 
-    def __init__(self, badge_gen: 'BadgeGenerator', feature=None):
+    def __init__(self, badge_gen: BadgeGenerator, feature=None):
         """Initialize metric with badge generator and feature branch."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     @staticmethod
-    def _count_functions(path: Optional[str]) -> Optional[int]:
+    def _count_functions(path: str | None) -> int | None:
         if not path or not Path(path).exists():
             return None
         try:

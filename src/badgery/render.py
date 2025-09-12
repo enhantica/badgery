@@ -8,9 +8,6 @@ import logging
 import os
 import re
 from typing import TYPE_CHECKING
-from typing import List
-from typing import Optional
-from typing import Tuple
 from urllib.error import HTTPError
 from urllib.error import URLError
 from urllib.request import urlopen
@@ -100,9 +97,9 @@ class HTMLDashboardRenderer:
 
     def __init__(
         self,
-        metrics: List[BaseMetric],
+        metrics: list[BaseMetric],
         feature: str,
-        badge_gen: 'BadgeGenerator',
+        badge_gen: BadgeGenerator,
         default_branch: str = 'master',
         develop_branch: str = 'develop',
     ):
@@ -115,7 +112,7 @@ class HTMLDashboardRenderer:
         self.develop_branch = develop_branch
 
     @staticmethod
-    def _fetch(url: str, timeout: float = 8.0) -> Optional[str]:
+    def _fetch(url: str, timeout: float = 8.0) -> str | None:
         """Fetch a URL and return its text content.
 
         Args:
@@ -147,7 +144,7 @@ class HTMLDashboardRenderer:
                 logging.debug('Response close failed: %s', close_exc)
         return None
 
-    def _github_badge_status(self, workflow: str, branch: Optional[str]) -> Optional[str]:
+    def _github_badge_status(self, workflow: str, branch: str | None) -> str | None:
         """Parse a GitHub Actions badge and return a normalized status.
 
         Args:
@@ -175,7 +172,7 @@ class HTMLDashboardRenderer:
             return word
         return word
 
-    def _codecov_percent(self, branch: Optional[str]) -> Optional[int]:
+    def _codecov_percent(self, branch: str | None) -> int | None:
         """Return Codecov percentage for a branch by parsing the badge.
 
         Args:
@@ -204,7 +201,7 @@ class HTMLDashboardRenderer:
         except Exception:
             return None
 
-    def _codefactor_grade(self, branch: str) -> Optional[str]:
+    def _codefactor_grade(self, branch: str) -> str | None:
         """Return a CodeFactor letter grade parsed from the badge.
 
         Returns:
@@ -240,7 +237,7 @@ class HTMLDashboardRenderer:
         return 'gray'
 
     @staticmethod
-    def _color_for_percent(p: Optional[float]) -> str:
+    def _color_for_percent(p: float | None) -> str:
         """Map a percentage to a color class name.
 
         Returns:
@@ -259,7 +256,7 @@ class HTMLDashboardRenderer:
         return 'red'
 
     @staticmethod
-    def _complexity_grade_color(avg: Optional[float]) -> Tuple[str, str]:
+    def _complexity_grade_color(avg: float | None) -> tuple[str, str]:
         """Map average cyclomatic complexity to a (grade, color).
 
         Returns:
@@ -277,7 +274,7 @@ class HTMLDashboardRenderer:
             return ('D', 'orange')
         return ('F', 'red')
 
-    def _status_text_for_metric(self, key: str, branch: str) -> Optional[Tuple[str, str]]:  # noqa: C901
+    def _status_text_for_metric(self, key: str, branch: str) -> tuple[str, str] | None:  # noqa: C901
         """Return normalized status text and color for a metric/branch.
 
         Args:
@@ -397,7 +394,7 @@ class HTMLDashboardRenderer:
                 return ('unknown', 'gray')
             return (status, 'gray')
 
-        def _fmt_int(v) -> Optional[str]:
+        def _fmt_int(v) -> str | None:
             if v in (None, ''):
                 return None
             try:
@@ -418,7 +415,7 @@ class HTMLDashboardRenderer:
             sloc, lloc = tup
             s = _fmt_int(sloc) or '-'
             lloc_str = _fmt_int(lloc) or '-'
-            ratio: Optional[float] = None
+            ratio: float | None = None
             try:
                 if lloc and int(str(lloc).replace(',', '').strip()) > 0:
                     ratio = float(sloc) / float(lloc)
@@ -481,10 +478,10 @@ class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
 
     def __init__(
         self,
-        metrics: List[BaseMetric],
+        metrics: list[BaseMetric],
         feature: str,
-        badge_gen: 'BadgeGenerator',
-        cards_spec: List[tuple[str, str, str]],
+        badge_gen: BadgeGenerator,
+        cards_spec: list[tuple[str, str, str]],
         default_branch: str = 'master',
         develop_branch: str = 'develop',
     ):
@@ -500,7 +497,7 @@ class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
 
     def render(self) -> str:
         """Return rendered HTML using the card spec order."""
-        cards: List[str] = []
+        cards: list[str] = []
         for key, title, icon in self.cards_spec:
             m = self.metric_by_key.get(key)
             if not m:

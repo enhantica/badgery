@@ -8,7 +8,6 @@ import argparse
 import logging
 import os
 from pathlib import Path
-from typing import Optional
 
 from badgery.badges import BadgeGenerator
 from badgery.config import build_metrics_from_config
@@ -46,7 +45,7 @@ def _collect_report_patterns(
     return complexity_pattern, maintainability_pattern, raw_pattern, docstring_pattern
 
 
-def _resolve_pattern(pattern: Optional[str], branch: str) -> Optional[str]:
+def _resolve_pattern(pattern: str | None, branch: str) -> str | None:
     if not pattern:
         return None
     if BRANCH_TOKEN in pattern:

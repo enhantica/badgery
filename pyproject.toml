@@ -168,12 +168,12 @@ select = [
   'PTH',    # Encourages using pathlib over os.path
   'RUF',    # Ruff-specific checks (e.g., enforcing best practices)
   'S',      # Security-related issues (e.g., use of insecure functions or libraries)
+  'SIM',    # Simplification issues (e.g., redundant code, unnecessary constructs)
   'TCH',    # Type checking issues (e.g., incompatible types, missing type annotations)
   'TID252', # Enforces absolute imports over relative imports
+  'TRY',    # Tryceratops Try/Except-related issues (e.g., broad exceptions, empty except blocks)
+  'UP',     # Pyupgrade-specific checks
   'W',      # General PEP 8 warnings (e.g., lines too long, trailing whitespace)
-  #'SIM',   # Simplification issues (e.g., redundant code, unnecessary constructs)
-  #'TRY',   # Tryceratops Try/Except-related issues (e.g., broad exceptions, empty except blocks)
-  #'UP',    # Pyupgrade-specific checks
 ]
 
 # Temporarily increase McCabe complexity limit to 17 to allow

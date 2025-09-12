@@ -8,7 +8,6 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Optional
 
 if TYPE_CHECKING:
     from badgery.badges import BadgeGenerator
@@ -79,7 +78,7 @@ def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:
         return []
 
     items: list[dict[str, Any]] = []
-    current: Optional[dict[str, Any]] = None
+    current: dict[str, Any] | None = None
     current_indent = 0
     for raw in lines[start:]:
         line = raw.rstrip()
@@ -187,7 +186,7 @@ def group_icon(group: str) -> str:
 
 def build_metrics_from_config(  # noqa: C901 - acceptable complexity
     cards: list[dict[str, Any]],
-    badge_gen: 'BadgeGenerator',
+    badge_gen: BadgeGenerator,
     feature: str,
 ):
     """Construct metric instances and an ordered card spec.

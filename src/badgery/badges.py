@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import os
-from typing import Dict
 
 REPO_DEFAULT = os.environ.get('GITHUB_REPOSITORY', 'easyscience/diffraction-lib')
 
@@ -25,7 +24,7 @@ class BadgeGenerator:
         self,
         _section: str,
         _branch: str,
-        _extra_params: Dict[str, str] | None = None,
+        _extra_params: dict[str, str] | None = None,
     ) -> str:
         """Return a placeholder badge URL.
 

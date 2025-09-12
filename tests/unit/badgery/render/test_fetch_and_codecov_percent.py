@@ -21,7 +21,9 @@ def test_fetch_non_https_and_urllib_error(monkeypatch: pytest.MonkeyPatch):
             return b''
 
     def raise_url_error(url, timeout=8.0):  # noqa: ARG001
-        raise URLError('network down')
+        # Raise URLError with an exception instance as reason to avoid
+        # string messages per TRY003
+        raise URLError(OSError())
 
     monkeypatch.setattr('badgery.render.urlopen', raise_url_error)
     assert r._fetch('https://example.com/badge.svg') is None
