@@ -124,7 +124,7 @@ jobs:
           whl_path="$(python3 -c "import pathlib; w = sorted(pathlib.Path('dist').glob('*.whl')); print(w[0].resolve().as_uri())")"
           echo "📦 Adding package from: $whl_path"
           pixi add --pypi "badgery[dev] @ $whl_path"
-          pixi badgery --version
+          pixi run badgery --version
 
       - name: Run unit tests
         shell: bash
