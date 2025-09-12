@@ -98,6 +98,15 @@ class HTMLDashboardRenderer:
       text-overflow: ellipsis;
       min-width: 0;
     }
+    /* Allow label color classes to take effect over base label color */
+    .values .item-label.green { color: #6eb543; }
+    .values .item-label.yellow-green { color: #b4cd32; }
+    .values .item-label.yellow { color: #e8b745; }
+    .values .item-label.orange { color: #f39c12; }
+    .values .item-label.red { color: #e46259; }
+    .values .item-label.gray { color: #757575; }
+    /* Keep branch icons neutral, not colorized by label color */
+    .values .item-label .icon { color: #9a9a9a; margin-right: 0.5em; }
     .values .item-value {
       white-space: nowrap;
     }
@@ -500,17 +509,23 @@ class HTMLDashboardRenderer:
             label and a right-aligned colored value.
         """
         status = self._status_text_for_metric(key, branch)
+        # Prepend a neutral icon per branch type
+        icon_cls = (
+            'fas fa-crown'
+            if branch == 'master'
+            else ('fas fa-hammer' if branch == 'develop' else 'fas fa-code-branch')
+        )
         if status is not None:
             text, color = status
             return (
                 '<div class="row">'
-                f'<span class="item-label {color}">{branch_label}</span>'
+                f'<span class="item-label {color}"><i class="{icon_cls} icon"></i>{branch_label}</span>'
                 f'<span class="item-value {color}">{text}</span>'
                 '</div>'
             )
         return (
             '<div class="row">'
-            f'<span class="item-label gray">{branch_label}</span>'
+            f'<span class="item-label gray"><i class="{icon_cls} icon"></i>{branch_label}</span>'
             '<span class="item-value gray">unknown</span>'
             '</div>'
         )
