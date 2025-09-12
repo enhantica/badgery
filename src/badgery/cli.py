@@ -135,9 +135,7 @@ def parse_args() -> argparse.Namespace:
     )
     args.raw_metrics_develop = _resolve_pattern(
         raw_pattern, args.develop_branch
-    ) or os.environ.get(
-        'CI_RAW_METRICS_DEVELOP'
-    )
+    ) or os.environ.get('CI_RAW_METRICS_DEVELOP')
     args.raw_metrics_feature = _resolve_pattern(raw_pattern, feature_branch) or os.environ.get(
         'CI_RAW_METRICS_FEATURE'
     )
