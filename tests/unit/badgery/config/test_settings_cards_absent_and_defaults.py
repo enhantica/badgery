@@ -6,7 +6,7 @@ from badgery.config import group_icon
 from badgery.config import load_settings_from_yaml
 
 
-def test_load_settings_without_cards_section(tmp_path: Path):
+def test_load_settings_without_cards_section(tmp_path: Path) -> None:
     yml = tmp_path / '.badgery.yaml'
     yml.write_text('default_branch: main\n# no cards here\n', encoding='utf-8')
     s = load_settings_from_yaml(str(yml))
@@ -15,5 +15,5 @@ def test_load_settings_without_cards_section(tmp_path: Path):
     assert s['cards'] == []
 
 
-def test_group_icon_default_fallback():
+def test_group_icon_default_fallback() -> None:
     assert group_icon('unknown-group') == 'fas fa-gauge'

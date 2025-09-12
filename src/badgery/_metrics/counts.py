@@ -41,7 +41,7 @@ class FileCountMetric(BaseMetric):
         self.master = self._count_files(getattr(args, 'cyclomatic_complexity_master', None))
         self.develop = self._count_files(getattr(args, 'cyclomatic_complexity_develop', None))
         self.feature_value = self._count_files(
-            getattr(args, 'cyclomatic_complexity_feature', None)
+            getattr(args, 'cyclomatic_complexity_feature', None),
         )
 
 
@@ -75,7 +75,7 @@ class FunctionCountMetric(BaseMetric):
         self.master = self._count_functions(getattr(args, 'cyclomatic_complexity_master', None))
         self.develop = self._count_functions(getattr(args, 'cyclomatic_complexity_develop', None))
         self.feature_value = self._count_functions(
-            getattr(args, 'cyclomatic_complexity_feature', None)
+            getattr(args, 'cyclomatic_complexity_feature', None),
         )
 
 
@@ -118,5 +118,5 @@ class FunctionsPerFileMetric(BaseMetric):
         self.master = self._read_counts(getattr(args, 'cyclomatic_complexity_master', None))
         self.develop = self._read_counts(getattr(args, 'cyclomatic_complexity_develop', None))
         self.feature_value = self._read_counts(
-            getattr(args, 'cyclomatic_complexity_feature', None)
+            getattr(args, 'cyclomatic_complexity_feature', None),
         )

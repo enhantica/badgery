@@ -11,7 +11,7 @@ def write_yaml(path: Path, text: str) -> None:
     path.write_text(text, encoding='utf-8')
 
 
-def test_load_cards_from_yaml_supports_inline_mapping_and_booleans(tmp_path: Path):
+def test_load_cards_from_yaml_supports_inline_mapping_and_booleans(tmp_path: Path) -> None:
     yml = tmp_path / '.badgery.yaml'
     write_yaml(
         yml,

@@ -9,7 +9,7 @@ from badgery.config import load_cards_from_yaml
 from badgery.config import load_settings_from_yaml
 
 
-def test_loaders_missing_file_defaults(tmp_path: Path):
+def test_loaders_missing_file_defaults(tmp_path: Path) -> None:
     missing = tmp_path / 'nope.yaml'
     assert load_cards_from_yaml(str(missing)) == []
     s = load_settings_from_yaml(str(missing))
@@ -18,7 +18,7 @@ def test_loaders_missing_file_defaults(tmp_path: Path):
     assert s['cards'] == []
 
 
-def test_load_settings_top_level_parsing_with_quotes(tmp_path: Path):
+def test_load_settings_top_level_parsing_with_quotes(tmp_path: Path) -> None:
     yml = tmp_path / '.badgery.yaml'
     yml.write_text(
         (
@@ -37,7 +37,7 @@ def test_load_settings_top_level_parsing_with_quotes(tmp_path: Path):
     assert s['develop_branch'] == 'develop'
 
 
-def test_build_metrics_skips_unknown_and_missing_workflow():
+def test_build_metrics_skips_unknown_and_missing_workflow() -> None:
     cards = [
         {'group': 'X', 'type': 'unknown', 'title': 'U'},  # unknown type
         {'group': 'Build & Release', 'type': 'gh_action', 'title': 'Build'},  # no workflow
@@ -53,7 +53,7 @@ def test_build_metrics_skips_unknown_and_missing_workflow():
     assert all(k[0] in {'files', 'funcs'} for k in spec)
 
 
-def test_group_icon_additional_mappings():
+def test_group_icon_additional_mappings() -> None:
     assert group_icon('Build & Release') == 'fas fa-rocket'
     assert group_icon('Size') == 'fas fa-file-code'
     # fuzzy matching and precedence

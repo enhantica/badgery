@@ -9,18 +9,20 @@ from badgery.metrics import GithubWorkflowMetric
 from badgery.render import HTMLDashboardRenderer
 
 
-def test_grade_color_for_letter_and_unknown():
+def test_grade_color_for_letter_and_unknown() -> None:
     r = HTMLDashboardRenderer([], feature='f', badge_gen=BadgeGenerator('r/x'))
-    assert r._grade_color_for_letter('A') == 'green'
-    assert r._grade_color_for_letter('b') == 'yellow-green'
-    assert r._grade_color_for_letter('C') == 'yellow'
-    assert r._grade_color_for_letter('D') == 'orange'
-    assert r._grade_color_for_letter('E') == 'red'
-    assert r._grade_color_for_letter('F') == 'red'
-    assert r._grade_color_for_letter('') == 'gray'
+    assert r._grade_color_for_letter('A') == 'green'  # noqa: SLF001
+    assert r._grade_color_for_letter('b') == 'yellow-green'  # noqa: SLF001
+    assert r._grade_color_for_letter('C') == 'yellow'  # noqa: SLF001
+    assert r._grade_color_for_letter('D') == 'orange'  # noqa: SLF001
+    assert r._grade_color_for_letter('E') == 'red'  # noqa: SLF001
+    assert r._grade_color_for_letter('F') == 'red'  # noqa: SLF001
+    assert r._grade_color_for_letter('') == 'gray'  # noqa: SLF001
 
 
-def test_status_text_for_codecov_with_fetch_and_env(monkeypatch: pytest.MonkeyPatch):
+def test_status_text_for_codecov_with_fetch_and_env(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     bg = BadgeGenerator('org/repo')
     cc = CodecovMetric(bg, feature='feat')
     # Provide env for master/develop
@@ -41,13 +43,15 @@ def test_status_text_for_codecov_with_fetch_and_env(monkeypatch: pytest.MonkeyPa
     monkeypatch.setattr(r, '_fetch', fake_fetch)
 
     # Master/develop use envs directly
-    assert r._status_text_for_metric('codecov', 'master') == ('91%', 'green')
-    assert r._status_text_for_metric('codecov', 'develop') == ('74%', 'yellow')
+    assert r._status_text_for_metric('codecov', 'master') == ('91%', 'green')  # noqa: SLF001
+    assert r._status_text_for_metric('codecov', 'develop') == ('74%', 'yellow')  # noqa: SLF001
     # Feature prefers fetched percent; falls back to env if missing
-    assert r._status_text_for_metric('codecov', 'feature') == ('83%', 'yellow-green')
+    assert r._status_text_for_metric('codecov', 'feature') == ('83%', 'yellow-green')  # noqa: SLF001
 
 
-def test_status_text_for_codefactor_with_fetch_and_env(monkeypatch: pytest.MonkeyPatch):
+def test_status_text_for_codefactor_with_fetch_and_env(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     bg = BadgeGenerator('org/repo')
     cf = CodeFactorMetric(bg, feature='feature-x')
     cf.read_all(object())
@@ -68,14 +72,14 @@ def test_status_text_for_codefactor_with_fetch_and_env(monkeypatch: pytest.Monke
     cf.read_all(object())
 
     # Master: fetch None -> value empty -> unknown gray
-    assert r._status_text_for_metric('codefactor', 'master') == ('unknown', 'gray')
+    assert r._status_text_for_metric('codefactor', 'master') == ('unknown', 'gray')  # noqa: SLF001
     # Develop: env 'C' -> yellow
-    assert r._status_text_for_metric('codefactor', 'develop') == ('C', 'yellow')
+    assert r._status_text_for_metric('codefactor', 'develop') == ('C', 'yellow')  # noqa: SLF001
     # Feature: env empty -> unknown gray
-    assert r._status_text_for_metric('codefactor', 'feature') == ('unknown', 'gray')
+    assert r._status_text_for_metric('codefactor', 'feature') == ('unknown', 'gray')  # noqa: SLF001
 
 
-def test_status_text_for_github_workflow(monkeypatch: pytest.MonkeyPatch):
+def test_status_text_for_github_workflow(monkeypatch: pytest.MonkeyPatch) -> None:
     bg = BadgeGenerator('org/repo')
     gw = GithubWorkflowMetric(bg, workflow_filename='ci.yml', label='CI', feature='my-feature')
     gw.read_all(object())
@@ -92,11 +96,11 @@ def test_status_text_for_github_workflow(monkeypatch: pytest.MonkeyPatch):
 
     monkeypatch.setattr(r, '_fetch', fake_fetch)
 
-    assert r._status_text_for_metric(gw.key, 'master') == ('passed', 'green')
-    assert r._status_text_for_metric(gw.key, 'feature') == ('failed', 'red')
+    assert r._status_text_for_metric(gw.key, 'master') == ('passed', 'green')  # noqa: SLF001
+    assert r._status_text_for_metric(gw.key, 'feature') == ('failed', 'red')  # noqa: SLF001
 
     # Fallback to env when fetch returns nothing
     monkeypatch.setattr(r, '_fetch', lambda *_a, **_k: '')
     monkeypatch.setenv('CI_WORKFLOW_CI_DEVELOP', 'queued')
     gw.read_all(object())
-    assert r._status_text_for_metric(gw.key, 'develop') == ('queued', 'gray')
+    assert r._status_text_for_metric(gw.key, 'develop') == ('queued', 'gray')  # noqa: SLF001

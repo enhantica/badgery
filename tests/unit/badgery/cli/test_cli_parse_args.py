@@ -15,7 +15,7 @@ def _write_yaml(path: Path, text: str) -> None:
 def test_parse_args_resolves_report_paths_with_branch_placeholders(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-):
+) -> None:
     # Prepare temp repo layout with reports per branch
     repo_root = tmp_path
     reports = repo_root / 'reports'
@@ -134,7 +134,10 @@ def test_parse_args_resolves_report_paths_with_branch_placeholders(
     )
 
 
-def test_parse_args_dir_pattern_with_double_star(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_parse_args_dir_pattern_with_double_star(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # Only test radon_cc resolution using "dir" with ** placeholder
     repo_root = tmp_path
     reports = repo_root / 'reports'

@@ -14,13 +14,13 @@ from badgery.metrics import MaintainabilityMetric
 from badgery.render import HTMLDashboardRendererWithSpec
 
 
-def _set_values(m: BaseMetric, master, develop, feature):
+def _set_values(m: BaseMetric, master: object, develop: object, feature: object) -> None:
     m.master = master
     m.develop = develop
     m.feature_value = feature
 
 
-def test_html_render_end_to_end_smoke():
+def test_html_render_end_to_end_smoke() -> None:
     # Create real metric instances but inject values directly
     bg = BadgeGenerator('org/repo')
     feature = 'feature-x'
@@ -74,7 +74,8 @@ def test_html_render_end_to_end_smoke():
 
     # Status lines include branch labels and values (split into label/value spans)
     labels = re.findall(
-        r'<span class="item-label(?: [^"]+)?">(?:\s*<i[^>]*></i>\s*)?([^<]+)</span>', html
+        r'<span class="item-label(?: [^"]+)?">(?:\s*<i[^>]*></i>\s*)?([^<]+)</span>',
+        html,
     )
     assert 'main' in labels
     assert 'develop' in labels

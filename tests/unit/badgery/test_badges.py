@@ -2,16 +2,18 @@ from __future__ import annotations
 
 import os
 
+import pytest
+
 from badgery.badges import BadgeGenerator
 
 
-def test_badge_generator_github_workflow_badge_img_master_branch():
+def test_badge_generator_github_workflow_badge_img_master_branch() -> None:
     bg = BadgeGenerator(repo='org/repo')
     url = bg.github_workflow_badge_img('ci.yml', None)
     assert url == 'https://github.com/org/repo/actions/workflows/ci.yml/badge.svg'
 
 
-def test_badge_generator_github_workflow_badge_img_specific_branch():
+def test_badge_generator_github_workflow_badge_img_specific_branch() -> None:
     bg = BadgeGenerator(repo='org/repo')
     url = bg.github_workflow_badge_img('ci.yml', 'feature-x')
     assert url == (
@@ -19,7 +21,7 @@ def test_badge_generator_github_workflow_badge_img_specific_branch():
     )
 
 
-def test_badge_generator_links_codecov_and_codefactor(monkeypatch):
+def test_badge_generator_links_codecov_and_codefactor(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv('CODECOV_REPO', 'acme/radar')
     bg = BadgeGenerator(repo='org/repo')
     # Codecov link respects CODECOV_REPO
@@ -41,7 +43,7 @@ def test_badge_generator_links_codecov_and_codefactor(monkeypatch):
     )
 
 
-def test_github_workflow_badge_link():
+def test_github_workflow_badge_link() -> None:
     bg = BadgeGenerator(repo='org/repo')
     assert (
         bg.github_workflow_badge_link('ci.yml')
@@ -49,7 +51,7 @@ def test_github_workflow_badge_link():
     )
 
 
-def test_codecov_badge_img_default_and_master(monkeypatch):
+def test_codecov_badge_img_default_and_master(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv('CODECOV_REPO', 'org/repo')
     token = os.environ.get('CODECOV_TOKEN', 'qtsB5Q5BXO')
     bg = BadgeGenerator(repo='org/repo')
@@ -65,9 +67,9 @@ def test_codecov_badge_img_default_and_master(monkeypatch):
     )
 
 
-def test_private_badge_helpers_return_empty_strings():
+def test_private_badge_helpers_return_empty_strings() -> None:
     bg = BadgeGenerator('org/repo')
     # The current implementation does not use these helpers; ensure they return empty strings
-    assert not bg._badge('section', 'branch')
+    assert not bg._badge('section', 'branch')  # noqa: SLF001
     assert not bg.codecov_badge('dev')
     assert not bg.codefactor_badge('dev')
