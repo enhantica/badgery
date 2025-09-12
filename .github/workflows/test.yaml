@@ -72,9 +72,9 @@ jobs:
         shell: bash
         run: pixi run dist-build
 
-      - name: Remove badgery editable install (for the next job)
-        shell: bash
-        run: pixi remove badgery --pypi
+      #- name: Remove badgery editable install (for the next job)
+      #  shell: bash
+      #  run: pixi remove badgery --pypi
 
       # More than one file/dir need to be specified in 'path', to preserve the
       # structure of the dist/ directory, not only its contents.

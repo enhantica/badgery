@@ -23,7 +23,8 @@ channels = ["conda-forge"]
 pip = "*" # Required to install from PyPI
 
 [pypi-dependencies] # == [feature.default.pypi-dependencies]
-badgery = { path = ".", editable = true, extras = ["dev"] }
+#badgery = { path = ".", editable = true, extras = ["dev"] }
+badgery = { git = "https://github.com/enhantica/badgery", extras = ["dev"] }
 
 # Extra features for different Python versions
 
