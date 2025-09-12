@@ -18,6 +18,11 @@ if TYPE_CHECKING:
 
 
 def _detect_feature_branch() -> str:
+    """Detect the feature branch name from common CI env vars.
+
+    Returns:
+        str: The detected branch name, or ``'unknown'`` if not present.
+    """
     return (
         os.environ.get('CI_BRANCH')
         or os.environ.get('GITHUB_REF_NAME')
@@ -290,6 +295,15 @@ class GithubWorkflowMetric(BaseMetric):
 
     @staticmethod
     def _env_key(base: str, branch: str) -> str:
+        """Return the env var key for a workflow status.
+
+        Args:
+            base: Normalized workflow name (stem), e.g. ``ci``.
+            branch: Branch label (``master``/``develop``/``feature``).
+
+        Returns:
+            str: The environment variable name to check.
+        """
         return f'CI_WORKFLOW_{base.upper().replace("-", "_")}_{branch.upper()}'
 
     def read_all(self, args):
@@ -377,6 +391,11 @@ class LinesOfCodeMetric(BaseMetric):
 
     @staticmethod
     def _extract_sloc_lloc(obj: Any) -> Tuple[int, int]:
+        """Recursively extract SLOC/LLOC from a JSON-like object.
+
+        Returns:
+            tuple[int, int]: The cumulative ``(sloc, lloc)`` pair.
+        """
         sloc = 0
         lloc = 0
         if isinstance(obj, dict):

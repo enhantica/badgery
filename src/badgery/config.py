@@ -46,6 +46,12 @@ def _parse_scalar(val: str) -> Any:
 
 
 def _parse_inline_mapping(rest: str, current: dict[str, Any]) -> None:
+    """Parse inline mapping after a list item marker.
+
+    Updates the provided ``current`` mapping.
+
+    Example: ``- group: Tests``.
+    """
     if rest and ':' in rest:
         key, val = rest.split(':', 1)
         current[key.strip()] = _parse_scalar(val)
@@ -196,6 +202,11 @@ def build_metrics_from_config(  # noqa: C901 - acceptable complexity
     singleton_by_type: dict[str, BaseMetric] = {}
 
     def _get_or_create(ctype: str) -> BaseMetric | None:
+        """Return a singleton metric instance for a given card type.
+
+        Uses a small mapping table and stores/reuses instances so that
+        multiple cards of the same type share the same metric object.
+        """
         if ctype in singleton_by_type:
             return singleton_by_type[ctype]
         mapping: dict[str, type[BaseMetric]] = {
