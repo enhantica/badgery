@@ -226,7 +226,7 @@ jobs:
           echo "📦 Looking for wheel in dist/"
           whl_path="$(python3 -c "import pathlib; w = sorted(pathlib.Path('dist').glob('*.whl')); print(w[0].resolve().as_uri())")"
           echo "📦 Adding package from: $whl_path"
-          pixi add --feature wheel --pypi "badgery[dev] @ $whl_path"
+          pixi add --pypi "badgery[dev] @ $whl_path"
 
       - name: Run unit tests
         shell: bash
