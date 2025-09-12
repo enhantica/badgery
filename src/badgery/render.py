@@ -111,6 +111,12 @@ class HTMLDashboardRenderer:
     CC_C = 20
     CC_D = 40
 
+    # Maintainability thresholds
+    MI_A = 80
+    MI_B = 60
+    MI_C = 40
+    MI_D = 20
+
     def __init__(
         self,
         metrics: list[BaseMetric],
