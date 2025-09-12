@@ -8,6 +8,7 @@ from badgery.metrics import ComplexityMetric
 from badgery.metrics import DocstringCoverageMetric
 from badgery.metrics import FileCountMetric
 from badgery.metrics import FunctionCountMetric
+from badgery.metrics import FunctionsPerFileMetric
 from badgery.metrics import LinesOfCodeMetric
 from badgery.metrics import MaintainabilityMetric
 from badgery.render import HTMLDashboardRendererWithSpec
@@ -42,14 +43,17 @@ def test_html_render_end_to_end_smoke():
     funcs = FunctionCountMetric(bg, feature=feature)
     _set_values(funcs, 120, 110, 130)
 
-    metrics = [mi, cc, dc, loc, files, funcs]
+    fpf = FunctionsPerFileMetric(bg, feature=feature)
+    # functions-per-file takes (functions, files) tuples per branch
+    _set_values(fpf, (120, 12), (110, 11), (130, 13))
+
+    metrics = [mi, cc, dc, loc, fpf]
     cards_spec = [
         (mi.key, 'Maintainability', 'fas fa-gauge'),
         (cc.key, 'Complexity', 'fas fa-gauge'),
         (dc.key, 'Docstrings', 'fas fa-square-poll-vertical'),
         (loc.key, 'LOC', 'fas fa-file-code'),
-        (files.key, 'Files', 'fas fa-file-code'),
-        (funcs.key, 'Functions', 'fas fa-file-code'),
+        (fpf.key, 'Functions per file', 'fas fa-file-code'),
     ]
 
     r = HTMLDashboardRendererWithSpec(
@@ -92,11 +96,11 @@ def test_html_render_end_to_end_smoke():
     assert '1.10 (110/100)' in html
     assert '2.50 (200/80)' in html
 
-    # Counts are formatted as blue text values (class color asserted indirectly via presence)
-    assert 'Files' in html
-    assert 'item-value blue">12' in html
-    assert 'Functions' in html
-    assert 'item-value blue">110' in html
+    # Functions per file card shows ratio and (funcs/files)
+    assert 'Functions per file' in html
+    assert '10.00 (120/12)' in html
+    assert '10.00 (110/11)' in html
+    assert '10.00 (130/13)' in html
 
     # Branch icons are present
     assert 'fas fa-crown' in html
