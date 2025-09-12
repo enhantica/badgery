@@ -99,7 +99,6 @@ def parse_args() -> argparse.Namespace:
         help='Logging verbosity (default: INFO)',
     )
     args = parser.parse_args()
-
     settings = load_settings_from_yaml(args.config)
     cards = settings.get('cards', [])
     args.cards_config = cards
@@ -171,6 +170,11 @@ def main() -> None:
     """Run the dashboard generation from CLI arguments."""
     args = parse_args()
     logging.basicConfig(level=getattr(logging, args.log_level))
+    # Inform about config presence after logging is configured
+    cfg_file = getattr(args, 'config', '.badgery.yaml')
+    cfg_path = Path(cfg_file)
+    if cfg_path.exists():
+        logging.info('Using config %s', cfg_file)
 
     feature = args.branch
     badge_gen = BadgeGenerator(repo=args.repo)
