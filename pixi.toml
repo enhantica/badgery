@@ -22,6 +22,9 @@ channels = ["conda-forge"]
 [dependencies] # == [feature.default.dependencies]
 pip = "*" # Required to install from PyPI
 
+[pypi-dependencies] # == [feature.default.pypi-dependencies]
+badgery = { path = ".", editable = true, extras = ["dev"] }
+
 # Extra features for different Python versions
 
 [feature.py313.dependencies]
