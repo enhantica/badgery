@@ -96,7 +96,7 @@ docstring-cov = "interrogate -c pyproject.toml src/"
 coverage = "pixi run docstring-cov || true; pixi run tests-cov || true"
 
 # 🚀 Development & Build Tasks
-pre-commit = { depends-on = ["code-quality", "tests"] }
+pre-commit = { depends-on = ["quality", "coverage"] }
 dist-build = "python -m build --wheel --outdir dist"
 spdx-update = "python tools/update_spdx.py"
 prettier-install = "npm install --no-save --no-audit --no-fund prettier prettier-plugin-toml"
