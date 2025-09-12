@@ -59,13 +59,8 @@ jobs:
 
       - name: Generate dashboard HTML
         run: >
-<<<<<<<< HEAD:.github/workflows/dashboard.yaml
           pixi run badgery --repo ${{ github.repository }} --branch ${{
           env.CI_BRANCH }} --output index.html
-========
-          pixi run badgery --repo ${{ github.repository }}
-          --branch ${{ env.CI_BRANCH }} --output index.html
->>>>>>>> origin/develop:.github/workflows/build-dashboard.yaml
 
       - name: Prepare publish directory
         run: |
