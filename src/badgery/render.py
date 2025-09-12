@@ -44,7 +44,7 @@ class HTMLDashboardRenderer:
     }
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(17em, 1fr));
       gap: 0;
       padding: 0;
       background-color: transparent;
@@ -59,7 +59,7 @@ class HTMLDashboardRenderer:
       display: flex;
       flex-direction: column;
     }
-    .label {
+    .card-title {
       font-weight: 300;
       color: #ccc;
       display: flex;
@@ -83,6 +83,23 @@ class HTMLDashboardRenderer:
       background-color: #1a1a1a;
       border-top: 1px solid #101010;
       font-size: 1em;
+    }
+    .values .row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1em;
+      min-width: 0;
+    }
+    .values .item-label {
+      color: #ccc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+    .values .item-value {
+      white-space: nowrap;
     }
     .values span img { vertical-align: middle; }
     .green { color: #6eb543; }
@@ -476,16 +493,27 @@ class HTMLDashboardRenderer:
         return result
 
     def _value_item_html(self, key: str, branch: str, branch_label: str) -> str:
-        """Render a single metric status span for a given branch.
+        """Render a single metric row with left label and right value.
 
         Returns:
-            str: HTML span element.
+            str: HTML for a row with two spans: a left-aligned branch
+            label and a right-aligned colored value.
         """
         status = self._status_text_for_metric(key, branch)
         if status is not None:
             text, color = status
-            return f'<span class="{color}">{branch_label}: {text}</span>'
-        return f'<span class="gray">{branch_label}: unknown</span>'
+            return (
+                '<div class="row">'
+                f'<span class="item-label">{branch_label}:</span>'
+                f'<span class="item-value {color}">{text}</span>'
+                '</div>'
+            )
+        return (
+            '<div class="row">'
+            f'<span class="item-label">{branch_label}:</span>'
+            '<span class="item-value gray">unknown</span>'
+            '</div>'
+        )
 
     def _card_html(self, title: str, icon_class: str, key: str) -> str:
         """Render a complete metric card HTML block.
@@ -501,7 +529,7 @@ class HTMLDashboardRenderer:
         ])
         return (
             f'<div class="card">\n'
-            f'  <div class="label"><i class="{icon_class}"></i>{title}</div>\n'
+            f'  <div class="card-title"><i class="{icon_class}"></i>{title}</div>\n'
             f'  <div class="values">\n{values_html}\n  </div>\n'
             f'</div>'
         )

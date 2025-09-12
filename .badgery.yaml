@@ -16,18 +16,18 @@ cards:
 
   - group: Code Quality
     type: codefactor
-    title: Code quality from CodeFactor.io
+    title: Code quality (CodeFactor.io)
     enabled: true
 
   - group: Code Quality
     type: radon_mi
-    title: Maintainability index with radon
+    title: Maintainability index (radon)
     report: reports/{branch}/maintainability-index.json
     enabled: true
 
   - group: Code Quality
     type: radon_cc
-    title: Cyclomatic complexity with radon
+    title: Cyclomatic complexity (radon)
     report: reports/{branch}/cyclomatic-complexity.json
     enabled: true
 
@@ -51,12 +51,12 @@ cards:
 
   - group: Coverage
     type: codecov
-    title: Unit test coverage from Codecov.io
+    title: Unit test coverage (Codecov.io)
     enabled: true
 
   - group: Coverage
     type: interrogate
-    title: Docstring coverage with interrogate
+    title: Docstring coverage (interrogate)
     report: reports/{branch}/coverage-docstring.txt
     enabled: true
 
