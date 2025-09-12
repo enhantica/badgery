@@ -6,7 +6,7 @@
 #   - Adds the label "[maintainer] release" so it is excluded from changelogs.
 #   - The PR body makes clear that this is automation only (no review needed).
 
-name: Create release PR
+name: Release PR creation
 
 on:
   workflow_dispatch: # manual trigger only

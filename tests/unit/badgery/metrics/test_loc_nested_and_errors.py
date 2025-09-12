@@ -20,7 +20,7 @@ def test_loc_nested_raw_fields_and_invalid_values(tmp_path: Path):
                 {'raw': {'sloc': 4, 'lloc': 4}},
                 {'sloc': 1, 'lloc': 1},
             ],
-        }
+        },
     }
     p = tmp_path / 'raw.json'
     p.write_text(json.dumps(data), encoding='utf-8')

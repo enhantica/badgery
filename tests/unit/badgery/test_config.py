@@ -52,7 +52,7 @@ def test_group_icon_mapping_basic():
     assert group_icon('Publish to PyPI') == 'fas fa-box'
 
 
-def test_build_metrics_from_config_constructs_metrics(tmp_path: Path):
+def test_build_metrics_from_config_constructs_metrics():
     cards = [
         {
             'group': 'Code Quality',

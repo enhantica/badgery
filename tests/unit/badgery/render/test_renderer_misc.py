@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from badgery.badges import BadgeGenerator
 from badgery.metrics import BaseMetric
+from badgery.metrics import LinesOfCodeMetric
 from badgery.render import HTMLDashboardRenderer
 
 
@@ -14,7 +15,7 @@ def test_value_item_html_unknown_metric():
 
 def test_base_renderer_render_returns_empty_string():
     r = HTMLDashboardRenderer([], feature='f', badge_gen=BadgeGenerator('r/x'))
-    assert r.render() == ''
+    assert not r.render()
 
 
 def test_status_text_unknown_metric_type_and_ratio_gray():
@@ -28,16 +29,15 @@ def test_status_text_unknown_metric_type_and_ratio_gray():
         def read_all(self, args):  # pragma: no cover - not used
             raise NotImplementedError
 
-        def badge(self, value):  # pragma: no cover - not used
-            return ''
+    def badge(self, _value):  # pragma: no cover - not used
+        _ = self
+        return ''
 
     m = UnknownMetric(BadgeGenerator('r/x'), feature='f')
     r = HTMLDashboardRenderer([m], feature='f', badge_gen=BadgeGenerator('r/x'))
     assert r._status_text_for_metric('u', 'master') == ('unknown', 'gray')
 
     # LinesOfCodeMetric ratio is gray when lloc is invalid or zero
-    from badgery.metrics import LinesOfCodeMetric
-
     loc = LinesOfCodeMetric(BadgeGenerator('r/x'), feature='f')
     loc.master = (100, 0)
     r = HTMLDashboardRenderer([loc], feature='f', badge_gen=BadgeGenerator('r/x'))

@@ -2,7 +2,7 @@
 # parameters.
 # https://github.com/Mattraks/delete-workflow-runs
 
-name: Delete old workflow runs
+name: Old workflow runs cleanup
 
 on:
   # Run monthly, at 00:00 on the 1st day of month.

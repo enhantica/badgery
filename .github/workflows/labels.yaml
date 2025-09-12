@@ -1,7 +1,7 @@
 # Verifies if a pull request has at least one label from a set of valid
 # labels before it can be merged.
 
-name: Verify PR labels
+name: PR label checks
 
 on:
   # Runs on pull requests to a repository
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Verify PR labels
+      - name: PR label checks
         uses: jesusvasquez333/verify-pr-label-action@v1.4.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

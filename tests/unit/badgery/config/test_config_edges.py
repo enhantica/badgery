@@ -37,7 +37,7 @@ def test_load_settings_top_level_parsing_with_quotes(tmp_path: Path):
     assert s['develop_branch'] == 'develop'
 
 
-def test_build_metrics_skips_unknown_and_missing_workflow(tmp_path: Path):
+def test_build_metrics_skips_unknown_and_missing_workflow():
     cards = [
         {'group': 'X', 'type': 'unknown', 'title': 'U'},  # unknown type
         {'group': 'Build & Release', 'type': 'gh_action', 'title': 'Build'},  # no workflow
@@ -48,8 +48,9 @@ def test_build_metrics_skips_unknown_and_missing_workflow(tmp_path: Path):
     metrics, spec = build_metrics_from_config(cards, bg, feature='f')
     keys = {m.key for m in metrics}
     # unknown and gh_action without workflow are skipped
-    assert 'files' in keys and 'funcs' in keys
-    assert all(k[0] in ('files', 'funcs') for k in spec)
+    assert 'files' in keys
+    assert 'funcs' in keys
+    assert all(k[0] in {'files', 'funcs'} for k in spec)
 
 
 def test_group_icon_additional_mappings():

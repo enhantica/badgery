@@ -485,8 +485,8 @@ packages:
   requires_python: '>=3.8'
 - pypi: ./
   name: badgery
-  version: 0.1.0+devdirty
-  sha256: 977016892836edd398986c2791763a2bd814002b49b8091a444fc60e153dfb1e
+  version: 0.1.1+devdirty
+  sha256: f70004e2ed3c169cb276967ccbed98cd8856f69908c23537eaf1b283cc4df7cc
   requires_dist:
   - build ; extra == 'dev'
   - docformatter ; extra == 'dev'
