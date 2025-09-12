@@ -151,6 +151,7 @@ preview = true
 # https://docs.astral.sh/ruff/rules/
 [tool.ruff.lint]
 select = [
+  'ARG',   # Argument-related issues (e.g., unused arguments)
   'B',      # Bugbear-specific checks (e.g., likely bugs, bad patterns)
   'C',      # Complexity-related issues (e.g., high McCabe complexity)
   'D',      # Docstring formatting issues (old rules)
@@ -167,7 +168,6 @@ select = [
   'TCH',    # Type checking issues (e.g., incompatible types, missing type annotations)
   'TID252', # Enforces absolute imports over relative imports
   'W',      # General PEP 8 warnings (e.g., lines too long, trailing whitespace)
-  #'ARG',   # Argument-related issues (e.g., unused arguments)
   #'PGH',   # Misc text patterns checks
   #'PTH',   # Encourages using pathlib over os.path
   #'RUF',   # Ruff-specific checks (e.g., enforcing best practices)

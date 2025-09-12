@@ -38,7 +38,7 @@ def test_cli_main_handles_metric_read_exception(tmp_path: Path, monkeypatch: pyt
     )
 
     # Render returns deterministic output
-    monkeypatch.setattr(cli_mod.HTMLDashboardRendererWithSpec, 'render', lambda self: 'HTML')
+    monkeypatch.setattr(cli_mod.HTMLDashboardRendererWithSpec, 'render', lambda _self: 'HTML')
 
     # Act: call main() and ensure it completes and writes the file
     cli_mod.main()

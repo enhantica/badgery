@@ -25,9 +25,9 @@ def test_package_main_invokes_cli_and_writes_output(
 
     monkeypatch.setattr(cli_mod, 'parse_args', lambda: Args())
     # Return no metrics and an empty spec to minimize work
-    monkeypatch.setattr(cfg_mod, 'build_metrics_from_config', lambda cards, bg, f: ([], []))
+    monkeypatch.setattr(cfg_mod, 'build_metrics_from_config', lambda _cards, _bg, _f: ([], []))
     # Deterministic render content
-    monkeypatch.setattr(render_mod.HTMLDashboardRendererWithSpec, 'render', lambda self: 'OK')
+    monkeypatch.setattr(render_mod.HTMLDashboardRendererWithSpec, 'render', lambda _self: 'OK')
 
     # Execute package as a script, which runs badgery.__main__
     runpy.run_module('badgery', run_name='__main__')

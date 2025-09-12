@@ -151,7 +151,7 @@ class MaintainabilityMetric(BaseMetric):
         mi_rounded = round(mi)
         return f'{mi_rounded} over {count} files'
 
-    def badge(self, value):
+    def badge(self, _value):
         """Return a badge string (unused in the HTML renderer)."""
         return ''
 
@@ -217,7 +217,7 @@ class ComplexityMetric(BaseMetric):
         avg, count = value
         return f'{avg:.1f} over {count} funcs'
 
-    def badge(self, value):
+    def badge(self, _value):
         """Return a badge string (unused)."""
         return ''
 
@@ -272,7 +272,7 @@ class DocstringCoverageMetric(BaseMetric):
             return '0%'
         return value
 
-    def badge(self, value):
+    def badge(self, _value):
         """Return a badge string (unused)."""
         return ''
 
@@ -306,7 +306,7 @@ class GithubWorkflowMetric(BaseMetric):
         """
         return f'CI_WORKFLOW_{base.upper().replace("-", "_")}_{branch.upper()}'
 
-    def read_all(self, args):
+    def read_all(self, _args):
         """Populate workflow status env vars for three branches."""
         base = self.key
         self.master = os.environ.get(self._env_key(base, 'master'), '')
@@ -339,7 +339,7 @@ class CodeFactorMetric(BaseMetric):
         """Initialize CodeFactor metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
-    def read_all(self, args):
+    def read_all(self, _args):
         """Read CodeFactor grades from environment variables."""
         self.master = os.environ.get('CI_CODEFACTOR_MASTER', '')
         self.develop = os.environ.get('CI_CODEFACTOR_DEVELOP', '')
@@ -372,7 +372,7 @@ class CodecovMetric(BaseMetric):
         """Initialize Codecov coverage metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
-    def read_all(self, args):
+    def read_all(self, _args):
         """Read coverage values from environment variables."""
         self.master = os.environ.get('CI_CODECOV_MASTER', '')
         self.develop = os.environ.get('CI_CODECOV_DEVELOP', '')

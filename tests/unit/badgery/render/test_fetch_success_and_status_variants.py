@@ -23,7 +23,7 @@ def test_fetch_success_path_and_status_variants(monkeypatch):
             return self._payload
 
     monkeypatch.setattr(
-        'badgery.render.urlopen', lambda url, timeout=8.0: DummyResp(200, b'<svg>ok</svg>')
+        'badgery.render.urlopen', lambda _url, _timeout=8.0: DummyResp(200, b'<svg>ok</svg>')
     )
     assert r._fetch('https://example.com/x.svg') == '<svg>ok</svg>'
 

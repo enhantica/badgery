@@ -28,7 +28,7 @@ def test_status_text_unknown_metric_type_and_ratio_gray():
         def read_all(self, args):  # pragma: no cover - not used
             raise NotImplementedError
 
-        def badge(self, value):  # pragma: no cover - not used
+        def badge(self, _value):  # pragma: no cover - not used
             return ''
 
     m = UnknownMetric(BadgeGenerator('r/x'), feature='f')

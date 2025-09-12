@@ -10,7 +10,7 @@ from badgery.metrics import LinesOfCodeMetric
 from badgery.metrics import MaintainabilityMetric
 
 
-def test_metric_formatters_unknown_values(tmp_path: Path):
+def test_metric_formatters_unknown_values():
     bg = BadgeGenerator('r/x')
     mi = MaintainabilityMetric(bg, feature='f')
     assert mi.format_value((None, None)) == 'unknown'

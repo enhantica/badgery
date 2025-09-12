@@ -23,9 +23,9 @@ class BadgeGenerator:
 
     def _badge(
         self,
-        section: str,
-        branch: str,
-        extra_params: Dict[str, str] | None = None,
+        _section: str,
+        _branch: str,
+        _extra_params: Dict[str, str] | None = None,
     ) -> str:
         """Return a placeholder badge URL.
 
@@ -34,7 +34,7 @@ class BadgeGenerator:
         """
         return ''
 
-    def codecov_badge(self, branch: str = 'master') -> str:
+    def codecov_badge(self, _branch: str = 'master') -> str:
         """Return a Codecov badge URL.
 
         Returns:
@@ -42,7 +42,7 @@ class BadgeGenerator:
         """
         return ''
 
-    def codefactor_badge(self, branch: str = 'master') -> str:
+    def codefactor_badge(self, _branch: str = 'master') -> str:
         """Return a CodeFactor badge URL.
 
         Returns:

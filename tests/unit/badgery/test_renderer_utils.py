@@ -12,7 +12,7 @@ class DummyMetric(BaseMetric):
     def read_all(self, args):  # pragma: no cover - not used
         raise NotImplementedError
 
-    def badge(self, value):  # pragma: no cover - not used
+    def badge(self, _value):  # pragma: no cover - not used
         return ''
 
 
