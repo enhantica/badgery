@@ -85,5 +85,7 @@ def test_html_render_end_to_end_smoke():
     assert 'feature-x: 2.50 (200/80)' in html
 
     # Counts are formatted as blue text values (class color asserted indirectly via presence)
-    assert 'Files' in html and 'main: 12' in html
-    assert 'Functions' in html and 'develop: 110' in html
+    assert 'Files' in html
+    assert 'main: 12' in html
+    assert 'Functions' in html
+    assert 'develop: 110' in html

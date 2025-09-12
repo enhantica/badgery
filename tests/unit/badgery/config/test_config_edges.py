@@ -48,7 +48,8 @@ def test_build_metrics_skips_unknown_and_missing_workflow():
     metrics, spec = build_metrics_from_config(cards, bg, feature='f')
     keys = {m.key for m in metrics}
     # unknown and gh_action without workflow are skipped
-    assert 'files' in keys and 'funcs' in keys
+    assert 'files' in keys
+    assert 'funcs' in keys
     assert all(k[0] in ('files', 'funcs') for k in spec)
 
 

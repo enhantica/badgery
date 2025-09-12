@@ -35,7 +35,8 @@ def test_package_main_invokes_cli_and_writes_output(
     runpy.run_module('badgery', run_name='__main__')
 
     out = out_path
-    assert out.exists() and out.read_text(encoding='utf-8') == 'OK'
+    assert out.exists()
+    assert out.read_text(encoding='utf-8') == 'OK'
 
 
 def test_importing_module_does_not_invoke_main():
