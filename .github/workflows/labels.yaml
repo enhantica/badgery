@@ -21,4 +21,4 @@ jobs:
             '[scope] bug, [scope] documentation, [scope] enhancement, [scope]
             maintenance, [scope] significant, [maintainer] release'
           pull-request-number: ${{ github.event.pull_request.number }}
-          disable-reviews: false
+          disable-reviews: true
