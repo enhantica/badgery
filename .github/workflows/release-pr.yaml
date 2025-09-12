@@ -3,7 +3,7 @@
 # Usage:
 #   - Triggered manually via workflow_dispatch.
 #   - Creates a PR titled "Release: merge develop into master".
-#   - Adds the label "[maintainer] release" so it is excluded from changelogs.
+#   - Adds the label "[maintainer] auto-pull-request" so it is excluded from changelogs.
 #   - The PR body makes clear that this is automation only (no review needed).
 
 name: Release PR creation
@@ -30,9 +30,9 @@ jobs:
             --base main \
             --head develop \
             --title "Release: merge develop into main" \
-            --label "[maintainer] release" \
-            --body "This pull request is created automatically to trigger the release pipeline. It  merges the accumulated changes from \`develop\` into \`main\`.
-            
-            ⚠️ Note: This PR is labeled \`[maintainer] release\` and is excluded from release notes and version bump logic."
+            --label "[maintainer] auto-pull-request" \
+            --body "This pull request is created automatically to trigger the release pipeline. It merges the accumulated changes from \`develop\` into \`main\`.
+
+            ⚠️ Note: This PR is labeled \`[maintainer] auto-pull-request\` and is excluded from release notes and version bump logic."
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_API_PERSONAL_ACCSESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_API_PERSONAL_ACCESS_TOKEN }}

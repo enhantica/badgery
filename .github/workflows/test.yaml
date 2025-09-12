@@ -81,7 +81,7 @@ jobs:
       - name: Upload Python package for the next job
         uses: actions/upload-artifact@v4
         with:
-          name: edl_${{ matrix.os }}_${{ runner.arch }}
+          name: badgery_${{ matrix.os }}_${{ runner.arch }}
           path: |
             dist/
             tests/
@@ -105,7 +105,7 @@ jobs:
           Download zipped Python package (incl. extra files) from previous job
         uses: actions/download-artifact@v4
         with: # name or path are taken from the upload step of the previous job
-          name: edl_${{ matrix.os }}_${{ runner.arch }}
+          name: badgery_${{ matrix.os }}_${{ runner.arch }}
           path: . # directory to extract downloaded zipped artifacts
 
       - name: Set up pixi

@@ -19,7 +19,7 @@ jobs:
           PR_LABELS=$(echo '${{ toJson(github.event.pull_request.labels.*.name) }}' | jq -r '.[]')
           echo "Current PR labels: $PR_LABELS"
           VALID_LABELS=(
-            "[maintainer] release"
+            "[maintainer] auto-pull-request"
             "[scope] bug"
             "[scope] documentation"
             "[scope] enhancement"
@@ -37,6 +37,9 @@ jobs:
           done
 
           if [ "$found" = false ]; then
-            echo "::error::PR must have at least one of: ${VALID_LABELS[*]}"
+            echo "ERROR: PR must have at least one of the following labels:"
+            for label in "${VALID_LABELS[@]}"; do
+              echo "       - $label"
+            done
             exit 1
           fi
