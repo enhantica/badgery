@@ -185,6 +185,9 @@ select = [
   'UP',     # Pyupgrade-specific checks
   'W',      # General PEP 8 warnings (e.g., lines too long, trailing whitespace)
 ]
+ignore = [
+  'COM812', # Conflicts with the Ruff formatter (trailing commas)
+]
 
 # Temporarily increase McCabe complexity limit to 17 to allow
 # refactoring in smaller steps.

@@ -30,10 +30,9 @@ jobs:
             --base main \
             --head develop \
             --title "Release: merge develop into main" \
-            --body "This pull request is created automatically to
-            trigger the release pipeline. It merges the accumulated
-            changes from \`develop\` into \`main\`.
-            ⚠️ Note: This PR is labeled \`[maintainer] release\` and is
-            excluded from release notes and version bump logic."
+            --label "[maintainer] release" \
+            --body "This pull request is created automatically to trigger the release pipeline. It  merges the accumulated changes from \`develop\` into \`main\`.
+            
+            ⚠️ Note: This PR is labeled \`[maintainer] release\` and is excluded from release notes and version bump logic."
         env:
           GITHUB_TOKEN: ${{ secrets.GH_API_PERSONAL_ACCSESS_TOKEN }}

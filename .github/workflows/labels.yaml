@@ -4,21 +4,31 @@
 name: PR label checks
 
 on:
-  # Runs on pull requests to a repository
   pull_request_target:
     types: [opened, labeled, unlabeled, synchronize]
 
-jobs:
-  verify-pr-labels:
-    runs-on: ubuntu-latest
+permissions:
+  pull-requests: read
 
+jobs:
+  require-label:
+    runs-on: ubuntu-latest
     steps:
-      - name: PR label checks
-        uses: jesusvasquez333/verify-pr-label-action@v1.4.0
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          valid-labels:
-            '[scope] bug, [scope] documentation, [scope] enhancement, [scope]
-            maintenance, [scope] significant, [maintainer] release'
-          pull-request-number: ${{ github.event.pull_request.number }}
-          disable-reviews: false
+      # Fail when none of the allowed labels are present
+      - name: Validate required labels
+        if: >-
+          !(
+            contains(github.event.pull_request.labels.*.name, '[maintainer]
+          release') ||
+            contains(github.event.pull_request.labels.*.name, '[scope] bug') ||
+            contains(github.event.pull_request.labels.*.name, '[scope]
+          documentation') ||
+            contains(github.event.pull_request.labels.*.name, '[scope]
+          enhancement') ||
+            contains(github.event.pull_request.labels.*.name, '[scope]
+          maintenance') ||
+            contains(github.event.pull_request.labels.*.name, '[scope]
+          significant') )
+        run: |
+          echo "::error::PR must have at least one of: [maintainer] release, [scope] bug, documentation, enhancement, maintenance, significant"
+          exit 1
