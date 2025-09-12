@@ -9,7 +9,7 @@ from badgery.render import HTMLDashboardRenderer
 def test_value_item_html_unknown_metric():
     r = HTMLDashboardRenderer([], feature='f', badge_gen=BadgeGenerator('r/x'))
     html = r._value_item_html('nope', 'master', 'main')
-    assert 'item-label">main:' in html
+    assert 'item-label">main' in html
     assert 'item-value gray">unknown' in html
 
 

@@ -504,13 +504,13 @@ class HTMLDashboardRenderer:
             text, color = status
             return (
                 '<div class="row">'
-                f'<span class="item-label">{branch_label}:</span>'
+                f'<span class="item-label">{branch_label}</span>'
                 f'<span class="item-value {color}">{text}</span>'
                 '</div>'
             )
         return (
             '<div class="row">'
-            f'<span class="item-label">{branch_label}:</span>'
+            f'<span class="item-label">{branch_label}</span>'
             '<span class="item-value gray">unknown</span>'
             '</div>'
         )
