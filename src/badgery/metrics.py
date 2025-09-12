@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import ClassVar
 from typing import Optional
 from typing import Tuple
 
@@ -40,7 +41,7 @@ class BaseMetric:
 
     key: str = ''
     label: str = ''
-    thresholds: list = []
+    thresholds: ClassVar[list] = []
     reverse: bool = False
     badge_url_func: Any = None
 
@@ -95,7 +96,7 @@ class MaintainabilityMetric(BaseMetric):
 
     key = 'maintainability'
     label = 'Maintainability index with radon'
-    thresholds = [
+    thresholds: ClassVar[list] = [
         (85, 'A', 'brightgreen'),
         (70, 'B', 'green'),
         (50, 'C', 'yellow'),
@@ -161,7 +162,7 @@ class ComplexityMetric(BaseMetric):
 
     key = 'complexity'
     label = 'Cyclomatic complexity with radon'
-    thresholds = [
+    thresholds: ClassVar[list] = [
         (5, 'A', 'brightgreen'),
         (10, 'B', 'green'),
         (15, 'C', 'yellow'),
@@ -227,7 +228,7 @@ class DocstringCoverageMetric(BaseMetric):
 
     key = 'docstring'
     label = 'Docstring coverage with interrogate'
-    thresholds = [
+    thresholds: ClassVar[list] = [
         (90, '', 'brightgreen'),
         (70, '', 'yellow'),
         (50, '', 'orange'),

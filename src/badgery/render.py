@@ -126,16 +126,25 @@ class HTMLDashboardRenderer:
             The response body decoded as UTF-8, or ``None`` on
             any error.
         """
+        if not (isinstance(url, str) and url.startswith('https://')):
+            return None
+        resp = None
         try:
-            if not (isinstance(url, str) and url.startswith('https://')):
-                return None
-            with urlopen(url, timeout=timeout) as resp:  # noqa: S310
-                if 200 <= resp.status < 300:
-                    return resp.read().decode('utf-8', errors='ignore')
+            resp = urlopen(url, timeout=timeout)  # noqa: S310
+            status = getattr(resp, 'status', 200)
+            if 200 <= status < 300:
+                data = resp.read()
+                return data.decode('utf-8', errors='ignore')
         except (URLError, HTTPError, TimeoutError) as exc:
             logging.debug('Fetch failed %s: %s', url, exc)
         except Exception as exc:
             logging.debug('Fetch failed %s: %s', url, exc)
+        finally:
+            try:
+                if resp and hasattr(resp, 'close'):
+                    resp.close()
+            except Exception as close_exc:
+                logging.debug('Response close failed: %s', close_exc)
         return None
 
     def _github_badge_status(self, workflow: str, branch: Optional[str]) -> Optional[str]:
@@ -191,7 +200,7 @@ class HTMLDashboardRenderer:
             return None
         try:
             val = float(matches[-1])
-            return int(round(val))
+            return round(val)
         except Exception:
             return None
 
@@ -199,7 +208,7 @@ class HTMLDashboardRenderer:
         """Return a CodeFactor letter grade parsed from the badge.
 
         Returns:
-            Optional[str]: Letter grade ``A``–``F`` or ``None``.
+            Optional[str]: Letter grade ``A``-``F`` or ``None``.
         """
         url = self.badge_gen.codefactor_badge_img(branch)
         svg = self._fetch(url)
@@ -297,7 +306,7 @@ class HTMLDashboardRenderer:
             except Exception:
                 p = None
             color = self._color_for_percent(p)
-            text = f'{int(round(p))}%' if p is not None else 'unknown'
+            text = f'{round(p)}%' if p is not None else 'unknown'
             return (text, color)
 
         if isinstance(m, MaintainabilityMetric):
@@ -319,7 +328,7 @@ class HTMLDashboardRenderer:
             else:
                 grade = 'F'
                 color = 'red'
-            text = f'{grade} ({int(round(mi))})'
+            text = f'{grade} ({round(mi)})'
             return (text, color)
 
         if isinstance(m, ComplexityMetric):
@@ -336,7 +345,7 @@ class HTMLDashboardRenderer:
                 if not val:
                     return ('unknown', 'gray')
                 try:
-                    p = int(round(float(str(val).strip().rstrip('%'))))
+                    p = round(float(str(val).strip().rstrip('%')))
                 except Exception:
                     return ('unknown', 'gray')
                 color = self._color_for_percent(float(p))
@@ -348,7 +357,7 @@ class HTMLDashboardRenderer:
                 val = value
                 if val:
                     try:
-                        p = int(round(float(str(val).strip().rstrip('%'))))
+                        p = round(float(str(val).strip().rstrip('%')))
                     except Exception:
                         p = None
             if p is None:

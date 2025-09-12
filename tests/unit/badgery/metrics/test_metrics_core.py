@@ -50,7 +50,7 @@ def test_lines_of_code_sum_raw_metrics(tmp_path: Path):
     p = tmp_path / 'raw.json'
     p.write_text(json.dumps(data), encoding='utf-8')
     loc = LinesOfCodeMetric(BadgeGenerator('r/x'))
-    sloc, lloc = loc._sum_raw_metrics(str(p))  # noqa: SLF001
+    sloc, lloc = loc._sum_raw_metrics(str(p))
     assert sloc == 30
     assert lloc == 15
 
@@ -67,8 +67,8 @@ def test_file_and_function_counts(tmp_path: Path):
     funcs = FunctionCountMetric(BadgeGenerator('r/x'))
 
     # Private helpers used via read_all; call directly for clarity
-    assert files._count_files(str(p)) == 2  # noqa: SLF001
-    assert funcs._count_functions(str(p)) == 4  # noqa: SLF001
+    assert files._count_files(str(p)) == 2
+    assert funcs._count_functions(str(p)) == 4
 
 
 def test_docstring_coverage_read_value_from_table_and_fallback(tmp_path: Path):

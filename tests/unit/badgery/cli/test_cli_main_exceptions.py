@@ -27,7 +27,7 @@ def test_cli_main_handles_metric_read_exception(tmp_path: Path, monkeypatch: pyt
     class RaisingMetric:
         key = 'raising'
 
-        def read_all(self, _):  # noqa: D401
+        def read_all(self, _):
             raise RuntimeError('boom')
 
     # build_metrics_from_config returns the raising metric and a simple spec

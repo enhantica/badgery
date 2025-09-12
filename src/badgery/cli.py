@@ -15,6 +15,9 @@ from badgery.config import build_metrics_from_config
 from badgery.config import load_settings_from_yaml
 from badgery.render import HTMLDashboardRendererWithSpec
 
+# Placeholder token used in report path patterns
+BRANCH_TOKEN = '{' + 'branch' + '}'
+
 
 def _collect_report_patterns(
     cards: list[dict],
@@ -46,8 +49,8 @@ def _collect_report_patterns(
 def _resolve_pattern(pattern: Optional[str], branch: str) -> Optional[str]:
     if not pattern:
         return None
-    if '{branch}' in pattern:
-        candidate = pattern.replace('{branch}', branch)
+    if BRANCH_TOKEN in pattern:
+        candidate = pattern.replace(BRANCH_TOKEN, branch)
     else:
         candidate = pattern.replace('**', branch)
     p = Path(candidate)
