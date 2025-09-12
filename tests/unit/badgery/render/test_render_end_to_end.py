@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from badgery.badges import BadgeGenerator
 from badgery.metrics import BaseMetric
 from badgery.metrics import ComplexityMetric
@@ -66,26 +68,37 @@ def test_html_render_end_to_end_smoke():
     assert 'Complexity' in html
     assert 'Docstrings' in html
 
-    # Status lines include branch labels and values
-    assert 'main: A (85)' in html
-    assert 'develop: B (65)' in html
-    assert 'feature-x: C (45)' in html
+    # Status lines include branch labels and values (split into label/value spans)
+    labels = re.findall(
+        r'<span class="item-label(?: [^"]+)?">(?:\s*<i[^>]*></i>\s*)?([^<]+)</span>', html
+    )
+    assert 'main' in labels
+    assert 'develop' in labels
+    assert 'feature-x' in labels
+    assert 'A (85)' in html
+    assert 'B (65)' in html
+    assert 'C (45)' in html
 
-    assert 'main: A (3.0)' in html
-    assert 'develop: C (12.0)' in html
-    assert 'feature-x: D (25.0)' in html or 'feature-x: F (25.0)' in html
+    assert 'A (3.0)' in html
+    assert 'C (12.0)' in html
+    assert ('D (25.0)' in html) or ('F (25.0)' in html)
 
-    assert 'main: 92%' in html
-    assert 'develop: 76%' in html
-    assert 'feature-x: 60%' in html
+    assert '92%' in html
+    assert '76%' in html
+    assert '60%' in html
 
     # LOC card includes ratio and tuple formatting
-    assert 'main: 1.00 (90/90)' in html
-    assert 'develop: 1.10 (110/100)' in html
-    assert 'feature-x: 2.50 (200/80)' in html
+    assert '1.00 (90/90)' in html
+    assert '1.10 (110/100)' in html
+    assert '2.50 (200/80)' in html
 
     # Counts are formatted as blue text values (class color asserted indirectly via presence)
     assert 'Files' in html
-    assert 'main: 12' in html
+    assert 'item-value blue">12' in html
     assert 'Functions' in html
-    assert 'develop: 110' in html
+    assert 'item-value blue">110' in html
+
+    # Branch icons are present
+    assert 'fas fa-crown' in html
+    assert 'fas fa-hammer' in html
+    assert 'fas fa-code-branch' in html

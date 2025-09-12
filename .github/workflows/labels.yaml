@@ -14,21 +14,28 @@ jobs:
   require-label:
     runs-on: ubuntu-latest
     steps:
-      # Fail when none of the allowed labels are present
       - name: Validate required labels
-        if: >-
-          !(
-            contains(github.event.pull_request.labels.*.name, '[maintainer]
-          release') ||
-            contains(github.event.pull_request.labels.*.name, '[scope] bug') ||
-            contains(github.event.pull_request.labels.*.name, '[scope]
-          documentation') ||
-            contains(github.event.pull_request.labels.*.name, '[scope]
-          enhancement') ||
-            contains(github.event.pull_request.labels.*.name, '[scope]
-          maintenance') ||
-            contains(github.event.pull_request.labels.*.name, '[scope]
-          significant') )
         run: |
-          echo "::error::PR must have at least one of: [maintainer] release, [scope] bug, documentation, enhancement, maintenance, significant"
-          exit 1
+          echo "Current PR labels: ${{ toJson(github.event.pull_request.labels.*.name) }}"
+          VALID_LABELS=(
+            "[maintainer] release"
+            "[scope] bug"
+            "[scope] documentation"
+            "[scope] enhancement"
+            "[scope] maintenance"
+            "[scope] significant"
+          )
+
+          found=false
+          for label in "${VALID_LABELS[@]}"; do
+            if echo "${{ toJson(github.event.pull_request.labels.*.name) }}" | grep -q "\"$label\""; then
+              echo "Found valid label: $label"
+              found=true
+              break
+            fi
+          done
+
+          if [ "$found" = false ]; then
+            echo "::error::PR must have at least one of: ${VALID_LABELS[*]}"
+            exit 1
+          fi
