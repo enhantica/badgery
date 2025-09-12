@@ -5,14 +5,14 @@
 [project]
 name = 'badgery'
 dynamic = ['version'] # Use versioningit to manage the version
-description = 'Turn your code metrics and CI results into a sleek, badge-driven HTML dashboard for your GitHub repo.'
+description = 'Turn code metrics and CI results into sleek, card-based HTML dashboards.'
 authors = [{ name = 'Badgery contributors' }]
 readme = 'README.md'
-license = { file = 'LICENSE' }
+license = { text = 'MIT' }
 classifiers = [
-  'Intended Audience :: Science/Research',
-  'Topic :: Scientific/Engineering',
-  'License :: OSI Approved :: BSD License',
+  'Intended Audience :: Developers',
+  'Topic :: Software Development :: Quality Assurance',
+  'License :: OSI Approved :: MIT License',
   'Operating System :: OS Independent',
   'Programming Language :: Python :: 3 :: Only',
   'Programming Language :: Python :: 3',
@@ -125,7 +125,7 @@ verbose = 1
 #######################################
 
 [tool.coverage.run]
-branch = true                    # Measure branch coverage as well
+branch = true            # Measure branch coverage as well
 source = ["src/badgery"] # Limit coverage to the source code directory
 
 [tool.coverage.report]
@@ -142,7 +142,7 @@ fail_under = 80     # Minimum coverage percentage to pass
 
 [tool.ruff]
 # Temporarily exclude some directories until we have improved the code quality there
-exclude = ['tests', 'tools']
+exclude = ['tools']
 indent-width = 4
 line-length = 99
 # Enable new rules that are not yet stable, like DOC
@@ -175,28 +175,11 @@ select = [
   #'TRY',   # Tryceratops Try/Except-related issues (e.g., broad exceptions, empty except blocks)
   #'UP',    # Pyupgrade-specific checks
 ]
-# Temporarily disable some docstring checks until we have improved the docstring coverage
-ignore = [
-  'C408',   # Ignore: Unnecessary `dict()` call
-  'C416',   # Ignore: Unnecessary list comprehension
-  'D100',   # Ignore: Missing docstring in public module
-  'D101',   # Ignore: Missing docstring in class
-  'D102',   # Ignore: Missing docstring in public method
-  'D103',   # Ignore: Missing docstring in public function
-  'D104',   # Ignore: Missing docstring in public package
-  'D105',   # Ignore: Missing docstring in magic method
-  'D107',   # Ignore: Missing docstring in __init__
-  'D205',   # Ignore: 1 blank line required between summary and description
-  'DOC201', # Ignore: `return` is not documented in docstring
-  'DOC501', # Ignore: Raised exception `ValueError` missing from docstring
-  'DOC502', # Ignore: Raised exception is not explicitly raised: `TypeError`
-  'DTZ005', # Ignore: `datetime.datetime.now()` called without a `tz` argument
-]
 
 # Temporarily increase McCabe complexity limit to 17 to allow
 # refactoring in smaller steps.
 [tool.ruff.lint.mccabe]
-max-complexity = 17 # default is 10
+max-complexity = 10 # default is 10
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = 'all'
@@ -205,7 +188,16 @@ ban-relative-imports = 'all'
 force-single-line = true
 
 [tool.ruff.lint.per-file-ignores]
-'*test_*.py' = ['S101'] # allow asserts in test files
+'tests/**/*.py' = [
+  'S101', # allow asserts in test files
+  'D100', # do not require docstrings in tests
+  'D101', # do not require docstrings in tests
+  'D102', # do not require docstrings in tests
+  'D103', # do not require docstrings in tests
+  'D104', # do not require docstrings in tests
+  'TCH',  # do not enforce type-checking import blocks in tests
+  'W505', # ignore doc line length in tests
+]
 
 [tool.ruff.lint.pycodestyle]
 max-line-length = 99 # https://peps.python.org/pep-0008/#maximum-line-length

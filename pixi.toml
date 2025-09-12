@@ -20,15 +20,15 @@ channels = ["conda-forge"]
 # Default feature configuration
 
 [dependencies] # == [feature.default.dependencies]
-pip = "*"        # Required to install from PyPI
+pip = "*" # Required to install from PyPI
+
+[pypi-dependencies] # == [feature.default.pypi-dependencies]
+badgery = { path = ".", editable = true, extras = ["dev"] }
 
 # Extra features for different Python versions
 
 [feature.py313.dependencies]
 python = "3.13.*"
-
-[feature.badgery-local-editable.pypi-dependencies]
-badgery = { path = ".", editable = true, extras = ["dev"]}
 
 # This feature installs Node.js and Prettier for formatting
 # non-Python files.
@@ -45,7 +45,8 @@ nodejs = ">=20,<21" # Required for prettier; pinned to a stable LTS
 # The `default` environment is always included in the lock file, so it does not
 # need to be specified explicitly in the environments section.
 
-default = { features = ["py313", "badgery-local-editable", "nodejs"] }
+default = { features = ["py313", "nodejs"] }
+wheel = { features = ["py313"] }
 
 #######
 # TASKS
@@ -54,10 +55,7 @@ default = { features = ["py313", "badgery-local-editable", "nodejs"] }
 [tasks]
 
 # 🧪 Testing Tasks
-unit-tests = "python -m pytest tests/unit/ --color=yes -v"
-func-tests = "python -m pytest tests/functional/ --color=yes -n auto -v"
-
-tests = { depends-on = ["unit-tests", "func-tests"] }
+tests = "python -m pytest tests/ --color=yes -v"
 
 # 🧹 Code Quality
 
@@ -66,16 +64,16 @@ pyproject-check = "python -m validate_pyproject pyproject.toml"
 py-lint-check = "python -m ruff check ."
 py-format-check = "python -m ruff format . --check"
 nonpy-format-check = "npx prettier . --list-different --config=prettierrc.toml"
-docs-format-check = "docformatter --check src/ tutorials/"
+docs-format-check = "docformatter --check src/"
 
 ## 🛠️ Fixes
 py-lint-fix = "python -m ruff check . --fix"
 py-format-fix = "python -m ruff format ."
 nonpy-format-fix = "npx prettier . --list-different --write --config=prettierrc.toml"
 nonpy-format-fix-modified = "npx prettier $(git diff --name-only HEAD | grep -E '\\.(json|ya?ml|toml|md|css|html)$' || echo .) --list-different --write --config=prettierrc.toml"
-docs-format-fix = "docformatter --in-place src/ tutorials/"
+docs-format-fix = "docformatter --in-place src/"
 
-code-quality = { depends-on = [
+quality = { depends-on = [
   "pyproject-check",
   "py-format-fix",
   "docs-format-fix",
@@ -92,14 +90,13 @@ raw-metrics = "radon raw -s src/"
 raw-metrics-json = "radon raw -s -j src/"
 
 # 📊 Coverage
-unit-tests-coverage = "pixi run unit-tests --cov=src/badgery --cov-report=term-missing"
-func-tests-coverage = "pixi run func-tests --cov=src/badgery --cov-report=term-missing"
-docstring-coverage = "interrogate -c pyproject.toml src/"
+tests-cov = "pixi run tests --cov=src/badgery --cov-report=term-missing"
+docstring-cov = "interrogate -c pyproject.toml src/"
 
-coverage = "pixi run docstring-coverage || true; pixi run unit-tests-coverage || true"
+coverage = "pixi run docstring-cov || true; pixi run tests-cov || true"
 
 # 🚀 Development & Build Tasks
-pre-commit = { depends-on = ["code-quality", "tests"] }
+pre-commit = { depends-on = ["quality", "coverage"] }
 dist-build = "python -m build --wheel --outdir dist"
 spdx-update = "python tools/update_spdx.py"
 prettier-install = "npm install --no-save --no-audit --no-fund prettier prettier-plugin-toml"

@@ -2,8 +2,8 @@ name: Build and publish dashboard
 
 on:
   push:
-  pull_request:
   workflow_dispatch:
+  workflow_call:
 
 concurrency:
   group:
@@ -41,6 +41,10 @@ jobs:
         run: |
           for BRANCH in ${{ env.DEFAULT_BRANCH }} ${{ env.DEVELOP_BRANCH }} ${{ env.CI_BRANCH }}; do
             echo "=== Processing branch $BRANCH ==="
+            if [ -d "../worktree-$BRANCH" ]; then
+              echo "Branch $BRANCH already processed, skipping"
+              continue
+            fi
             git worktree add ../worktree-$BRANCH origin/$BRANCH
             mkdir -p reports/$BRANCH
             echo "Docstring coverage for branch $BRANCH"
@@ -55,8 +59,8 @@ jobs:
 
       - name: Generate dashboard HTML
         run: >
-          pixi run badgery --repo ${{ github.repository }}
-          --branch ${{ env.CI_BRANCH }} --output index.html
+          pixi run badgery --repo ${{ github.repository }} --branch ${{
+          env.CI_BRANCH }} --output index.html
 
       - name: Prepare publish directory
         run: |
@@ -74,4 +78,5 @@ jobs:
 
       - name: Add dashboard link to summary
         run: |
-          echo "[Dashboard link](https://${{ env.REPO_OWNER }}.github.io/dashboard/${{ env.REPO_NAME }}/${{ env.CI_BRANCH }}/index.html)" >> $GITHUB_STEP_SUMMARY
+          URL="https://${{ env.REPO_OWNER }}.github.io/dashboard/${{ env.REPO_NAME }}/${{ env.CI_BRANCH }}"
+          echo "Dashboard link: [$URL]($URL)" >> $GITHUB_STEP_SUMMARY

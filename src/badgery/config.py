@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Badgery contributors <https://github.com/enhantica/badgery>
+# SPDX-License-Identifier: MIT
+"""Configuration loading and mapping utilities for Badgery."""
+
 from __future__ import annotations
 
 import logging
@@ -20,72 +24,91 @@ from badgery.metrics import LinesOfCodeMetric
 from badgery.metrics import MaintainabilityMetric
 
 
+def _parse_scalar(val: str) -> Any:
+    """Parse a YAML-like scalar: booleans and quoted strings.
+
+    Returns:
+        Any: Parsed Python value for the scalar string.
+
+    Notes:
+        This is a tiny helper to keep load functions simpler and reduce
+        complexity without introducing a real YAML parser dependency.
+    """
+    sval = val.strip()
+    low = sval.lower()
+    if low in ('true', 'false'):
+        return low == 'true'
+    if (sval.startswith("'") and sval.endswith("'")) or (
+        sval.startswith('"') and sval.endswith('"')
+    ):
+        return sval[1:-1]
+    return sval
+
+
+def _parse_inline_mapping(rest: str, current: dict[str, Any]) -> None:
+    """Parse inline mapping after a list item marker.
+
+    Updates the provided ``current`` mapping.
+
+    Example: ``- group: Tests``.
+    """
+    if rest and ':' in rest:
+        key, val = rest.split(':', 1)
+        current[key.strip()] = _parse_scalar(val)
+
+
 def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:
+    """Load the `cards:` list from `.badgery.yaml`.
+
+    Returns:
+        list[dict[str, Any]]: Card mappings in declaration order.
+    """
     p = Path(path)
     if not p.exists():
         logging.info('Config %s not found; using empty card list', path)
         return []
     lines = p.read_text(encoding='utf-8').splitlines()
+    # Find the start of the cards section first to reduce branching
+    start = None
+    for idx, raw in enumerate(lines):
+        s = raw.strip()
+        if s and not s.startswith('#') and s == 'cards:':
+            start = idx + 1
+            break
+    if start is None:
+        return []
+
     items: list[dict[str, Any]] = []
-    in_cards = False
     current: Optional[dict[str, Any]] = None
     current_indent = 0
-    for raw in lines:
+    for raw in lines[start:]:
         line = raw.rstrip()
-        if not line.strip() or line.strip().startswith('#'):
+        stripped = line.strip()
+        if not stripped or stripped.startswith('#'):
             continue
-        if not in_cards:
-            if line.strip() == 'cards:':
-                in_cards = True
-                continue
-            else:
-                continue
         if line.lstrip().startswith('- '):
             current = {}
             items.append(current)
             current_indent = len(line) - len(line.lstrip())
-            # Support inline mapping after '- ' (e.g., "- group: Tests")
             rest = line.lstrip()[2:].strip()
-            if rest and ':' in rest:
-                key, val = rest.split(':', 1)
-                key = key.strip()
-                val = val.strip()
-                if val.lower() in ('true', 'false'):
-                    current[key] = (val.lower() == 'true')
-                else:
-                    is_single_quoted = val.startswith("'") and val.endswith("'")
-                    is_double_quoted = val.startswith('"') and val.endswith('"')
-                    if is_single_quoted or is_double_quoted:
-                        val = val[1:-1]
-                    current[key] = val
+            _parse_inline_mapping(rest, current)
             continue
         if current is None:
             continue
         indent = len(line) - len(line.lstrip())
-        if indent <= current_indent:
-            continue
-        if ':' not in line:
+        if indent <= current_indent or ':' not in line:
             continue
         key, val = line.strip().split(':', 1)
-        val = val.strip()
-        if val.lower() in ('true', 'false'):
-            current[key] = (val.lower() == 'true')
-        else:
-            is_single_quoted = val.startswith("'") and val.endswith("'")
-            is_double_quoted = val.startswith('"') and val.endswith('"')
-            if is_single_quoted or is_double_quoted:
-                val = val[1:-1]
-            current[key] = val
+        current[key.strip()] = _parse_scalar(val)
     return items
 
 
 def load_settings_from_yaml(path: str) -> dict[str, Any]:
-    """Load top-level settings (default/develop branch) and cards.
+    """Load top-level settings (default/develop) and cards.
 
-    Returns a dict with keys:
-    - 'default_branch': str (defaults to 'master')
-    - 'develop_branch': str (defaults to 'develop')
-    - 'cards': list[dict]
+    Returns:
+        dict[str, Any]: Keys `default_branch`, `develop_branch`, and
+        `cards` with parsed values.
     """
     p = Path(path)
     settings: dict[str, Any] = {
@@ -132,6 +155,7 @@ def load_settings_from_yaml(path: str) -> dict[str, Any]:
 
 
 def group_icon(group: str) -> str:
+    """Return a Font Awesome icon class for a group name."""
     g = (group or '').strip().lower()
     mapping = {
         'tests': 'fas fa-vial',
@@ -161,38 +185,46 @@ def group_icon(group: str) -> str:
     return 'fas fa-gauge'
 
 
-def build_metrics_from_config(  # noqa: C901 - acceptable complexity for mapping
+def build_metrics_from_config(  # noqa: C901 - acceptable complexity
     cards: list[dict[str, Any]],
     badge_gen: 'BadgeGenerator',
     feature: str,
 ):
+    """Construct metric instances and an ordered card spec.
+
+    Returns:
+        tuple[list, list[tuple[str, str, str]]]: The metric objects
+        and an ordered card specification.
+    """
     metrics: list[BaseMetric] = []
     cards_spec: list[tuple[str, str, str]] = []
 
     singleton_by_type: dict[str, BaseMetric] = {}
 
     def _get_or_create(ctype: str) -> BaseMetric | None:
+        """Return a singleton metric instance for a given card type.
+
+        Uses a small mapping table and stores/reuses instances so that
+        multiple cards of the same type share the same metric object.
+        """
         if ctype in singleton_by_type:
             return singleton_by_type[ctype]
-        inst: BaseMetric | None = None
-        if ctype == 'codefactor':
-            inst = CodeFactorMetric(badge_gen, feature=feature)
-        elif ctype in ('codecov', 'codecove'):
-            inst = CodecovMetric(badge_gen, feature=feature)
-        elif ctype == 'radon_mi':
-            inst = MaintainabilityMetric(badge_gen, feature=feature)
-        elif ctype == 'radon_cc':
-            inst = ComplexityMetric(badge_gen, feature=feature)
-        elif ctype == 'radon_loc':
-            inst = LinesOfCodeMetric(badge_gen, feature=feature)
-        elif ctype == 'radon_files':
-            inst = FileCountMetric(badge_gen, feature=feature)
-        elif ctype == 'radon_funcs':
-            inst = FunctionCountMetric(badge_gen, feature=feature)
-        elif ctype == 'interrogate':
-            inst = DocstringCoverageMetric(badge_gen, feature=feature)
-        if inst is not None:
-            singleton_by_type[ctype] = inst
+        mapping: dict[str, type[BaseMetric]] = {
+            'codefactor': CodeFactorMetric,
+            'codecov': CodecovMetric,
+            'codecove': CodecovMetric,  # alias
+            'radon_mi': MaintainabilityMetric,
+            'radon_cc': ComplexityMetric,
+            'radon_loc': LinesOfCodeMetric,
+            'radon_files': FileCountMetric,
+            'radon_funcs': FunctionCountMetric,
+            'interrogate': DocstringCoverageMetric,
+        }
+        cls = mapping.get(ctype)
+        if cls is None:
+            return None
+        inst: BaseMetric = cls(badge_gen, feature=feature)
+        singleton_by_type[ctype] = inst
         return inst
 
     for card in cards:
