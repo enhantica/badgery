@@ -16,7 +16,8 @@ jobs:
     steps:
       - name: Validate required labels
         run: |
-          echo "Current PR labels: ${{ toJson(github.event.pull_request.labels.*.name) }}"
+          PR_LABELS=$(echo '${{ toJson(github.event.pull_request.labels.*.name) }}' | jq -r '.[]')
+          echo "Current PR labels: $PR_LABELS"
           VALID_LABELS=(
             "[maintainer] release"
             "[scope] bug"
@@ -28,8 +29,8 @@ jobs:
 
           found=false
           for label in "${VALID_LABELS[@]}"; do
-            if echo "${{ toJson(github.event.pull_request.labels.*.name) }}" | grep -q "\"$label\""; then
-              echo "Found valid label: $label"
+            if echo "$PR_LABELS" | grep -Fxq "$label"; then
+              echo "✅ Found valid label: $label"
               found=true
               break
             fi
