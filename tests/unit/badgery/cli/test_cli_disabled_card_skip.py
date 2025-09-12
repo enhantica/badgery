@@ -8,7 +8,10 @@ import pytest
 from badgery.cli import parse_args
 
 
-def test_parse_args_skips_disabled_cards(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_parse_args_skips_disabled_cards(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     reports = tmp_path / 'reports'
     (reports / 'feat').mkdir(parents=True)
     (reports / 'feat' / 'cc.json').write_text('{"a.py": []}', encoding='utf-8')

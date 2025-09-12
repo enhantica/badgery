@@ -17,7 +17,7 @@ from badgery.metrics import LinesOfCodeMetric
 from badgery.metrics import MaintainabilityMetric
 
 
-def test_maintainability_metric_reads_and_formats(tmp_path: Path):
+def test_maintainability_metric_reads_and_formats(tmp_path: Path) -> None:
     data = {'a.py': {'mi': 90}, 'b.py': {'mi': 70}}
     p = tmp_path / 'mi.json'
     p.write_text(json.dumps(data), encoding='utf-8')
@@ -31,7 +31,7 @@ def test_maintainability_metric_reads_and_formats(tmp_path: Path):
     assert m.format_value((avg, count)) == '80 over 2 files'  # actual
 
 
-def test_complexity_metric_reads_and_formats(tmp_path: Path):
+def test_complexity_metric_reads_and_formats(tmp_path: Path) -> None:
     data = {'a.py': [{'complexity': 2}, {'complexity': 4}], 'b.py': []}
     p = tmp_path / 'cc.json'
     p.write_text(json.dumps(data), encoding='utf-8')
@@ -44,7 +44,7 @@ def test_complexity_metric_reads_and_formats(tmp_path: Path):
     assert m.format_value((avg, count)) == '3.0 over 2 funcs'
 
 
-def test_docstring_coverage_metric_reads_total_and_fallback(tmp_path: Path):
+def test_docstring_coverage_metric_reads_total_and_fallback(tmp_path: Path) -> None:
     # Case 1: table TOTAL line
     p1 = tmp_path / 'interrogate1.txt'
     p1.write_text('| TOTAL | something | 88% |', encoding='utf-8')
@@ -60,7 +60,7 @@ def test_docstring_coverage_metric_reads_total_and_fallback(tmp_path: Path):
     assert not m.read_value(str(tmp_path / 'missing.txt'))
 
 
-def test_lines_of_code_metric_sums_simple_list(tmp_path: Path):
+def test_lines_of_code_metric_sums_simple_list(tmp_path: Path) -> None:
     # Use list-based structure to avoid double-counting raw nested objects
     p = tmp_path / 'raw.json'
     p.write_text(json.dumps([{'sloc': 3, 'lloc': 2}, {'sloc': 7, 'lloc': 5}]), encoding='utf-8')
@@ -81,7 +81,7 @@ def test_lines_of_code_metric_sums_simple_list(tmp_path: Path):
     assert m.feature_value == (10, 7)
 
 
-def test_file_and_function_count_metrics(tmp_path: Path):
+def test_file_and_function_count_metrics(tmp_path: Path) -> None:
     data = {
         'a.py': [{'complexity': 1}, {'complexity': 2}],
         'b.py': [],
@@ -125,7 +125,7 @@ def test_file_and_function_count_metrics(tmp_path: Path):
     assert fnc.feature_value == expected_funcs_total
 
 
-def test_codecov_and_codefactor_env_metrics(monkeypatch: pytest.MonkeyPatch):
+def test_codecov_and_codefactor_env_metrics(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv('CI_CODECOV_MASTER', '82%')
     monkeypatch.setenv('CI_CODECOV_DEVELOP', '79%')
     monkeypatch.setenv('CI_CODECOV_FEATURE', '75%')
@@ -145,7 +145,7 @@ def test_codecov_and_codefactor_env_metrics(monkeypatch: pytest.MonkeyPatch):
     assert cf.feature_value == 'C'
 
 
-def test_github_workflow_metric_refs_and_env(monkeypatch: pytest.MonkeyPatch):
+def test_github_workflow_metric_refs_and_env(monkeypatch: pytest.MonkeyPatch) -> None:
     # Key base is derived from workflow stem: 'ci.yml' -> 'ci'
     monkeypatch.setenv('CI_WORKFLOW_CI_MASTER', 'passed')
     monkeypatch.setenv('CI_WORKFLOW_CI_DEVELOP', 'failed')

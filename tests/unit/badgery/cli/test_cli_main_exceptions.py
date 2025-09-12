@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Never
 
 import pytest
 
@@ -8,7 +9,7 @@ from badgery import cli as cli_mod
 
 
 class _Args:
-    def __init__(self, output: Path):
+    def __init__(self, output: Path) -> None:
         self.output = str(output)
         self.repo = 'org/repo'
         self.branch = 'f'
@@ -18,7 +19,10 @@ class _Args:
         self.log_level = 'ERROR'
 
 
-def test_cli_main_handles_metric_read_exception(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_cli_main_handles_metric_read_exception(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # Arrange: parse_args returns our args
     args = _Args(tmp_path / 'out.html')
     monkeypatch.setattr(cli_mod, 'parse_args', lambda: args)
@@ -27,7 +31,7 @@ def test_cli_main_handles_metric_read_exception(tmp_path: Path, monkeypatch: pyt
     class RaisingMetric:
         key = 'raising'
 
-        def read_all(self, _):
+        def read_all(self, _: object) -> Never:
             _ = self
             raise RuntimeError('boom')
 

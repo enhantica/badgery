@@ -5,14 +5,14 @@ from badgery.metrics import LinesOfCodeMetric
 from badgery.render import HTMLDashboardRenderer
 
 
-def _status(loc_tuple):
+def _status(loc_tuple: tuple[int, int]) -> tuple[str, str]:
     loc = LinesOfCodeMetric(BadgeGenerator('r/x'), feature='f')
     loc.master = loc_tuple
     r = HTMLDashboardRenderer([loc], feature='f', badge_gen=BadgeGenerator('r/x'))
-    return r._status_text_for_metric('loc', 'master')
+    return r._status_text_for_metric('loc', 'master')  # noqa: SLF001
 
 
-def test_loc_ratio_color_thresholds_orange_and_yellow():
+def test_loc_ratio_color_thresholds_orange_and_yellow() -> None:
     # Yellow when 1.25 >= ratio > 1.1
     assert _status((125, 100))[1] == 'yellow'
     # Orange when 1.5 >= ratio > 1.25

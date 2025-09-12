@@ -13,11 +13,11 @@ from badgery import render as render_mod
 def test_package_main_invokes_cli_and_writes_output(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-):
+) -> None:
     # Patch parse_args to control arguments provided to main()
 
     class Args:
-        def __init__(self, output_path: Path):
+        def __init__(self, output_path: Path) -> None:
             self.output = str(output_path)
             self.repo = 'org/repo'
             self.branch = 'feat'
@@ -41,7 +41,7 @@ def test_package_main_invokes_cli_and_writes_output(
     assert out.read_text(encoding='utf-8') == 'OK'
 
 
-def test_importing_module_does_not_invoke_main():
+def test_importing_module_does_not_invoke_main() -> None:
     # Importing __main__ should not run main() branch (covers else branch)
     mod = __import__('badgery.__main__', fromlist=['*'])
     assert hasattr(mod, '__doc__')

@@ -151,15 +151,15 @@ preview = true
 # https://docs.astral.sh/ruff/rules/
 [tool.ruff.lint]
 select = [
-  'ANN',    # Missing or incorrect type annotations
-  'ARG',    # Argument-related issues (e.g., unused arguments)
-  'B',      # Bugbear-specific checks (e.g., likely bugs, bad patterns)
-  'C',      # Complexity-related issues (e.g., high McCabe complexity)
-  'COM',    # Comment formatting issues
-  'D',      # Docstring formatting issues (old rules)
-  'DOC',    # Docstring formatting issues (new rules)
-  'DTZ',    # Datetime timezone issues (e.g., inconsistent timezone formats)
-  'E',      # General PEP 8 style errors
+  'ANN', # Missing or incorrect type annotations
+  'ARG', # Argument-related issues (e.g., unused arguments)
+  'B',   # Bugbear-specific checks (e.g., likely bugs, bad patterns)
+  'C',   # Complexity-related issues (e.g., high McCabe complexity)
+  'COM', # Comment formatting issues
+  'D',   # Docstring formatting issues (old rules)
+  'DOC', # Docstring formatting issues (new rules)
+  'DTZ', # Datetime timezone issues (e.g., inconsistent timezone formats)
+  'E',   # General PEP 8 style errors
   #'ERA',    # Commented-out or dead code issues
   'F',      # Pyflakes-specific checks (e.g., unused variables, imports)
   'FLY',    # Flynt-specific checks (e.g., enforcing f-strings)
@@ -187,9 +187,10 @@ select = [
   'UP',     # Pyupgrade-specific checks
   'W',      # General PEP 8 warnings (e.g., lines too long, trailing whitespace)
 ]
+ignore = [
+  'COM812', # Conflicts with the Ruff formatter (trailing commas)
+]
 
-# Temporarily increase McCabe complexity limit to 17 to allow
-# refactoring in smaller steps.
 [tool.ruff.lint.mccabe]
 max-complexity = 10 # default is 10
 

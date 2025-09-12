@@ -429,7 +429,10 @@ class HTMLDashboardRenderer:
         return (letter, self._grade_color_for_letter(letter))
 
     def _status_workflow(
-        self, m: GithubWorkflowMetric, value: object, branch: str,
+        self,
+        m: GithubWorkflowMetric,
+        value: object,
+        branch: str,
     ) -> tuple[str, str]:
         if branch == 'master':
             branch_for_badge = None
@@ -543,7 +546,10 @@ class HTMLDashboardRenderer:
         return (f'{ratio:.2f} ({funcs_s}/{files_s})', color)
 
     def _status_for_metric_instance(
-        self, m: BaseMetric, value: object, branch: str,
+        self,
+        m: BaseMetric,
+        value: object,
+        branch: str,
     ) -> tuple[str, str]:
         """Return status text/color for a metric instance and value."""
         result: tuple[str, str]

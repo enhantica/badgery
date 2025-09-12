@@ -12,7 +12,7 @@ def write_yaml(path: Path, text: str) -> None:
     path.write_text(text, encoding='utf-8')
 
 
-def test_load_settings_and_cards_with_branch_placeholders(tmp_path: Path):
+def test_load_settings_and_cards_with_branch_placeholders(tmp_path: Path) -> None:
     yml = tmp_path / '.badgery.yaml'
     write_yaml(
         yml,
@@ -43,7 +43,7 @@ cards:
     assert settings['cards'][1]['workflow'] == 'code.yaml'
 
 
-def test_group_icon_mapping_basic():
+def test_group_icon_mapping_basic() -> None:
     assert group_icon('Tests') == 'fas fa-vial'
     assert group_icon('Code Quality') == 'fas fa-gauge'
     assert group_icon('Coverage') == 'fas fa-square-poll-vertical'
@@ -52,7 +52,7 @@ def test_group_icon_mapping_basic():
     assert group_icon('Publish to PyPI') == 'fas fa-box'
 
 
-def test_build_metrics_from_config_constructs_metrics():
+def test_build_metrics_from_config_constructs_metrics() -> None:
     cards = [
         {
             'group': 'Code Quality',

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import pytest
+
 from badgery.badges import BadgeGenerator
 from badgery.metrics import ComplexityMetric
 
 
-def test_detect_feature_branch_from_env_ci_branch(monkeypatch):
+def test_detect_feature_branch_from_env_ci_branch(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv('GITHUB_REF_NAME', raising=False)
     monkeypatch.delenv('GITHUB_HEAD_REF', raising=False)
     monkeypatch.setenv('CI_BRANCH', 'feat-ci')
@@ -12,7 +14,7 @@ def test_detect_feature_branch_from_env_ci_branch(monkeypatch):
     assert m.feature == 'feat-ci'
 
 
-def test_detect_feature_branch_from_env_ref_name(monkeypatch):
+def test_detect_feature_branch_from_env_ref_name(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv('CI_BRANCH', raising=False)
     monkeypatch.delenv('GITHUB_HEAD_REF', raising=False)
     monkeypatch.setenv('GITHUB_REF_NAME', 'feat-ref')
@@ -20,7 +22,7 @@ def test_detect_feature_branch_from_env_ref_name(monkeypatch):
     assert m.feature == 'feat-ref'
 
 
-def test_detect_feature_branch_from_env_head_ref(monkeypatch):
+def test_detect_feature_branch_from_env_head_ref(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv('CI_BRANCH', raising=False)
     monkeypatch.delenv('GITHUB_REF_NAME', raising=False)
     monkeypatch.setenv('GITHUB_HEAD_REF', 'feat-head')
@@ -28,7 +30,7 @@ def test_detect_feature_branch_from_env_head_ref(monkeypatch):
     assert m.feature == 'feat-head'
 
 
-def test_detect_feature_branch_unknown(monkeypatch):
+def test_detect_feature_branch_unknown(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv('CI_BRANCH', raising=False)
     monkeypatch.delenv('GITHUB_REF_NAME', raising=False)
     monkeypatch.delenv('GITHUB_HEAD_REF', raising=False)
