@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from badgery.badges import BadgeGenerator
 from badgery.metrics import BaseMetric
 from badgery.metrics import LinesOfCodeMetric
@@ -9,8 +11,11 @@ from badgery.render import HTMLDashboardRenderer
 def test_value_item_html_unknown_metric():
     r = HTMLDashboardRenderer([], feature='f', badge_gen=BadgeGenerator('r/x'))
     html = r._value_item_html('nope', 'master', 'main')
-    assert 'main: unknown' in html
-    assert 'class="gray"' in html
+
+    assert re.search(
+        r'<span class="item-label(?: [^"]+)?">(?:\s*<i[^>]*></i>\s*)?main</span>', html
+    )
+    assert 'item-value gray">unknown' in html
 
 
 def test_base_renderer_render_returns_empty_string():

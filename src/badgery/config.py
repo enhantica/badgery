@@ -225,38 +225,44 @@ def build_metrics_from_config(  # noqa: C901 - acceptable complexity
         singleton_by_type[ctype] = inst
         return inst
 
-    for card in cards:
+    def _process_card(
+        card: dict[str, Any],
+    ) -> tuple[BaseMetric | None, tuple[str, str, str] | None]:
         if not card.get('enabled', True):
-            continue
+            return (None, None)
         ctype = str(card.get('type', '')).strip().lower()
-        title = card.get('title') or ''
-        group = card.get('group') or ''
+        title = str(card.get('title') or '')
+        group = str(card.get('group') or '')
         icon = group_icon(group)
 
         if ctype == 'gh_action':
             workflow = card.get('workflow') or card.get('file')
             if not workflow:
                 logging.debug('Skipping gh_action without workflow/file in card %s', card)
-                continue
+                return (None, None)
             metric = GithubWorkflowMetric(
                 badge_gen,
                 workflow_filename=str(workflow),
                 label=title,
                 feature=feature,
             )
-            metrics.append(metric)
             key = Path(str(workflow)).stem.replace('.', '-').replace('_', '-')
-            cards_spec.append((key, title, icon))
-            continue
+            return (metric, (key, title, icon))
 
         metric = _get_or_create(ctype)
         if metric is None:
             logging.debug('Unknown card type %r; skipping', ctype)
-            continue
+            return (None, None)
         if title:
             metric.label = title
+        return (metric, (metric.key, metric.label or title, icon))
+
+    for card in cards:
+        metric, spec = _process_card(card)
+        if metric is None or spec is None:
+            continue
         if metric not in metrics:
             metrics.append(metric)
-        cards_spec.append((metric.key, metric.label or title, icon))
+        cards_spec.append(spec)
 
     return metrics, cards_spec
