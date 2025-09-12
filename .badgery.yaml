@@ -56,7 +56,7 @@ cards:
 
   - group: Security
     type: gh_action
-    title: Scan security (GitHub.io)
+    title: Scan security (GitHub.com)
     workflow: security.yaml
     enabled: true
 
