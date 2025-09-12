@@ -55,7 +55,7 @@ class HTMLDashboardRenderer:
       overflow: hidden;
       border: 1px solid #111;
       background-color: transparent;
-      margin: 0.5em;
+      margin: 0.75em;
       display: flex;
       flex-direction: column;
     }
@@ -64,12 +64,12 @@ class HTMLDashboardRenderer:
       color: #ccc;
       display: flex;
       align-items: center;
-      gap: 0.5em;
+      gap: 0.75em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       background-color: #202020;
-      padding: 0.7em .7em;
+      padding: 1em 1em;
       border-radius: 0;
       margin: 0;
       font-size: 1em;
@@ -79,14 +79,14 @@ class HTMLDashboardRenderer:
       flex-direction: column;
       font-weight: 300;
       gap: 0.5em;
-      padding: 0.7em 0.7em;
+      padding: 1em 1em;
       background-color: #1a1a1a;
       border-top: 1px solid #101010;
       font-size: 1em;
     }
     .values span img { vertical-align: middle; }
     .green { color: #6eb543; }
-    .yellow-green { color: #9acd32; }
+    .yellow-green { color: #b4cd32; }
     .yellow { color: #e8b745; }
     .orange { color: #f39c12; }
     .red { color: #e46259; }
@@ -116,6 +116,12 @@ class HTMLDashboardRenderer:
     MI_B = 60
     MI_C = 40
     MI_D = 20
+
+    # SLOC/LLOC ratio thresholds
+    RATIO_GREEN = 1.0
+    RATIO_YELLOW_GREEN = 1.1
+    RATIO_YELLOW = 1.25
+    RATIO_ORANGE = 1.5
 
     def __init__(
         self,
@@ -296,17 +302,138 @@ class HTMLDashboardRenderer:
             return ('D', 'orange')
         return ('F', 'red')
 
-    def _status_text_for_metric(self, key: str, branch: str) -> tuple[str, str] | None:  # noqa: C901, PLR0911, PLR0912, PLR0914, PLR0915
-        """Return normalized status text and color for a metric/branch.
+    # Helpers broken out to reduce complexity of dispatcher below
+    def _status_docstring(self, value: object) -> tuple[str, str]:
+        if not value:
+            return ('unknown', 'gray')
+        try:
+            p = float(str(value).strip().rstrip('%'))
+        except Exception:
+            p = None
+        color = self._color_for_percent(p)
+        text = f'{round(p)}%' if p is not None else 'unknown'
+        return (text, color)
 
-        Args:
-            key: Metric key, e.g. ``codecov``.
-            branch: One of ``master``, ``develop``, or ``feature``.
+    @staticmethod
+    def _status_maintainability(value: object) -> tuple[str, str]:
+        if not value or not isinstance(value, tuple) or value[0] is None:
+            return ('unknown', 'gray')
+        mi = float(value[0])
+        if mi >= HTMLDashboardRenderer.MI_A:
+            grade, color = 'A', 'green'
+        elif mi >= HTMLDashboardRenderer.MI_B:
+            grade, color = 'B', 'yellow-green'
+        elif mi >= HTMLDashboardRenderer.MI_C:
+            grade, color = 'C', 'yellow'
+        elif mi >= HTMLDashboardRenderer.MI_D:
+            grade, color = 'D', 'orange'
+        else:
+            grade, color = 'F', 'red'
+        return (f'{round(mi)} ({grade})', color)
 
-        Returns:
-            tuple[str, str]: ``(text, color)`` or
-            ``('unknown', 'gray')``.
-        """
+    def _status_complexity(self, value: object) -> tuple[str, str]:
+        if not value or not isinstance(value, tuple) or value[0] is None:
+            return ('unknown', 'gray')
+        avg = float(value[0])
+        grade, color = self._complexity_grade_color(avg)
+        return (f'{avg:.1f} ({grade})', color)
+
+    def _status_codecov(self, value: object, branch: str) -> tuple[str, str]:
+        if branch == 'master':
+            branch_for_badge = None
+        elif branch == 'feature':
+            branch_for_badge = self.feature
+        else:
+            branch_for_badge = self.develop_branch
+        p = self._codecov_percent(branch_for_badge)
+        if p is None:
+            try:
+                p = int(str(value).strip().rstrip('%')) if value else None
+            except Exception:
+                p = None
+        color = self._color_for_percent(p)
+        text = f'{p}%' if p is not None else 'unknown'
+        return (text, color)
+
+    def _status_codefactor(self, value: object, branch: str) -> tuple[str, str]:
+        if branch == 'master':
+            branch_for_badge = None
+        elif branch == 'develop':
+            branch_for_badge = self.develop_branch
+        else:
+            branch_for_badge = self.feature
+        letter = self._codefactor_grade(branch_for_badge)
+        if letter is None:
+            letter = str(value or '').strip().upper()
+        if not letter:
+            return ('unknown', 'gray')
+        return (letter, self._grade_color_for_letter(letter))
+
+    def _status_workflow(
+        self, m: GithubWorkflowMetric, value: object, branch: str
+    ) -> tuple[str, str]:
+        if branch == 'master':
+            branch_for_badge = None
+        elif branch == 'feature':
+            branch_for_badge = self.feature
+        else:
+            branch_for_badge = self.develop_branch
+        status = self._github_badge_status(m.workflow_filename, branch_for_badge)
+        if status is None:
+            status = str(value or '').strip().lower()
+        if status in {'success', 'succeeded', 'pass', 'passed', 'passing', 'ok'}:
+            return ('passed', 'green')
+        if status in {'fail', 'failed', 'failing', 'error', 'cancelled'}:
+            return ('failed', 'red')
+        if status in {'-', '', 'unknown', 'no status', 'no status yet'}:
+            return ('unknown', 'gray')
+        return (status, 'gray')
+
+    @staticmethod
+    def _fmt_int(v: object) -> str | None:
+        if v in {None, ''}:
+            return None
+        try:
+            return f'{int(str(v).replace(",", "").strip()):,}'
+        except Exception:
+            return None
+
+    def _status_count(self, value: object) -> tuple[str, str]:
+        formatted = self._fmt_int(value)
+        if formatted is None:
+            return ('-', 'gray')
+        return (formatted, 'blue')
+
+    def _status_loc(self, value: object) -> tuple[str, str]:
+        tup = value if isinstance(value, tuple) else None
+        if not tup:
+            return ('-', 'gray')
+        sloc, lloc = tup
+        s = self._fmt_int(sloc) or '-'
+        lloc_str = self._fmt_int(lloc) or '-'
+        ratio: float | None = None
+        try:
+            raw_lloc = int(str(lloc).replace(',', '').strip()) if lloc is not None else 0
+            if raw_lloc > 0:
+                ratio = float(sloc) / float(raw_lloc)
+        except Exception:
+            ratio = None
+        if ratio is None:
+            return (f'{s}/{lloc_str}', 'gray')
+        if ratio <= HTMLDashboardRenderer.RATIO_GREEN:
+            color = 'green'
+        elif ratio <= HTMLDashboardRenderer.RATIO_YELLOW_GREEN:
+            color = 'yellow-green'
+        elif ratio <= HTMLDashboardRenderer.RATIO_YELLOW:
+            color = 'yellow'
+        elif ratio <= HTMLDashboardRenderer.RATIO_ORANGE:
+            color = 'orange'
+        else:
+            color = 'red'
+        return (f'{ratio:.2f} ({s}/{lloc_str})', color)
+
+    def _status_text_for_metric(self, key: str, branch: str) -> tuple[str, str] | None:
+        """Return status and color for a metric/branch."""
         m = self.metric_by_key.get(key)
         if not m:
             return None
@@ -317,151 +444,26 @@ class HTMLDashboardRenderer:
         )
         value = getattr(m, attr, None)
 
+        result: tuple[str, str]
         if isinstance(m, DocstringCoverageMetric):
-            if not value:
-                return ('unknown', 'gray')
-            try:
-                p = float(str(value).strip().rstrip('%'))
-            except Exception:
-                p = None
-            color = self._color_for_percent(p)
-            text = f'{round(p)}%' if p is not None else 'unknown'
-            return (text, color)
-
-        if isinstance(m, MaintainabilityMetric):
-            if not value or not isinstance(value, tuple) or value[0] is None:
-                return ('unknown', 'gray')
-            mi = float(value[0])
-            if mi >= HTMLDashboardRenderer.MI_A:
-                grade = 'A'
-                color = 'green'
-            elif mi >= HTMLDashboardRenderer.MI_B:
-                grade = 'B'
-                color = 'yellow-green'
-            elif mi >= HTMLDashboardRenderer.MI_C:
-                grade = 'C'
-                color = 'yellow'
-            elif mi >= HTMLDashboardRenderer.MI_D:
-                grade = 'D'
-                color = 'orange'
-            else:
-                grade = 'F'
-                color = 'red'
-            text = f'{grade} ({round(mi)})'
-            return (text, color)
-
-        if isinstance(m, ComplexityMetric):
-            if not value or not isinstance(value, tuple) or value[0] is None:
-                return ('unknown', 'gray')
-            avg = float(value[0])
-            grade, color = self._complexity_grade_color(avg)
-            text = f'{grade} ({avg:.1f})'
-            return (text, color)
-
-        if isinstance(m, CodecovMetric):
-            if branch in {'master', 'develop'}:
-                val = value
-                if not val:
-                    return ('unknown', 'gray')
-                try:
-                    p = round(float(str(val).strip().rstrip('%')))
-                except Exception:
-                    return ('unknown', 'gray')
-                color = self._color_for_percent(float(p))
-                return (f'{p}%', color)
-
-            branch_for_badge = self.feature
-            p = self._codecov_percent(branch_for_badge)
-            if p is None:
-                val = value
-                if val:
-                    try:
-                        p = round(float(str(val).strip().rstrip('%')))
-                    except Exception:
-                        p = None
-            if p is None:
-                return ('unknown', 'gray')
-            color = self._color_for_percent(float(p))
-            return (f'{p}%', color)
-
-        if isinstance(m, CodeFactorMetric):
-            if branch == 'master':
-                branch_for_badge = self.default_branch
-            elif branch == 'develop':
-                branch_for_badge = self.develop_branch
-            else:
-                branch_for_badge = self.feature
-            letter = self._codefactor_grade(branch_for_badge)
-            if letter is None:
-                letter = str(value or '').strip().upper()
-            if not letter:
-                return ('unknown', 'gray')
-            return (letter, self._grade_color_for_letter(letter))
-
-        if isinstance(m, GithubWorkflowMetric):
-            if branch == 'master':
-                branch_for_badge = None
-            elif branch == 'feature':
-                branch_for_badge = self.feature
-            else:
-                branch_for_badge = self.develop_branch
-            status = self._github_badge_status(m.workflow_filename, branch_for_badge)
-            if status is None:
-                status = str(value or '').strip().lower()
-            if status in {'success', 'succeeded', 'pass', 'passed', 'passing', 'ok'}:
-                return ('passed', 'green')
-            if status in {'fail', 'failed', 'failing', 'error', 'cancelled'}:
-                return ('failed', 'red')
-            if status in {'-', '', 'unknown', 'no status', 'no status yet'}:
-                return ('unknown', 'gray')
-            return (status, 'gray')
-
-        def _fmt_int(v: object) -> str | None:
-            if v in {None, ''}:
-                return None
-            try:
-                return f'{int(str(v).replace(",", "").strip()):,}'
-            except Exception:
-                return None
-
-        if isinstance(m, (FileCountMetric, FunctionCountMetric)):
-            formatted = _fmt_int(value)
-            if formatted is None:
-                return ('-', 'gray')
-            return (formatted, 'blue')
-
-        if isinstance(m, LinesOfCodeMetric):
-            tup = value if isinstance(value, tuple) else None
-            if not tup:
-                return ('-', 'gray')
-            sloc, lloc = tup
-            s = _fmt_int(sloc) or '-'
-            lloc_str = _fmt_int(lloc) or '-'
-            ratio: float | None = None
-            try:
-                if lloc and int(str(lloc).replace(',', '').strip()) > 0:
-                    ratio = float(sloc) / float(lloc)
-            except Exception:
-                ratio = None
-            if ratio is None:
-                return (f'{s}/{lloc_str}', 'gray')
-            r_green = 1.0
-            r_yg = 1.1
-            r_y = 1.25
-            r_o = 1.5
-            if ratio <= r_green:
-                color = 'green'
-            elif ratio <= r_yg:
-                color = 'yellow-green'
-            elif ratio <= r_y:
-                color = 'yellow'
-            elif ratio <= r_o:
-                color = 'orange'
-            else:
-                color = 'red'
-            return (f'{ratio:.2f} ({s}/{lloc_str})', color)
-
-        return ('unknown', 'gray')
+            result = self._status_docstring(value)
+        elif isinstance(m, MaintainabilityMetric):
+            result = self._status_maintainability(value)
+        elif isinstance(m, ComplexityMetric):
+            result = self._status_complexity(value)
+        elif isinstance(m, CodecovMetric):
+            result = self._status_codecov(value, branch)
+        elif isinstance(m, CodeFactorMetric):
+            result = self._status_codefactor(value, branch)
+        elif isinstance(m, GithubWorkflowMetric):
+            result = self._status_workflow(m, value, branch)
+        elif isinstance(m, (FileCountMetric, FunctionCountMetric)):
+            result = self._status_count(value)
+        elif isinstance(m, LinesOfCodeMetric):
+            result = self._status_loc(value)
+        else:
+            result = ('unknown', 'gray')
+        return result
 
     def _value_item_html(self, key: str, branch: str, branch_label: str) -> str:
         """Render a single metric status span for a given branch.
