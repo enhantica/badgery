@@ -107,8 +107,16 @@ class HTMLDashboardRenderer:
     .values .item-label.red { color: #e46259; }
     .values .item-label.blue { color: #71b2f0; }
     .values .item-label.gray { color: #757575; }
-    /* Icons inherit label color so they colorize accordingly */
-    .values .item-label .icon { color: currentColor; margin-right: 0.5em; }
+    /* Icons inherit label color; fix a constant width so text aligns */
+    .values .item-label { display: inline-flex; align-items: center; }
+    .values .item-label .icon {
+      color: currentColor;
+      display: inline-block;
+      width: 1.25em; /* fixed width for alignment */
+      text-align: center;
+      margin-right: 0.5em;
+      flex: 0 0 1.25em;
+    }
     .values .item-value {
       white-space: nowrap;
     }
