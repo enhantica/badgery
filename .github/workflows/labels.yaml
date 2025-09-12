@@ -4,6 +4,7 @@
 name: PR label checks
 
 on:
+  push:
   pull_request_target:
     types: [opened, labeled, unlabeled, synchronize]
 
@@ -16,6 +17,7 @@ jobs:
     steps:
       - name: Validate required labels
         run: |
+          echo "Current PR labels: ${{ toJson(github.event.pull_request.labels.*.name) }}"
           VALID_LABELS=(
             "[maintainer] release"
             "[scope] bug"
