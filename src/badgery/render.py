@@ -329,31 +329,41 @@ class HTMLDashboardRenderer:
             grade, color = 'D', 'orange'
         else:
             grade, color = 'F', 'red'
-        return (f'{round(mi)} ({grade})', color)
+        # Show grade first to match tests (e.g., "A (85)")
+        return (f'{grade} ({round(mi)})', color)
 
     def _status_complexity(self, value: object) -> tuple[str, str]:
         if not value or not isinstance(value, tuple) or value[0] is None:
             return ('unknown', 'gray')
         avg = float(value[0])
         grade, color = self._complexity_grade_color(avg)
-        return (f'{avg:.1f} ({grade})', color)
+        # Show grade first to match tests (e.g., "A (3.0)")
+        return (f'{grade} ({avg:.1f})', color)
 
     def _status_codecov(self, value: object, branch: str) -> tuple[str, str]:
-        if branch == 'master':
-            branch_for_badge = None
-        elif branch == 'feature':
-            branch_for_badge = self.feature
-        else:
-            branch_for_badge = self.develop_branch
-        p = self._codecov_percent(branch_for_badge)
-        if p is None:
+        # Master/develop: use provided value (env), do not fetch
+        if branch in {'master', 'develop'}:
+            if not value:
+                return ('unknown', 'gray')
             try:
-                p = int(str(value).strip().rstrip('%')) if value else None
+                p = round(float(str(value).strip().rstrip('%')))
+            except Exception:
+                return ('unknown', 'gray')
+            color = self._color_for_percent(float(p))
+            return (f'{p}%', color)
+
+        # Feature: prefer live badge, fall back to provided value
+        branch_for_badge = self.feature
+        p = self._codecov_percent(branch_for_badge)
+        if p is None and value:
+            try:
+                p = round(float(str(value).strip().rstrip('%')))
             except Exception:
                 p = None
-        color = self._color_for_percent(p)
-        text = f'{p}%' if p is not None else 'unknown'
-        return (text, color)
+        if p is None:
+            return ('unknown', 'gray')
+        color = self._color_for_percent(float(p))
+        return (f'{p}%', color)
 
     def _status_codefactor(self, value: object, branch: str) -> tuple[str, str]:
         if branch == 'master':
