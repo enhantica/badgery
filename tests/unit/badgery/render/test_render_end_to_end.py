@@ -69,7 +69,9 @@ def test_html_render_end_to_end_smoke():
     assert 'Docstrings' in html
 
     # Status lines include branch labels and values (split into label/value spans)
-    labels = re.findall(r'<span class="item-label(?: [^"]+)?">([^<]+)</span>', html)
+    labels = re.findall(
+        r'<span class="item-label(?: [^"]+)?">(?:\s*<i[^>]*></i>\s*)?([^<]+)</span>', html
+    )
     assert 'main' in labels
     assert 'develop' in labels
     assert 'feature-x' in labels
@@ -95,3 +97,8 @@ def test_html_render_end_to_end_smoke():
     assert 'item-value blue">12' in html
     assert 'Functions' in html
     assert 'item-value blue">110' in html
+
+    # Branch icons are present
+    assert 'fas fa-crown' in html
+    assert 'fas fa-hammer' in html
+    assert 'fas fa-code-branch' in html
