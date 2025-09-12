@@ -23,8 +23,10 @@ def test_maintainability_metric_reads_and_formats(tmp_path: Path):
     p.write_text(json.dumps(data), encoding='utf-8')
     m = MaintainabilityMetric(BadgeGenerator('x/y'), feature='f')
     avg, count = m.read_value(str(p))
-    assert round(avg, 2) == 80.0  # desired
-    assert count == 2  # desired
+    expected_avg = 80.0
+    expected_count = 2
+    assert round(avg, 2) == expected_avg  # desired
+    assert count == expected_count  # desired
     # formatted
     assert m.format_value((avg, count)) == '80 over 2 files'  # actual
 
@@ -35,8 +37,10 @@ def test_complexity_metric_reads_and_formats(tmp_path: Path):
     p.write_text(json.dumps(data), encoding='utf-8')
     m = ComplexityMetric(BadgeGenerator('x/y'), feature='f')
     avg, count = m.read_value(str(p))
-    assert round(avg, 3) == 3.0
-    assert count == 2
+    expected_avg3 = 3.0
+    expected_two = 2
+    assert round(avg, 3) == expected_avg3
+    assert count == expected_two
     assert m.format_value((avg, count)) == '3.0 over 2 funcs'
 
 
@@ -53,7 +57,7 @@ def test_docstring_coverage_metric_reads_total_and_fallback(tmp_path: Path):
     assert m.read_value(str(p2)) == '77%'
 
     # Case 3: unknown
-    assert m.read_value(str(tmp_path / 'missing.txt')) == ''
+    assert not m.read_value(str(tmp_path / 'missing.txt'))
 
 
 def test_lines_of_code_metric_sums_simple_list(tmp_path: Path):
@@ -70,7 +74,7 @@ def test_lines_of_code_metric_sums_simple_list(tmp_path: Path):
                 'raw_metrics_develop': str(p),
                 'raw_metrics_feature': str(p),
             },
-        )
+        ),
     )
     assert m.master == (10, 7)
     assert m.develop == (10, 7)
@@ -96,11 +100,12 @@ def test_file_and_function_count_metrics(tmp_path: Path):
                 'cyclomatic_complexity_develop': str(p),
                 'cyclomatic_complexity_feature': str(p),
             },
-        )
+        ),
     )
-    assert fc.master == 2  # only keys with list values
-    assert fc.develop == 2
-    assert fc.feature_value == 2
+    expected_files_total = 2
+    assert fc.master == expected_files_total  # only keys with list values
+    assert fc.develop == expected_files_total
+    assert fc.feature_value == expected_files_total
 
     fnc = FunctionCountMetric(BadgeGenerator('x/y'), feature='f')
     fnc.read_all(
@@ -112,11 +117,12 @@ def test_file_and_function_count_metrics(tmp_path: Path):
                 'cyclomatic_complexity_develop': str(p),
                 'cyclomatic_complexity_feature': str(p),
             },
-        )
+        ),
     )
-    assert fnc.master == 2
-    assert fnc.develop == 2
-    assert fnc.feature_value == 2
+    expected_funcs_total = 2
+    assert fnc.master == expected_funcs_total
+    assert fnc.develop == expected_funcs_total
+    assert fnc.feature_value == expected_funcs_total
 
 
 def test_codecov_and_codefactor_env_metrics(monkeypatch: pytest.MonkeyPatch):
@@ -154,5 +160,5 @@ def test_github_workflow_metric_refs_and_env(monkeypatch: pytest.MonkeyPatch):
     # Badge image links derived from BadgeGenerator helpers
     assert bg.github_workflow_badge_img('ci.yml', None).endswith('/badge.svg')
     assert bg.github_workflow_badge_img('ci.yml', 'feature-x').endswith(
-        '/badge.svg?branch=feature-x'
+        '/badge.svg?branch=feature-x',
     )

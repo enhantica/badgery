@@ -68,6 +68,6 @@ def test_codecov_badge_img_default_and_master(monkeypatch):
 def test_private_badge_helpers_return_empty_strings():
     bg = BadgeGenerator('org/repo')
     # The current implementation does not use these helpers; ensure they return empty strings
-    assert bg._badge('section', 'branch') == ''
-    assert bg.codecov_badge('dev') == ''
-    assert bg.codefactor_badge('dev') == ''
+    assert not bg._badge('section', 'branch')
+    assert not bg.codecov_badge('dev')
+    assert not bg.codefactor_badge('dev')

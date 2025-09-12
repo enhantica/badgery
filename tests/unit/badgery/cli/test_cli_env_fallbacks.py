@@ -9,7 +9,7 @@ from badgery.cli import parse_args
 
 
 def test_parse_args_env_fallbacks_used_when_reports_missing(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ):
     # Config points to non-existent files; args should fall back to env vars
     yml = tmp_path / '.badgery.yaml'

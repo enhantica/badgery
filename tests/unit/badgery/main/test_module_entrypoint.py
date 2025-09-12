@@ -1,18 +1,19 @@
 from __future__ import annotations
 
-import runpy
 from pathlib import Path
+import runpy
 
 import pytest
 
+from badgery import cli as cli_mod
+from badgery import config as cfg_mod
+from badgery import render as render_mod
+
 
 def test_package_main_invokes_cli_and_writes_output(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ):
     # Patch parse_args to control arguments provided to main()
-    from badgery import cli as cli_mod
-    from badgery import config as cfg_mod
-    from badgery import render as render_mod
 
     class Args:
         def __init__(self, output_path: Path):

@@ -46,7 +46,6 @@ class HTMLDashboardRenderer:
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
       gap: 0;
-      row-gap: 1em;
       padding: 0;
       background-color: transparent;
       justify-content: start;
@@ -59,7 +58,6 @@ class HTMLDashboardRenderer:
       margin: 0.5em;
       display: flex;
       flex-direction: column;
-      padding: 0.8em 0.8em;
     }
     .label {
       font-weight: 300;
@@ -82,20 +80,36 @@ class HTMLDashboardRenderer:
       font-weight: 300;
       gap: 0.5em;
       padding: 0.7em 0.7em;
-      background-color: #222;
+      background-color: #1a1a1a;
       border-top: 1px solid #101010;
-      font-size: 1.1em;
+      font-size: 1em;
     }
     .values span img { vertical-align: middle; }
     .green { color: #6eb543; }
     .yellow-green { color: #9acd32; }
-    .yellow { color: #FFD54F; }
-    .orange { color: #FFA726; }
+    .yellow { color: #e8b745; }
+    .orange { color: #f39c12; }
     .red { color: #e46259; }
     .blue { color: #71b2f0; }
     .gray { color: #757575; }
     a { color: inherit; text-decoration: none; }
     """
+
+    # HTTP ok status range
+    OK_LOWER = 200
+    OK_UPPER = 300
+
+    # Percent thresholds
+    PCT_GREEN = 90
+    PCT_YELLOW_GREEN = 75
+    PCT_YELLOW = 60
+    PCT_ORANGE = 40
+
+    # Complexity thresholds
+    CC_A = 5
+    CC_B = 10
+    CC_C = 20
+    CC_D = 40
 
     def __init__(
         self,
@@ -104,7 +118,7 @@ class HTMLDashboardRenderer:
         badge_gen: BadgeGenerator,
         default_branch: str = 'master',
         develop_branch: str = 'develop',
-    ):
+    ) -> None:
         """Initialize renderer with metrics and branch labels."""
         self.metrics = metrics
         self.feature = feature
@@ -130,8 +144,8 @@ class HTMLDashboardRenderer:
         resp = None
         try:
             resp = urlopen(url, timeout=timeout)  # noqa: S310
-            status = getattr(resp, 'status', 200)
-            if 200 <= status < 300:
+            status = getattr(resp, 'status', HTMLDashboardRenderer.OK_LOWER)
+            if HTMLDashboardRenderer.OK_LOWER <= status < HTMLDashboardRenderer.OK_UPPER:
                 data = resp.read()
                 return data.decode('utf-8', errors='ignore')
         except (URLError, HTTPError, TimeoutError) as exc:
@@ -170,7 +184,7 @@ class HTMLDashboardRenderer:
             return 'passed'
         if word == 'failing':
             return 'failed'
-        if word in ('cancelled', 'skipped', 'queued', 'in progress'):
+        if word in {'cancelled', 'skipped', 'queued', 'in progress'}:
             return word
         return word
 
@@ -187,7 +201,7 @@ class HTMLDashboardRenderer:
         """
         token = os.environ.get('CODECOV_TOKEN', 'qtsB5Q5BXO')
         repo = os.environ.get('CODECOV_REPO', self.badge_gen.repo)
-        if branch and branch not in ('', 'master'):
+        if branch and branch not in {'', 'master'}:
             url = f'https://codecov.io/gh/{repo}/branch/{branch}/graph/badge.svg?token={token}'
         else:
             url = f'https://codecov.io/gh/{repo}/graph/badge.svg?token={token}'
@@ -234,7 +248,7 @@ class HTMLDashboardRenderer:
             return 'yellow'
         if letter == 'D':
             return 'orange'
-        if letter in ('E', 'F'):
+        if letter in {'E', 'F'}:
             return 'red'
         return 'gray'
 
@@ -247,13 +261,13 @@ class HTMLDashboardRenderer:
         """
         if p is None:
             return 'gray'
-        if p >= 90:
+        if p >= HTMLDashboardRenderer.PCT_GREEN:
             return 'green'
-        if p >= 75:
+        if p >= HTMLDashboardRenderer.PCT_YELLOW_GREEN:
             return 'yellow-green'
-        if p >= 60:
+        if p >= HTMLDashboardRenderer.PCT_YELLOW:
             return 'yellow'
-        if p >= 40:
+        if p >= HTMLDashboardRenderer.PCT_ORANGE:
             return 'orange'
         return 'red'
 
@@ -266,17 +280,17 @@ class HTMLDashboardRenderer:
         """
         if avg is None:
             return ('?', 'gray')
-        if avg <= 5:
+        if avg <= HTMLDashboardRenderer.CC_A:
             return ('A', 'green')
-        if avg <= 10:
+        if avg <= HTMLDashboardRenderer.CC_B:
             return ('B', 'yellow-green')
-        if avg <= 20:
+        if avg <= HTMLDashboardRenderer.CC_C:
             return ('C', 'yellow')
-        if avg <= 40:
+        if avg <= HTMLDashboardRenderer.CC_D:
             return ('D', 'orange')
         return ('F', 'red')
 
-    def _status_text_for_metric(self, key: str, branch: str) -> tuple[str, str] | None:  # noqa: C901
+    def _status_text_for_metric(self, key: str, branch: str) -> tuple[str, str] | None:  # noqa: C901, PLR0911, PLR0912, PLR0914, PLR0915
         """Return normalized status text and color for a metric/branch.
 
         Args:
@@ -339,7 +353,7 @@ class HTMLDashboardRenderer:
             return (text, color)
 
         if isinstance(m, CodecovMetric):
-            if branch in ('master', 'develop'):
+            if branch in {'master', 'develop'}:
                 val = value
                 if not val:
                     return ('unknown', 'gray')
@@ -388,16 +402,16 @@ class HTMLDashboardRenderer:
             status = self._github_badge_status(m.workflow_filename, branch_for_badge)
             if status is None:
                 status = str(value or '').strip().lower()
-            if status in ('success', 'succeeded', 'pass', 'passed', 'passing', 'ok'):
+            if status in {'success', 'succeeded', 'pass', 'passed', 'passing', 'ok'}:
                 return ('passed', 'green')
-            if status in ('fail', 'failed', 'failing', 'error', 'cancelled'):
+            if status in {'fail', 'failed', 'failing', 'error', 'cancelled'}:
                 return ('failed', 'red')
-            if status in ('-', '', 'unknown', 'no status', 'no status yet'):
+            if status in {'-', '', 'unknown', 'no status', 'no status yet'}:
                 return ('unknown', 'gray')
             return (status, 'gray')
 
-        def _fmt_int(v) -> str | None:
-            if v in (None, ''):
+        def _fmt_int(v: object) -> str | None:
+            if v in {None, ''}:
                 return None
             try:
                 return f'{int(str(v).replace(",", "").strip()):,}'
@@ -425,13 +439,17 @@ class HTMLDashboardRenderer:
                 ratio = None
             if ratio is None:
                 return (f'{s}/{lloc_str}', 'gray')
-            if ratio <= 1.0:
+            r_green = 1.0
+            r_yg = 1.1
+            r_y = 1.25
+            r_o = 1.5
+            if ratio <= r_green:
                 color = 'green'
-            elif ratio <= 1.1:
+            elif ratio <= r_yg:
                 color = 'yellow-green'
-            elif ratio <= 1.25:
+            elif ratio <= r_y:
                 color = 'yellow'
-            elif ratio <= 1.5:
+            elif ratio <= r_o:
                 color = 'orange'
             else:
                 color = 'red'
@@ -470,7 +488,8 @@ class HTMLDashboardRenderer:
             f'</div>'
         )
 
-    def render(self) -> str:
+    @staticmethod
+    def render() -> str:
         """Return the rendered HTML string for the dashboard."""
         return ''
 

@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import ClassVar
+from typing import Never
 
 if TYPE_CHECKING:
     from badgery.badges import BadgeGenerator
@@ -46,10 +47,10 @@ class BaseMetric:
     def __init__(
         self,
         badge_gen: BadgeGenerator,
-        key=None,
-        label=None,
+        key: str | None = None,
+        label: str | None = None,
         feature: str | None = None,
-    ):
+    ) -> None:
         """Initialize a metric and its runtime state."""
         self.badge_gen = badge_gen
         if key is not None:
@@ -61,23 +62,25 @@ class BaseMetric:
         self.develop = None
         self.feature_value = None
 
-    def read_value(self, path: str):
+    @staticmethod
+    def read_value(path: str) -> Never:
         """Read a single branch value from a file path."""
         raise NotImplementedError
 
-    def read_all(self, args):
+    def read_all(self, args: object) -> Never:
         """Populate values for default, develop, and feature."""
         raise NotImplementedError
 
-    def format_value(self, value):
+    @staticmethod
+    def format_value(value: object) -> str:
         """Return a human-readable representation for `value`."""
         return str(value)
 
-    def badge(self, value):
+    def badge(self, value: object) -> Never:
         """Return a badge string for `value` (unused in HTML)."""
         raise NotImplementedError
 
-    def refs(self):
+    def refs(self) -> dict[str, str]:
         """Return a mapping of rendered badges per branch."""
         return {
             'master': self.badge(self.master),
@@ -103,11 +106,12 @@ class MaintainabilityMetric(BaseMetric):
     ]
     reverse = False
 
-    def __init__(self, badge_gen: BadgeGenerator, feature=None):
+    def __init__(self, badge_gen: BadgeGenerator, feature: str | None = None) -> None:
         """Initialize maintainability metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
-    def read_value(self, path: str):
+    @staticmethod
+    def read_value(path: str) -> tuple[float | None, int | None]:
         """Read average MI and file count.
 
         Returns:
@@ -130,13 +134,14 @@ class MaintainabilityMetric(BaseMetric):
                 logging.debug('Failed to read maintainability from %s: %s', path, exc)
         return (None, None)
 
-    def read_all(self, args):
+    def read_all(self, args: object) -> None:
         """Populate MI values for default, develop, and feature."""
         self.master = self.read_value(args.maintainability_index_master)
         self.develop = self.read_value(args.maintainability_index_develop)
         self.feature_value = self.read_value(args.maintainability_index_feature)
 
-    def format_value(self, value):
+    @staticmethod
+    def format_value(value: object) -> str:
         """Return a human-readable MI summary for display."""
         if (
             not value
@@ -150,7 +155,8 @@ class MaintainabilityMetric(BaseMetric):
         mi_rounded = round(mi)
         return f'{mi_rounded} over {count} files'
 
-    def badge(self, _value):
+    @staticmethod
+    def badge(_value: object) -> str:
         """Return a badge string (unused in the HTML renderer)."""
         return ''
 
@@ -168,42 +174,47 @@ class ComplexityMetric(BaseMetric):
     ]
     reverse = True
 
-    def __init__(self, badge_gen: BadgeGenerator, feature=None):
+    def __init__(self, badge_gen: BadgeGenerator, feature: str | None = None) -> None:
         """Initialize complexity metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
-    def read_value(self, path: str):
+    @staticmethod
+    def read_value(path: str) -> tuple[float | None, int | None]:
         """Read average MI and file count.
 
         Returns:
             tuple[float | None, int | None]: Average MI and file
             count, or (None, None) if unavailable.
         """
-        if path and Path(path).exists():
-            try:
-                data = json.loads(Path(path).read_text(encoding='utf-8'))
-                complexities = []
-                for file_data in data.values():
-                    if isinstance(file_data, list):
-                        for item in file_data:
-                            if isinstance(item, dict):
-                                complexity_value = item.get('complexity')
-                                if isinstance(complexity_value, (int, float)):
-                                    complexities.append(complexity_value)
-                if complexities:
-                    avg_complexity = sum(complexities) / len(complexities)
-                    return (avg_complexity, len(complexities))
-            except Exception as exc:
-                logging.debug('Failed to read complexity from %s: %s', path, exc)
+        if not (path and Path(path).exists()):
+            return (None, None)
+        try:
+            data = json.loads(Path(path).read_text(encoding='utf-8'))
+        except Exception as exc:
+            logging.debug('Failed to read complexity from %s: %s', path, exc)
+            return (None, None)
+        if not isinstance(data, dict):
+            return (None, None)
+        values = [
+            item.get('complexity')
+            for file_data in data.values()
+            if isinstance(file_data, list)
+            for item in file_data
+            if isinstance(item, dict) and isinstance(item.get('complexity'), (int, float))
+        ]
+        if values:
+            avg_complexity = sum(values) / len(values)
+            return (avg_complexity, len(values))
         return (None, None)
 
-    def read_all(self, args):
+    def read_all(self, args: object) -> None:
         """Populate complexity values for three branches."""
         self.master = self.read_value(args.cyclomatic_complexity_master)
         self.develop = self.read_value(args.cyclomatic_complexity_develop)
         self.feature_value = self.read_value(args.cyclomatic_complexity_feature)
 
-    def format_value(self, value):
+    @staticmethod
+    def format_value(value: object) -> str:
         """Return human-readable average complexity summary."""
         if (
             not value
@@ -216,7 +227,8 @@ class ComplexityMetric(BaseMetric):
         avg, count = value
         return f'{avg:.1f} over {count} funcs'
 
-    def badge(self, _value):
+    @staticmethod
+    def badge(_value: object) -> str:
         """Return a badge string (unused)."""
         return ''
 
@@ -234,11 +246,12 @@ class DocstringCoverageMetric(BaseMetric):
     ]
     reverse = False
 
-    def __init__(self, badge_gen: BadgeGenerator, feature=None):
+    def __init__(self, badge_gen: BadgeGenerator, feature: str | None = None) -> None:
         """Initialize docstring coverage metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
-    def read_value(self, path: str):
+    @staticmethod
+    def read_value(path: str) -> str:
         """Read coverage percent string from text report file.
 
         Returns:
@@ -249,29 +262,30 @@ class DocstringCoverageMetric(BaseMetric):
             for line in lines:
                 if line.startswith('| TOTAL'):
                     parts = line.split('|')
-                    if len(parts) >= 3:
-                        percent = parts[-2].strip()
-                        return percent
+                    min_parts = 3
+                    if len(parts) >= min_parts:
+                        return parts[-2].strip()
             for line in reversed(lines):
                 if 'actual:' in line:
                     after_actual = line.split('actual:')[-1].strip()
-                    percent = after_actual.split()[0]
-                    return percent
+                    return after_actual.split()[0]
         return ''
 
-    def read_all(self, args):
+    def read_all(self, args: object) -> None:
         """Populate coverage values for three branches."""
         self.master = self.read_value(args.coverage_docstring_master)
         self.develop = self.read_value(args.coverage_docstring_develop)
         self.feature_value = self.read_value(args.coverage_docstring_feature)
 
-    def format_value(self, value):
+    @staticmethod
+    def format_value(value: object) -> str:
         """Return a percentage string, defaulting to 0%."""
         if not value:
             return '0%'
         return value
 
-    def badge(self, _value):
+    @staticmethod
+    def badge(_value: object) -> str:
         """Return a badge string (unused)."""
         return ''
 
@@ -284,8 +298,8 @@ class GithubWorkflowMetric(BaseMetric):
         badge_gen: BadgeGenerator,
         workflow_filename: str,
         label: str,
-        feature=None,
-    ):
+        feature: str | None = None,
+    ) -> None:
         """Initialize workflow metric with file name and label."""
         base = Path(workflow_filename).stem.replace('.', '-').replace('_', '-')
         key = base
@@ -305,18 +319,18 @@ class GithubWorkflowMetric(BaseMetric):
         """
         return f'CI_WORKFLOW_{base.upper().replace("-", "_")}_{branch.upper()}'
 
-    def read_all(self, _args):
+    def read_all(self, _args: object) -> None:
         """Populate workflow status env vars for three branches."""
         base = self.key
         self.master = os.environ.get(self._env_key(base, 'master'), '')
         self.develop = os.environ.get(self._env_key(base, 'develop'), '')
         self.feature_value = os.environ.get(self._env_key(base, 'feature'), '')
 
-    def badge(self, value):
+    def badge(self, value: object) -> str:
         """Return a badge string (unused)."""
         return self.badge_gen.github_badge(self.workflow_filename, value)
 
-    def refs(self):
+    def refs(self) -> dict[str, str]:
         """Return workflow badge URLs for branches."""
         return {
             'master': self.badge('master'),
@@ -334,21 +348,21 @@ class CodeFactorMetric(BaseMetric):
     key = 'codefactor'
     label = 'Code quality from CodeFactor.io'
 
-    def __init__(self, badge_gen: BadgeGenerator, feature=None):
+    def __init__(self, badge_gen: BadgeGenerator, feature: str | None = None) -> None:
         """Initialize CodeFactor metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
-    def read_all(self, _args):
+    def read_all(self, _args: object) -> None:
         """Read CodeFactor grades from environment variables."""
         self.master = os.environ.get('CI_CODEFACTOR_MASTER', '')
         self.develop = os.environ.get('CI_CODEFACTOR_DEVELOP', '')
         self.feature_value = os.environ.get('CI_CODEFACTOR_FEATURE', '')
 
-    def badge(self, value):
+    def badge(self, value: object) -> str:
         """Return a badge string (unused)."""
         return self.badge_gen.codefactor_badge(value)
 
-    def refs(self):
+    def refs(self) -> dict[str, str]:
         """Return CodeFactor overview URLs for branches."""
         cf = self.badge_gen.codefactor
         return {
@@ -367,11 +381,11 @@ class CodecovMetric(BaseMetric):
     key = 'codecov'
     label = 'Unit test coverage from Codecov.io'
 
-    def __init__(self, badge_gen: BadgeGenerator, feature=None):
+    def __init__(self, badge_gen: BadgeGenerator, feature: str | None = None) -> None:
         """Initialize Codecov coverage metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
-    def read_all(self, _args):
+    def read_all(self, _args: object) -> None:
         """Read coverage values from environment variables."""
         self.master = os.environ.get('CI_CODECOV_MASTER', '')
         self.develop = os.environ.get('CI_CODECOV_DEVELOP', '')
@@ -384,12 +398,12 @@ class LinesOfCodeMetric(BaseMetric):
     key = 'loc'
     label = 'Source/Logical lines of code'
 
-    def __init__(self, badge_gen: BadgeGenerator, feature=None):
+    def __init__(self, badge_gen: BadgeGenerator, feature: str | None = None) -> None:
         """Initialize line count metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
     @staticmethod
-    def _extract_sloc_lloc(obj: Any) -> tuple[int, int]:
+    def _extract_sloc_lloc(obj: object) -> tuple[int, int]:
         """Recursively extract SLOC/LLOC from a JSON-like object.
 
         Returns:
@@ -433,7 +447,7 @@ class LinesOfCodeMetric(BaseMetric):
             return None
         return LinesOfCodeMetric._extract_sloc_lloc(data)
 
-    def read_all(self, args):
+    def read_all(self, args: object) -> None:
         """Populate SLOC/LLOC tuples for three branches."""
         self.master = self._sum_raw_metrics(getattr(args, 'raw_metrics_master', None))
         self.develop = self._sum_raw_metrics(getattr(args, 'raw_metrics_develop', None))
@@ -446,7 +460,7 @@ class FileCountMetric(BaseMetric):
     key = 'files'
     label = 'Number of files'
 
-    def __init__(self, badge_gen: BadgeGenerator, feature=None):
+    def __init__(self, badge_gen: BadgeGenerator, feature: str | None = None) -> None:
         """Initialize metric with badge generator and feature branch."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
@@ -462,12 +476,12 @@ class FileCountMetric(BaseMetric):
             return len([k for k, v in data.items() if isinstance(v, list)])
         return None
 
-    def read_all(self, args):
+    def read_all(self, args: object) -> None:
         """Populate values for three branches."""
         self.master = self._count_files(getattr(args, 'cyclomatic_complexity_master', None))
         self.develop = self._count_files(getattr(args, 'cyclomatic_complexity_develop', None))
         self.feature_value = self._count_files(
-            getattr(args, 'cyclomatic_complexity_feature', None)
+            getattr(args, 'cyclomatic_complexity_feature', None),
         )
 
 
@@ -477,7 +491,7 @@ class FunctionCountMetric(BaseMetric):
     key = 'funcs'
     label = 'Number of functions'
 
-    def __init__(self, badge_gen: BadgeGenerator, feature=None):
+    def __init__(self, badge_gen: BadgeGenerator, feature: str | None = None) -> None:
         """Initialize metric with badge generator and feature branch."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
 
@@ -496,10 +510,10 @@ class FunctionCountMetric(BaseMetric):
                     total += len(v)
         return total if total else None
 
-    def read_all(self, args):
+    def read_all(self, args: object) -> None:
         """Populate values for three branches."""
         self.master = self._count_functions(getattr(args, 'cyclomatic_complexity_master', None))
         self.develop = self._count_functions(getattr(args, 'cyclomatic_complexity_develop', None))
         self.feature_value = self._count_functions(
-            getattr(args, 'cyclomatic_complexity_feature', None)
+            getattr(args, 'cyclomatic_complexity_feature', None),
         )

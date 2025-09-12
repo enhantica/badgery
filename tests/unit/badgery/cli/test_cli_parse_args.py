@@ -13,7 +13,7 @@ def _write_yaml(path: Path, text: str) -> None:
 
 
 def test_parse_args_resolves_report_paths_with_branch_placeholders(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ):
     # Prepare temp repo layout with reports per branch
     repo_root = tmp_path

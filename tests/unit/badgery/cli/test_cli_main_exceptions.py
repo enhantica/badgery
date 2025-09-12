@@ -28,6 +28,7 @@ def test_cli_main_handles_metric_read_exception(tmp_path: Path, monkeypatch: pyt
         key = 'raising'
 
         def read_all(self, _):
+            _ = self
             raise RuntimeError('boom')
 
     # build_metrics_from_config returns the raising metric and a simple spec

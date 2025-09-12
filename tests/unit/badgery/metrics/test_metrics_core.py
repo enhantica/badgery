@@ -22,8 +22,10 @@ def test_maintainability_read_value_and_format(tmp_path: Path):
     p.write_text(json.dumps(data), encoding='utf-8')
     m = MaintainabilityMetric(BadgeGenerator('r/x'))
     avg, count = m.read_value(str(p))
-    assert round(avg) == 67
-    assert count == 3
+    expected_round = 67
+    expected_count = 3
+    assert round(avg) == expected_round
+    assert count == expected_count
     # Human-readable format
     assert m.format_value((66.6, 3)).endswith('over 3 files')
 
@@ -37,8 +39,9 @@ def test_complexity_read_value(tmp_path: Path):
     p.write_text(json.dumps(data), encoding='utf-8')
     c = ComplexityMetric(BadgeGenerator('r/x'))
     avg, count = c.read_value(str(p))
-    assert pytest.approx(avg, rel=1e-6) == (3 + 8 + 10) / 3
-    assert count == 3
+    expected_three = 3
+    assert pytest.approx(avg, rel=1e-6) == (3 + 8 + 10) / expected_three
+    assert count == expected_three
 
 
 def test_lines_of_code_sum_raw_metrics(tmp_path: Path):
@@ -51,8 +54,10 @@ def test_lines_of_code_sum_raw_metrics(tmp_path: Path):
     p.write_text(json.dumps(data), encoding='utf-8')
     loc = LinesOfCodeMetric(BadgeGenerator('r/x'))
     sloc, lloc = loc._sum_raw_metrics(str(p))
-    assert sloc == 30
-    assert lloc == 15
+    expected_sloc = 30
+    expected_lloc = 15
+    assert sloc == expected_sloc
+    assert lloc == expected_lloc
 
 
 def test_file_and_function_counts(tmp_path: Path):
@@ -67,8 +72,10 @@ def test_file_and_function_counts(tmp_path: Path):
     funcs = FunctionCountMetric(BadgeGenerator('r/x'))
 
     # Private helpers used via read_all; call directly for clarity
-    assert files._count_files(str(p)) == 2
-    assert funcs._count_functions(str(p)) == 4
+    expected_files = 2
+    expected_funcs = 4
+    assert files._count_files(str(p)) == expected_files
+    assert funcs._count_functions(str(p)) == expected_funcs
 
 
 def test_docstring_coverage_read_value_from_table_and_fallback(tmp_path: Path):

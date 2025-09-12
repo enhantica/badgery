@@ -151,9 +151,11 @@ preview = true
 # https://docs.astral.sh/ruff/rules/
 [tool.ruff.lint]
 select = [
+  'ANN',
   'ARG',    # Argument-related issues (e.g., unused arguments)
   'B',      # Bugbear-specific checks (e.g., likely bugs, bad patterns)
   'C',      # Complexity-related issues (e.g., high McCabe complexity)
+  'COM',
   'D',      # Docstring formatting issues (old rules)
   'DOC',    # Docstring formatting issues (new rules)
   'DTZ',    # Docstring timezone issues (e.g., inconsistent timezone formats)
@@ -166,13 +168,18 @@ select = [
   'NPY',    # NumPy-specific checks (e.g., array operations, broadcasting)
   'PERF',   # Performance-related issues (e.g., inefficient code patterns)
   'PGH',    # Misc text patterns checks
+  'PIE',
+  'PL',     # PyLint-specific checks (e.g., code smells, potential errors)
   'PT',     # Pytest-related issues
   'PTH',    # Encourages using pathlib over os.path
+  'RET',
   'RUF',    # Ruff-specific checks (e.g., enforcing best practices)
   'S',      # Security-related issues (e.g., use of insecure functions or libraries)
   'SIM',    # Simplification issues (e.g., redundant code, unnecessary constructs)
+  'SLF',
   'T20',    # Flake8-print-specific checks (e.g., print statements left in code) 
   'TCH',    # Type checking issues (e.g., incompatible types, missing type annotations)
+  'TD',
   'TID252', # Enforces absolute imports over relative imports
   'TRY',    # Tryceratops Try/Except-related issues (e.g., broad exceptions, empty except blocks)
   'UP',     # Pyupgrade-specific checks
@@ -200,6 +207,8 @@ force-single-line = true
   'D104', # do not require docstrings in tests
   'TCH',  # do not enforce type-checking import blocks in tests
   'W505', # ignore doc line length in tests
+  'SLF001', # allow access to private members in tests
+  'ANN001', 'ANN201', 'ANN202', 'ANN204', 'ANN205', 'ANN401', # ignore annotations in tests
 ]
 
 [tool.ruff.lint.pycodestyle]

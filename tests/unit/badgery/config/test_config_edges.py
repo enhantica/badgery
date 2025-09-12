@@ -50,7 +50,7 @@ def test_build_metrics_skips_unknown_and_missing_workflow():
     # unknown and gh_action without workflow are skipped
     assert 'files' in keys
     assert 'funcs' in keys
-    assert all(k[0] in ('files', 'funcs') for k in spec)
+    assert all(k[0] in {'files', 'funcs'} for k in spec)
 
 
 def test_group_icon_additional_mappings():
