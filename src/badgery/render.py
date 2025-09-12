@@ -46,6 +46,7 @@ class HTMLDashboardRenderer:
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
       gap: 0;
+      row-gap: 1em;
       padding: 0;
       background-color: transparent;
       justify-content: start;
@@ -58,6 +59,7 @@ class HTMLDashboardRenderer:
       margin: 0.5em;
       display: flex;
       flex-direction: column;
+      padding: 0.8em 0.8em;
     }
     .label {
       font-weight: 300;
@@ -80,15 +82,15 @@ class HTMLDashboardRenderer:
       font-weight: 300;
       gap: 0.5em;
       padding: 0.7em 0.7em;
-      background-color: #1a1a1a;
+      background-color: #222;
       border-top: 1px solid #101010;
-      font-size: 1em;
+      font-size: 1.1em;
     }
     .values span img { vertical-align: middle; }
     .green { color: #6eb543; }
     .yellow-green { color: #9acd32; }
-    .yellow { color: #e8b745; }
-    .orange { color: #f39c12; }
+    .yellow { color: #FFD54F; }
+    .orange { color: #FFA726; }
     .red { color: #e46259; }
     .blue { color: #71b2f0; }
     .gray { color: #757575; }
