@@ -1,4 +1,4 @@
-name: Test code and package
+name: Code and package tests
 
 on:
   # Trigger the workflow on push
