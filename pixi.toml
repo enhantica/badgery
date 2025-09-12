@@ -54,7 +54,7 @@ default = { features = ["py313", "badgery-local-editable", "nodejs"] }
 [tasks]
 
 # 🧪 Testing Tasks
-tests = "python -m pytest tests/unit/ --color=yes -v"
+tests = "python -m pytest tests/ --color=yes -v"
 
 # 🧹 Code Quality
 
@@ -89,9 +89,8 @@ raw-metrics = "radon raw -s src/"
 raw-metrics-json = "radon raw -s -j src/"
 
 # 📊 Coverage
-unit-tests-coverage = "pixi run unit-tests --cov=src/badgery --cov-report=term-missing"
-func-tests-coverage = "pixi run func-tests --cov=src/badgery --cov-report=term-missing"
-docstring-coverage = "interrogate -c pyproject.toml src/"
+tests-cov = "pixi run tests --cov=src/badgery --cov-report=term-missing"
+docstring-cov = "interrogate -c pyproject.toml src/"
 
 coverage = "pixi run docstring-coverage || true; pixi run unit-tests-coverage || true"
 
