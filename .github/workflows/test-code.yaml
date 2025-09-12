@@ -175,6 +175,10 @@ jobs:
         shell: bash
         run: pixi run dist-build
 
+      - name: Remove badgery editable install (for the next job)
+        shell: bash
+        run: pixi remove badgery --pypi --feature badgery-local-editable
+
       # More than one file/dir need to be specified in 'path', to preserve the
       # structure of the dist/ directory, not only its contents.
       - name: Upload Python package for the next job
@@ -213,7 +217,6 @@ jobs:
           environments: wheel
           activate-environment: wheel
           run-install: true
-          frozen: false
           cache: false
           post-cleanup: false
 
