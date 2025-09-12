@@ -1,7 +1,7 @@
 # Drafts your next Release notes as pull requests are merged into
 # default branch
 
-name: Update release draft
+name: Release draft update
 
 on:
   # Runs on pushes targeting the default branch (updates the real draft release)

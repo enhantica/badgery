@@ -7,14 +7,15 @@ from __future__ import annotations
 import argparse
 import logging
 import os
-from glob import glob
 from pathlib import Path
-from typing import Optional
 
 from badgery.badges import BadgeGenerator
 from badgery.config import build_metrics_from_config
 from badgery.config import load_settings_from_yaml
 from badgery.render import HTMLDashboardRendererWithSpec
+
+# Placeholder token used in report path patterns
+BRANCH_TOKEN = '{' + 'branch' + '}'
 
 
 def _collect_report_patterns(
@@ -44,19 +45,22 @@ def _collect_report_patterns(
     return complexity_pattern, maintainability_pattern, raw_pattern, docstring_pattern
 
 
-def _resolve_pattern(pattern: Optional[str], branch: str) -> Optional[str]:
+def _resolve_pattern(pattern: str | None, branch: str) -> str | None:
     if not pattern:
         return None
-    if '{branch}' in pattern:
-        candidate = pattern.replace('{branch}', branch)
+    if BRANCH_TOKEN in pattern:
+        candidate = pattern.replace(BRANCH_TOKEN, branch)
     else:
         candidate = pattern.replace('**', branch)
     p = Path(candidate)
     if p.exists():
         return str(p)
-    matches = glob(candidate)
-    if matches:
-        return matches[0]
+    # Prefer pathlib over glob module (PTH207)
+    parent = p.parent
+    pattern = p.name
+    if parent.exists():
+        for match in parent.glob(pattern):
+            return str(match)
     return None
 
 
@@ -111,43 +115,53 @@ def parse_args() -> argparse.Namespace:
     ) = _collect_report_patterns(cards)
 
     args.cyclomatic_complexity_master = _resolve_pattern(
-        complexity_pattern, args.default_branch
+        complexity_pattern,
+        args.default_branch,
     ) or os.environ.get('CI_COMPLEXITY_MASTER')
     args.cyclomatic_complexity_develop = _resolve_pattern(
-        complexity_pattern, args.develop_branch
+        complexity_pattern,
+        args.develop_branch,
     ) or os.environ.get('CI_COMPLEXITY_DEVELOP')
     args.cyclomatic_complexity_feature = _resolve_pattern(
-        complexity_pattern, feature_branch
+        complexity_pattern,
+        feature_branch,
     ) or os.environ.get('CI_COMPLEXITY_FEATURE')
 
     args.maintainability_index_master = _resolve_pattern(
-        maintainability_pattern, args.default_branch
+        maintainability_pattern,
+        args.default_branch,
     ) or os.environ.get('CI_MAINTAINABILITY_MASTER')
     args.maintainability_index_develop = _resolve_pattern(
-        maintainability_pattern, args.develop_branch
+        maintainability_pattern,
+        args.develop_branch,
     ) or os.environ.get('CI_MAINTAINABILITY_DEVELOP')
     args.maintainability_index_feature = _resolve_pattern(
-        maintainability_pattern, feature_branch
+        maintainability_pattern,
+        feature_branch,
     ) or os.environ.get('CI_MAINTAINABILITY_FEATURE')
 
     args.raw_metrics_master = _resolve_pattern(raw_pattern, args.default_branch) or os.environ.get(
-        'CI_RAW_METRICS_MASTER'
+        'CI_RAW_METRICS_MASTER',
     )
     args.raw_metrics_develop = _resolve_pattern(
-        raw_pattern, args.develop_branch
+        raw_pattern,
+        args.develop_branch,
     ) or os.environ.get('CI_RAW_METRICS_DEVELOP')
     args.raw_metrics_feature = _resolve_pattern(raw_pattern, feature_branch) or os.environ.get(
-        'CI_RAW_METRICS_FEATURE'
+        'CI_RAW_METRICS_FEATURE',
     )
 
     args.coverage_docstring_master = _resolve_pattern(
-        docstring_pattern, args.default_branch
+        docstring_pattern,
+        args.default_branch,
     ) or os.environ.get('CI_DOCSTRING_MASTER')
     args.coverage_docstring_develop = _resolve_pattern(
-        docstring_pattern, args.develop_branch
+        docstring_pattern,
+        args.develop_branch,
     ) or os.environ.get('CI_DOCSTRING_DEVELOP')
     args.coverage_docstring_feature = _resolve_pattern(
-        docstring_pattern, feature_branch
+        docstring_pattern,
+        feature_branch,
     ) or os.environ.get('CI_DOCSTRING_FEATURE')
 
     return args

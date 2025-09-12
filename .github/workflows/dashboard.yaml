@@ -1,7 +1,6 @@
-name: Build and publish dashboard
+name: Dashboard build and publish
 
 on:
-  push:
   workflow_dispatch:
   workflow_call:
 

@@ -151,8 +151,11 @@ preview = true
 # https://docs.astral.sh/ruff/rules/
 [tool.ruff.lint]
 select = [
+  'ANN',
+  'ARG',    # Argument-related issues (e.g., unused arguments)
   'B',      # Bugbear-specific checks (e.g., likely bugs, bad patterns)
   'C',      # Complexity-related issues (e.g., high McCabe complexity)
+  'COM',
   'D',      # Docstring formatting issues (old rules)
   'DOC',    # Docstring formatting issues (new rules)
   'DTZ',    # Docstring timezone issues (e.g., inconsistent timezone formats)
@@ -163,17 +166,24 @@ select = [
   'I',      # Import sorting issues (e.g., unsorted imports)
   'N',      # Naming convention issues (e.g., variable names, function names)
   'NPY',    # NumPy-specific checks (e.g., array operations, broadcasting)
+  'PERF',   # Performance-related issues (e.g., inefficient code patterns)
+  'PGH',    # Misc text patterns checks
+  'PIE',
+  'PL',     # PyLint-specific checks (e.g., code smells, potential errors)
+  'PT',     # Pytest-related issues
+  'PTH',    # Encourages using pathlib over os.path
+  'RET',
+  'RUF',    # Ruff-specific checks (e.g., enforcing best practices)
   'S',      # Security-related issues (e.g., use of insecure functions or libraries)
+  'SIM',    # Simplification issues (e.g., redundant code, unnecessary constructs)
+  'SLF',
+  'T20',    # Flake8-print-specific checks (e.g., print statements left in code) 
   'TCH',    # Type checking issues (e.g., incompatible types, missing type annotations)
+  'TD',
   'TID252', # Enforces absolute imports over relative imports
+  'TRY',    # Tryceratops Try/Except-related issues (e.g., broad exceptions, empty except blocks)
+  'UP',     # Pyupgrade-specific checks
   'W',      # General PEP 8 warnings (e.g., lines too long, trailing whitespace)
-  #'ARG',   # Argument-related issues (e.g., unused arguments)
-  #'PGH',   # Misc text patterns checks
-  #'PTH',   # Encourages using pathlib over os.path
-  #'RUF',   # Ruff-specific checks (e.g., enforcing best practices)
-  #'SIM',   # Simplification issues (e.g., redundant code, unnecessary constructs)
-  #'TRY',   # Tryceratops Try/Except-related issues (e.g., broad exceptions, empty except blocks)
-  #'UP',    # Pyupgrade-specific checks
 ]
 
 # Temporarily increase McCabe complexity limit to 17 to allow
@@ -189,14 +199,21 @@ force-single-line = true
 
 [tool.ruff.lint.per-file-ignores]
 'tests/**/*.py' = [
-  'S101', # allow asserts in test files
-  'D100', # do not require docstrings in tests
-  'D101', # do not require docstrings in tests
-  'D102', # do not require docstrings in tests
-  'D103', # do not require docstrings in tests
-  'D104', # do not require docstrings in tests
-  'TCH',  # do not enforce type-checking import blocks in tests
-  'W505', # ignore doc line length in tests
+  'S101',   # allow asserts in test files
+  'D100',   # do not require docstrings in tests
+  'D101',   # do not require docstrings in tests
+  'D102',   # do not require docstrings in tests
+  'D103',   # do not require docstrings in tests
+  'D104',   # do not require docstrings in tests
+  'TCH',    # do not enforce type-checking import blocks in tests
+  'W505',   # ignore doc line length in tests
+  'SLF001', # allow access to private members in tests
+  'ANN001',
+  'ANN201',
+  'ANN202',
+  'ANN204',
+  'ANN205',
+  'ANN401', # ignore annotations in tests
 ]
 
 [tool.ruff.lint.pycodestyle]

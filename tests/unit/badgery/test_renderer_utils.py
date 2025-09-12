@@ -12,7 +12,8 @@ class DummyMetric(BaseMetric):
     def read_all(self, args):  # pragma: no cover - not used
         raise NotImplementedError
 
-    def badge(self, value):  # pragma: no cover - not used
+    def badge(self, _value):  # pragma: no cover - not used
+        _ = self
         return ''
 
 
@@ -35,7 +36,7 @@ def test_renderer_color_thresholds_and_complexity_grade():
     assert r._complexity_grade_color(None) == ('?', 'gray')
 
 
-def test_renderer_parses_svg_for_status_and_percent(monkeypatch):
+def test_renderer_parses_svg_for_status_and_percent(monkeypatch: object) -> None:
     # Prepare a renderer with a dummy metric to access methods
     r = HTMLDashboardRenderer([], feature='f', badge_gen=BadgeGenerator('r/x'))
 
@@ -57,6 +58,7 @@ def test_renderer_parses_svg_for_status_and_percent(monkeypatch):
     # GitHub status
     assert r._github_badge_status('ci.yml', 'main') == 'passed'
     # Codecov percent
-    assert r._codecov_percent('dev') == 85
+    expected_percent = 85
+    assert r._codecov_percent('dev') == expected_percent
     # CodeFactor grade
     assert r._codefactor_grade('main') == 'A'

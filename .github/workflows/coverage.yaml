@@ -11,6 +11,11 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+# Need permissions to trigger the dashboard build workflow
+permissions:
+  actions: write
+  contents: read
+
 # Allow only one concurrent workflow, skipping runs queued between the run
 # in-progress and latest queued. And cancel in-progress runs.
 concurrency:
@@ -23,6 +28,7 @@ env:
   CI_BRANCH: ${{ github.head_ref || github.ref_name }}
 
 jobs:
+  # Job 1: Run docstring coverage
   docstring-coverage:
     runs-on: ubuntu-latest
 
@@ -43,6 +49,7 @@ jobs:
       - name: Run docstring coverage
         run: pixi run docstring-cov
 
+  # Job 2: Run unit tests with coverage and upload to Codecov
   unit-tests-coverage:
     runs-on: ubuntu-latest
 
@@ -63,18 +70,9 @@ jobs:
       - name: Run unit tests with coverage
         run: pixi run tests-cov --cov-report=xml:coverage-unit.xml
 
-      - name: Upload unit tests coverage to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
-        with:
-          name: unit-tests-job
-          files: ./coverage-unit.xml
-          fail_ci_if_error: true
-          verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
-
+  # Job 3: Trigger dashboard build
   trigger-dashboard-build:
-    needs: [docstring-coverage, unit-tests-coverage]
+    needs: [docstring-coverage, unit-tests-coverage] # depend on the previous jobs
 
     runs-on: ubuntu-latest
 

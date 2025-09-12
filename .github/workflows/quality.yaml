@@ -1,4 +1,4 @@
-name: Check code quality
+name: Code quality checks
 
 on:
   # Trigger the workflow on push
@@ -54,14 +54,14 @@ jobs:
           pixi run prettier-install
 
       # Check the validity of pyproject.toml
-      - name: Check validity of pyproject.toml
+      - name: pyproject.toml validity check
         id: check_pyproject
         continue-on-error: true
         shell: bash
         run: pixi run pyproject-check
 
       # Check code linting with Ruff in the project root
-      - name: Check code linting
+      - name: Code linting check
         id: check_code_linting
         continue-on-error: true
         shell: bash
@@ -74,7 +74,7 @@ jobs:
           echo "In project root run 'pixi run py-lint-fix' and commit changes"
 
       # Check code formatting with Ruff in the project root
-      - name: Check code formatting
+      - name: Code formatting check
         id: check_code_formatting
         continue-on-error: true
         shell: bash
@@ -88,7 +88,7 @@ jobs:
 
       # Check formatting of Markdown, YAML, TOML, etc. files with Prettier in
       # the project root
-      - name: Check formatting of Markdown, YAML, TOML, etc. files
+      - name: Formatting check for Markdown, YAML, TOML, etc. files
         id: check_others_formatting
         continue-on-error: true
         shell: bash

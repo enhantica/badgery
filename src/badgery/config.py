@@ -8,7 +8,6 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Optional
 
 if TYPE_CHECKING:
     from badgery.badges import BadgeGenerator
@@ -24,11 +23,11 @@ from badgery.metrics import LinesOfCodeMetric
 from badgery.metrics import MaintainabilityMetric
 
 
-def _parse_scalar(val: str) -> Any:
+def _parse_scalar(val: str) -> object:
     """Parse a YAML-like scalar: booleans and quoted strings.
 
     Returns:
-        Any: Parsed Python value for the scalar string.
+        object: Parsed Python value for the scalar string.
 
     Notes:
         This is a tiny helper to keep load functions simpler and reduce
@@ -36,7 +35,7 @@ def _parse_scalar(val: str) -> Any:
     """
     sval = val.strip()
     low = sval.lower()
-    if low in ('true', 'false'):
+    if low in {'true', 'false'}:
         return low == 'true'
     if (sval.startswith("'") and sval.endswith("'")) or (
         sval.startswith('"') and sval.endswith('"')
@@ -79,7 +78,7 @@ def load_cards_from_yaml(path: str) -> list[dict[str, Any]]:
         return []
 
     items: list[dict[str, Any]] = []
-    current: Optional[dict[str, Any]] = None
+    current: dict[str, Any] | None = None
     current_indent = 0
     for raw in lines[start:]:
         line = raw.rstrip()
@@ -135,16 +134,15 @@ def load_settings_from_yaml(path: str) -> dict[str, Any]:
                 key, val = line.split(':', 1)
                 key = key.strip()
                 val = val.strip()
-                if val.lower() in ('true', 'false'):
+                if val.lower() in {'true', 'false'}:
                     parsed = val.lower() == 'true'
+                elif (val.startswith("'") and val.endswith("'")) or (
+                    val.startswith('"') and val.endswith('"')
+                ):
+                    parsed = val[1:-1]
                 else:
-                    if (val.startswith("'") and val.endswith("'")) or (
-                        val.startswith('"') and val.endswith('"')
-                    ):
-                        parsed = val[1:-1]
-                    else:
-                        parsed = val
-                if key in ('default_branch', 'develop_branch'):
+                    parsed = val
+                if key in {'default_branch', 'develop_branch'}:
                     settings[key] = parsed
         else:
             break
@@ -166,30 +164,30 @@ def group_icon(group: str) -> str:
         'build & release': 'fas fa-rocket',
         'publish to pypi': 'fas fa-box',
     }
-    if g in mapping:
-        return mapping[g]
-    if 'test' in g:
-        return 'fas fa-vial'
-    if 'qualit' in g:
-        return 'fas fa-gauge'
-    if 'size' in g:
-        return 'fas fa-file-code'
-    if 'cover' in g:
-        return 'fas fa-square-poll-vertical'
-    if 'secur' in g:
-        return 'fas fa-lock'
-    if 'build' in g or 'release' in g:
-        return 'fas fa-rocket'
-    if 'pypi' in g or 'publish' in g:
-        return 'fas fa-box'
-    return 'fas fa-gauge'
+    icon = mapping.get(g, 'fas fa-gauge')
+    if icon == 'fas fa-gauge':
+        if 'test' in g:
+            icon = 'fas fa-vial'
+        elif 'qualit' in g:
+            icon = 'fas fa-gauge'
+        elif 'size' in g:
+            icon = 'fas fa-file-code'
+        elif 'cover' in g:
+            icon = 'fas fa-square-poll-vertical'
+        elif 'secur' in g:
+            icon = 'fas fa-lock'
+        elif 'build' in g or 'release' in g:
+            icon = 'fas fa-rocket'
+        elif 'pypi' in g or 'publish' in g:
+            icon = 'fas fa-box'
+    return icon
 
 
 def build_metrics_from_config(  # noqa: C901 - acceptable complexity
     cards: list[dict[str, Any]],
-    badge_gen: 'BadgeGenerator',
+    badge_gen: BadgeGenerator,
     feature: str,
-):
+) -> tuple[list[BaseMetric], list[tuple[str, str, str]]]:
     """Construct metric instances and an ordered card spec.
 
     Returns:

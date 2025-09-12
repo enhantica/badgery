@@ -10,7 +10,7 @@ from badgery.metrics import LinesOfCodeMetric
 from badgery.metrics import MaintainabilityMetric
 
 
-def test_metric_formatters_unknown_values(tmp_path: Path):
+def test_metric_formatters_unknown_values():
     bg = BadgeGenerator('r/x')
     mi = MaintainabilityMetric(bg, feature='f')
     assert mi.format_value((None, None)) == 'unknown'
@@ -35,7 +35,9 @@ def test_lines_of_code_invalid_json_returns_none(tmp_path: Path):
         },
     )
     loc.read_all(args)
-    assert loc.master is None and loc.develop is None and loc.feature_value is None
+    assert loc.master is None
+    assert loc.develop is None
+    assert loc.feature_value is None
 
 
 def test_file_and_function_count_invalid_or_missing(tmp_path: Path):
@@ -54,7 +56,8 @@ def test_file_and_function_count_invalid_or_missing(tmp_path: Path):
     )
     fc.read_all(args)
     fn.read_all(args)
-    assert fc.master is None and fn.master is None
+    assert fc.master is None
+    assert fn.master is None
 
 
 def test_maintainability_and_complexity_read_value_invalid_json(tmp_path: Path):
