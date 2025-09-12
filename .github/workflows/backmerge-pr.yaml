@@ -1,0 +1,40 @@
+# This workflow creates a backmerge PR from `main` into `develop`
+# whenever a new version tag is pushed (v*).
+#
+# Usage:
+#   - Triggered automatically on tag push (v*).
+#   - Creates a PR titled "Backmerge: main into develop".
+#   - Adds the label "[maintainer] release" so it is excluded from changelogs.
+
+name: Backmerge PR creation
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-backmerge-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Create PR from main to develop
+        run: |
+          gh pr create \
+            --base develop \
+            --head main \
+            --title "Backmerge: main into develop" \
+            --label "[maintainer] auto-pull-request" \
+            --body "This pull request backmerges changes from \`main\` into \`develop\`, following a new release tag push.
+
+            ⚠️ Note: This PR is labeled \`[maintainer] auto-pull-request\` and is excluded from release notes and version bump logic."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_API_PERSONAL_ACCSESS_TOKEN }}

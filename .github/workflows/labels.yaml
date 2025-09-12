@@ -20,6 +20,7 @@ jobs:
           echo "Current PR labels: $PR_LABELS"
           VALID_LABELS=(
             "[maintainer] release"
+            "[maintainer] auto-pull-request"
             "[scope] bug"
             "[scope] documentation"
             "[scope] enhancement"
