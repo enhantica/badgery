@@ -12,6 +12,7 @@ from badgery._metrics.codefactor import CodeFactorMetric
 from badgery._metrics.complexity import ComplexityMetric
 from badgery._metrics.counts import FileCountMetric
 from badgery._metrics.counts import FunctionCountMetric
+from badgery._metrics.counts import FunctionsPerFileMetric
 from badgery._metrics.docstring import DocstringCoverageMetric
 from badgery._metrics.loc import LinesOfCodeMetric
 from badgery._metrics.maintainability import MaintainabilityMetric
@@ -25,6 +26,7 @@ __all__ = [
     'DocstringCoverageMetric',
     'FileCountMetric',
     'FunctionCountMetric',
+    'FunctionsPerFileMetric',
     'GithubWorkflowMetric',
     'LinesOfCodeMetric',
     'MaintainabilityMetric',

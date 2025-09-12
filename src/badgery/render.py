@@ -19,6 +19,7 @@ from badgery.metrics import ComplexityMetric
 from badgery.metrics import DocstringCoverageMetric
 from badgery.metrics import FileCountMetric
 from badgery.metrics import FunctionCountMetric
+from badgery.metrics import FunctionsPerFileMetric
 from badgery.metrics import GithubWorkflowMetric
 from badgery.metrics import LinesOfCodeMetric
 from badgery.metrics import MaintainabilityMetric
@@ -149,6 +150,19 @@ class HTMLDashboardRenderer:
     RATIO_YELLOW_GREEN = 1.1
     RATIO_YELLOW = 1.25
     RATIO_ORANGE = 1.5
+
+    # Functions-per-file ratio thresholds (bands A-F)
+    FPF_A_MIN = 5
+    FPF_A_MAX = 20
+    FPF_B_LOW_MIN = 3
+    FPF_B_LOW_MAX = 5
+    FPF_B_HIGH_MIN = 20
+    FPF_B_HIGH_MAX = 30
+    FPF_C_LOW_MIN = 1
+    FPF_C_LOW_MAX = 3
+    FPF_C_HIGH_MIN = 30
+    FPF_C_HIGH_MAX = 50
+    FPF_D_MIN = 50  # ratio > 50
 
     def __init__(
         self,
@@ -469,18 +483,65 @@ class HTMLDashboardRenderer:
             color = 'red'
         return (f'{ratio:.2f} ({s}/{lloc_str})', color)
 
-    def _status_text_for_metric(self, key: str, branch: str) -> tuple[str, str] | None:
-        """Return status and color for a metric/branch."""
-        m = self.metric_by_key.get(key)
-        if not m:
-            return None
-        attr = (
-            'master'
-            if branch == 'master'
-            else ('develop' if branch == 'develop' else 'feature_value')
-        )
-        value = getattr(m, attr, None)
+    def _status_funcs_per_file(self, value: object) -> tuple[str, str]:
+        """Colorize functions-per-file ratio and show counts.
 
+        Expects a tuple ``(functions, files)`` and formats as
+        ``RATIO (functions/files)`` with thousand separators.
+
+        Returns:
+            tuple[str, str]: Status text and color class name.
+        """
+        tup = value if isinstance(value, tuple) else None
+        if not tup:
+            return ('-', 'gray')
+        funcs, files = tup
+        funcs_s = self._fmt_int(funcs) or '-'
+        files_s = self._fmt_int(files) or '-'
+        ratio: float | None = None
+        try:
+            raw_files = int(str(files).replace(',', '').strip()) if files is not None else 0
+            raw_funcs = int(str(funcs).replace(',', '').strip()) if funcs is not None else 0
+            if raw_files > 0:
+                ratio = float(raw_funcs) / float(raw_files)
+        except Exception:
+            ratio = None
+        if ratio is None:
+            return (f'{funcs_s}/{files_s}', 'gray')
+        # Thresholds derived from requested grading bands:
+        # A: 5-20
+        # B: 3-5 or 20-30
+        # C: 1-3 or 30-50
+        # D: >50
+        # F: otherwise
+        if HTMLDashboardRenderer.FPF_A_MIN <= ratio <= HTMLDashboardRenderer.FPF_A_MAX:
+            color = 'green'
+        elif (
+            (HTMLDashboardRenderer.FPF_B_LOW_MIN <= ratio < HTMLDashboardRenderer.FPF_B_LOW_MAX)
+            or (
+                HTMLDashboardRenderer.FPF_B_HIGH_MIN < ratio
+                <= HTMLDashboardRenderer.FPF_B_HIGH_MAX
+            )
+        ):
+            color = 'yellow-green'
+        elif (
+            (HTMLDashboardRenderer.FPF_C_LOW_MIN <= ratio < HTMLDashboardRenderer.FPF_C_LOW_MAX)
+            or (
+                HTMLDashboardRenderer.FPF_C_HIGH_MIN < ratio
+                <= HTMLDashboardRenderer.FPF_C_HIGH_MAX
+            )
+        ):
+            color = 'yellow'
+        elif ratio > HTMLDashboardRenderer.FPF_D_MIN:
+            color = 'orange'
+        else:
+            color = 'red'
+        return (f'{ratio:.2f} ({funcs_s}/{files_s})', color)
+
+    def _status_for_metric_instance(
+        self, m: BaseMetric, value: object, branch: str
+    ) -> tuple[str, str]:
+        """Return status text/color for a metric instance and value."""
         result: tuple[str, str]
         if isinstance(m, DocstringCoverageMetric):
             result = self._status_docstring(value)
@@ -496,11 +557,26 @@ class HTMLDashboardRenderer:
             result = self._status_workflow(m, value, branch)
         elif isinstance(m, (FileCountMetric, FunctionCountMetric)):
             result = self._status_count(value)
+        elif isinstance(m, FunctionsPerFileMetric):
+            result = self._status_funcs_per_file(value)
         elif isinstance(m, LinesOfCodeMetric):
             result = self._status_loc(value)
         else:
             result = ('unknown', 'gray')
         return result
+
+    def _status_text_for_metric(self, key: str, branch: str) -> tuple[str, str] | None:
+        """Return status and color for a metric/branch."""
+        m = self.metric_by_key.get(key)
+        if not m:
+            return None
+        attr = (
+            'master'
+            if branch == 'master'
+            else ('develop' if branch == 'develop' else 'feature_value')
+        )
+        value = getattr(m, attr, None)
+        return self._status_for_metric_instance(m, value, branch)
 
     def _value_item_html(self, key: str, branch: str, branch_label: str) -> str:
         """Render a single metric row with left label and right value.
