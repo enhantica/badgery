@@ -213,7 +213,7 @@ jobs:
           environments: wheel
           activate-environment: wheel
           run-install: true
-          frozen: true
+          frozen: false
           cache: false
           post-cleanup: false
 
