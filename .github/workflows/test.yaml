@@ -127,12 +127,4 @@ jobs:
   # Job 3: Trigger dashboard build
   trigger-dashboard-build:
     needs: [test-source, test-package] # depend on previous jobs
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check-out repository
-        uses: actions/checkout@v5
-
-      - name: Trigger dashboard build
-        uses: enhantica/badgery/.github/workflows/dashboard.yaml@{{ env.CI_BRANCH }}
+    uses: enhantica/badgery/.github/workflows/dashboard.yaml@{{ env.CI_BRANCH }}
