@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Badgery contributors <https://github.com/enhantica/badgery>
+# SPDX-License-Identifier: MIT
+"""Module entrypoint for running Badgery as `python -m badgery`."""
+
 from __future__ import annotations
 
 from badgery import main

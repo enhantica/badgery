@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Badgery contributors <https://github.com/enhantica/badgery>
+# SPDX-License-Identifier: MIT
+"""HTML rendering for the Badgery dashboard."""
+
 from __future__ import annotations
 
 import logging
@@ -27,6 +31,8 @@ if TYPE_CHECKING:
 
 
 class HTMLDashboardRenderer:
+    """Render metrics into a compact HTML dashboard."""
+
     CSS = """
     body {
       --base-size: clamp(18px, 1.5vw, 22px);
@@ -100,6 +106,7 @@ class HTMLDashboardRenderer:
         default_branch: str = 'master',
         develop_branch: str = 'develop',
     ):
+        """Initialize renderer with metrics and branch labels."""
         self.metrics = metrics
         self.feature = feature
         self.badge_gen = badge_gen
@@ -109,6 +116,16 @@ class HTMLDashboardRenderer:
 
     @staticmethod
     def _fetch(url: str, timeout: float = 8.0) -> Optional[str]:
+        """Fetch a URL and return its text content.
+
+        Args:
+            url: HTTPS URL to fetch.
+            timeout: Socket timeout in seconds.
+
+        Returns:
+            The response body decoded as UTF-8, or ``None`` on
+            any error.
+        """
         try:
             if not (isinstance(url, str) and url.startswith('https://')):
                 return None
@@ -122,6 +139,17 @@ class HTMLDashboardRenderer:
         return None
 
     def _github_badge_status(self, workflow: str, branch: Optional[str]) -> Optional[str]:
+        """Parse a GitHub Actions badge and return a normalized status.
+
+        Args:
+            workflow: Workflow filename, e.g. ``ci.yml``.
+            branch: Optional branch name to include in the badge URL.
+
+        Returns:
+            One of: ``passed``, ``failed``, ``queued``, ``cancelled``,
+            ``skipped``, ``in progress``, or ``None`` if the badge
+            cannot be parsed.
+        """
         url = self.badge_gen.github_workflow_badge_img(workflow, branch)
         svg = self._fetch(url)
         if not svg:
@@ -139,6 +167,16 @@ class HTMLDashboardRenderer:
         return word
 
     def _codecov_percent(self, branch: Optional[str]) -> Optional[int]:
+        """Return Codecov percentage for a branch by parsing the badge.
+
+        Args:
+            branch: Optional branch; ``None`` / ``master`` resolve to
+                the default graph.
+
+        Returns:
+            Integer percentage rounded to nearest whole number, or
+            ``None``.
+        """
         token = os.environ.get('CODECOV_TOKEN', 'qtsB5Q5BXO')
         repo = os.environ.get('CODECOV_REPO', self.badge_gen.repo)
         if branch and branch not in ('', 'master'):
@@ -158,6 +196,11 @@ class HTMLDashboardRenderer:
             return None
 
     def _codefactor_grade(self, branch: str) -> Optional[str]:
+        """Return a CodeFactor letter grade parsed from the badge.
+
+        Returns:
+            Optional[str]: Letter grade ``A``–``F`` or ``None``.
+        """
         url = self.badge_gen.codefactor_badge_img(branch)
         svg = self._fetch(url)
         if not svg:
@@ -169,6 +212,11 @@ class HTMLDashboardRenderer:
 
     @staticmethod
     def _grade_color_for_letter(letter: str) -> str:
+        """Map a CodeFactor letter grade to a color class name.
+
+        Returns:
+            str: Color class name.
+        """
         letter = (letter or '').upper()
         if letter == 'A':
             return 'green'
@@ -184,6 +232,11 @@ class HTMLDashboardRenderer:
 
     @staticmethod
     def _color_for_percent(p: Optional[float]) -> str:
+        """Map a percentage to a color class name.
+
+        Returns:
+            str: Color class name.
+        """
         if p is None:
             return 'gray'
         if p >= 90:
@@ -198,6 +251,11 @@ class HTMLDashboardRenderer:
 
     @staticmethod
     def _complexity_grade_color(avg: Optional[float]) -> Tuple[str, str]:
+        """Map average cyclomatic complexity to a (grade, color).
+
+        Returns:
+            tuple[str, str]: Grade letter and color class.
+        """
         if avg is None:
             return ('?', 'gray')
         if avg <= 5:
@@ -211,11 +269,23 @@ class HTMLDashboardRenderer:
         return ('F', 'red')
 
     def _status_text_for_metric(self, key: str, branch: str) -> Optional[Tuple[str, str]]:  # noqa: C901
+        """Return normalized status text and color for a metric/branch.
+
+        Args:
+            key: Metric key, e.g. ``codecov``.
+            branch: One of ``master``, ``develop``, or ``feature``.
+
+        Returns:
+            tuple[str, str]: ``(text, color)`` or
+            ``('unknown', 'gray')``.
+        """
         m = self.metric_by_key.get(key)
         if not m:
             return None
-        attr = 'master' if branch == 'master' else (
-            'develop' if branch == 'develop' else 'feature_value'
+        attr = (
+            'master'
+            if branch == 'master'
+            else ('develop' if branch == 'develop' else 'feature_value')
         )
         value = getattr(m, attr, None)
 
@@ -287,7 +357,12 @@ class HTMLDashboardRenderer:
             return (f'{p}%', color)
 
         if isinstance(m, CodeFactorMetric):
-            branch_for_badge = self.feature if branch == 'feature' else branch
+            if branch == 'master':
+                branch_for_badge = self.default_branch
+            elif branch == 'develop':
+                branch_for_badge = self.develop_branch
+            else:
+                branch_for_badge = self.feature
             letter = self._codefactor_grade(branch_for_badge)
             if letter is None:
                 letter = str(value or '').strip().upper()
@@ -357,6 +432,11 @@ class HTMLDashboardRenderer:
         return ('unknown', 'gray')
 
     def _value_item_html(self, key: str, branch: str, branch_label: str) -> str:
+        """Render a single metric status span for a given branch.
+
+        Returns:
+            str: HTML span element.
+        """
         status = self._status_text_for_metric(key, branch)
         if status is not None:
             text, color = status
@@ -364,6 +444,11 @@ class HTMLDashboardRenderer:
         return f'<span class="gray">{branch_label}: unknown</span>'
 
     def _card_html(self, title: str, icon_class: str, key: str) -> str:
+        """Render a complete metric card HTML block.
+
+        Returns:
+            str: HTML block for a metric card.
+        """
         feature_label = self.feature
         values_html = '\n'.join([
             self._value_item_html(key, 'master', self.default_branch),
@@ -378,10 +463,13 @@ class HTMLDashboardRenderer:
         )
 
     def render(self) -> str:
+        """Return the rendered HTML string for the dashboard."""
         return ''
 
 
 class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
+    """Renderer variant that uses an explicit card order spec."""
+
     def __init__(
         self,
         metrics: List[BaseMetric],
@@ -391,6 +479,7 @@ class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
         default_branch: str = 'master',
         develop_branch: str = 'develop',
     ):
+        """Initialize with context and ordered card spec."""
         super().__init__(
             metrics,
             feature,
@@ -401,6 +490,7 @@ class HTMLDashboardRendererWithSpec(HTMLDashboardRenderer):
         self.cards_spec = cards_spec
 
     def render(self) -> str:
+        """Return rendered HTML using the card spec order."""
         cards: List[str] = []
         for key, title, icon in self.cards_spec:
             m = self.metric_by_key.get(key)
