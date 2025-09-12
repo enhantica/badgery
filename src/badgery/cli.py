@@ -7,7 +7,6 @@ from __future__ import annotations
 import argparse
 import logging
 import os
-from glob import glob
 from pathlib import Path
 from typing import Optional
 
@@ -54,9 +53,12 @@ def _resolve_pattern(pattern: Optional[str], branch: str) -> Optional[str]:
     p = Path(candidate)
     if p.exists():
         return str(p)
-    matches = glob(candidate)
-    if matches:
-        return matches[0]
+    # Prefer pathlib over glob module (PTH207)
+    parent = p.parent
+    pattern = p.name
+    if parent.exists():
+        for match in parent.glob(pattern):
+            return str(match)
     return None
 
 

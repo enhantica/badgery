@@ -164,12 +164,12 @@ select = [
   'I',      # Import sorting issues (e.g., unsorted imports)
   'N',      # Naming convention issues (e.g., variable names, function names)
   'NPY',    # NumPy-specific checks (e.g., array operations, broadcasting)
+  'PGH',   # Misc text patterns checks
+  'PTH',   # Encourages using pathlib over os.path
   'S',      # Security-related issues (e.g., use of insecure functions or libraries)
   'TCH',    # Type checking issues (e.g., incompatible types, missing type annotations)
   'TID252', # Enforces absolute imports over relative imports
   'W',      # General PEP 8 warnings (e.g., lines too long, trailing whitespace)
-  #'PGH',   # Misc text patterns checks
-  #'PTH',   # Encourages using pathlib over os.path
   #'RUF',   # Ruff-specific checks (e.g., enforcing best practices)
   #'SIM',   # Simplification issues (e.g., redundant code, unnecessary constructs)
   #'TRY',   # Tryceratops Try/Except-related issues (e.g., broad exceptions, empty except blocks)
