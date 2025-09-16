@@ -22,6 +22,8 @@ class CodecovMetric(BaseMetric):
     def __init__(self, badge_gen: BadgeGenerator, feature: str | None = None) -> None:
         """Initialize Codecov coverage metric."""
         super().__init__(badge_gen, key=self.key, label=self.label, feature=feature)
+        # Optional Codecov flag (e.g., "unittests") provided via config
+        self.flag: str | None = None
 
     def read_all(self, _args: object) -> None:
         """Read coverage values from environment variables."""

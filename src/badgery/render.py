@@ -249,12 +249,14 @@ class HTMLDashboardRenderer:
             return word
         return word
 
-    def _codecov_percent(self, branch: str | None) -> int | None:
+    def _codecov_percent(self, branch: str | None, flag: str | None = None) -> int | None:
         """Return Codecov percentage for a branch by parsing the badge.
 
         Args:
             branch: Optional branch; ``None`` / ``master`` resolve to
                 the default graph.
+            flag: Optional Codecov flag (e.g., ``unittests``) used to
+                filter results when Codecov flags are configured.
 
         Returns:
             Integer percentage rounded to nearest whole number, or
@@ -262,10 +264,11 @@ class HTMLDashboardRenderer:
         """
         token = os.environ.get('CODECOV_TOKEN', 'qtsB5Q5BXO')
         repo = os.environ.get('CODECOV_REPO', self.badge_gen.repo)
+        flag_qs = f'&flag={flag}' if flag else ''
         if branch and branch not in {'', 'master'}:
-            url = f'https://codecov.io/gh/{repo}/branch/{branch}/graph/badge.svg?token={token}'
+            url = f'https://codecov.io/gh/{repo}/branch/{branch}/graph/badge.svg?token={token}{flag_qs}'
         else:
-            url = f'https://codecov.io/gh/{repo}/graph/badge.svg?token={token}'
+            url = f'https://codecov.io/gh/{repo}/graph/badge.svg?token={token}{flag_qs}'
         svg = self._fetch(url)
         if not svg:
             return None
@@ -390,25 +393,30 @@ class HTMLDashboardRenderer:
         return (f'{grade} ({avg:.1f})', color)
 
     def _status_codecov(self, value: object, branch: str) -> tuple[str, str]:
-        # Master/develop: use provided value (env), do not fetch
-        if branch in {'master', 'develop'}:
-            if not value:
-                return ('unknown', 'gray')
-            try:
-                p = round(float(str(value).strip().rstrip('%')))
-            except Exception:
-                return ('unknown', 'gray')
-            color = self._color_for_percent(float(p))
-            return (f'{p}%', color)
+        # Resolve optional flag from the Codecov metric
+        metric = self.metric_by_key.get('codecov')
+        flag = getattr(metric, 'flag', None) if isinstance(metric, CodecovMetric) else None
 
-        # Feature: prefer live badge, fall back to provided value
-        branch_for_badge = self.feature
-        p = self._codecov_percent(branch_for_badge)
-        if p is None and value:
+        def _parse_env(v: object) -> int | None:
             try:
-                p = round(float(str(value).strip().rstrip('%')))
+                return round(float(str(v).strip().rstrip('%')))
             except Exception:
-                p = None
+                return None
+
+        # Master/develop: prefer env, fall back to badge fetch
+        if branch in {'master', 'develop'}:
+            p = _parse_env(value) if value else None
+            if p is None:
+                branch_for_badge = (
+                    self.default_branch if branch == 'master' else self.develop_branch
+                )
+                p = self._codecov_percent(branch_for_badge, flag)
+        else:
+            # Feature: prefer live badge, fall back to provided value
+            p = self._codecov_percent(self.feature, flag)
+            if p is None and value:
+                p = _parse_env(value)
+
         if p is None:
             return ('unknown', 'gray')
         color = self._color_for_percent(float(p))
@@ -416,7 +424,7 @@ class HTMLDashboardRenderer:
 
     def _status_codefactor(self, value: object, branch: str) -> tuple[str, str]:
         if branch == 'master':
-            branch_for_badge = None
+            branch_for_badge = self.default_branch
         elif branch == 'develop':
             branch_for_badge = self.develop_branch
         else:
@@ -435,7 +443,7 @@ class HTMLDashboardRenderer:
         branch: str,
     ) -> tuple[str, str]:
         if branch == 'master':
-            branch_for_badge = None
+            branch_for_badge = self.default_branch
         elif branch == 'feature':
             branch_for_badge = self.feature
         else:
@@ -628,6 +636,10 @@ class HTMLDashboardRenderer:
             str: HTML block for a metric card.
         """
         feature_label = self.feature
+        # Avoid ambiguous duplicate labels when feature equals a
+        # canonical branch name
+        if feature_label in {self.default_branch, self.develop_branch}:
+            feature_label = f'{feature_label} (feature)'
         values_html = '\n'.join([
             self._value_item_html(key, 'master', self.default_branch),
             self._value_item_html(key, 'develop', self.develop_branch),
