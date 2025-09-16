@@ -75,7 +75,7 @@ class BadgeGenerator:
         """
         return f'https://github.com/{self.repo}/actions/workflows/{workflow}'
 
-    def codecov_badge_img(self, branch: str | None = None) -> str:
+    def codecov_badge_img(self, branch: str | None = None, flag: str | None = None) -> str:
         """Return image URL for a Codecov badge.
 
         Returns:
@@ -83,9 +83,10 @@ class BadgeGenerator:
         """
         token = os.environ.get('CODECOV_TOKEN', 'qtsB5Q5BXO')
         repo = os.environ.get('CODECOV_REPO', self.repo)
+        flag_qs = f'&flag={flag}' if flag else ''
         if branch and branch not in {'', 'master'}:
-            return f'https://codecov.io/gh/{repo}/branch/{branch}/graph/badge.svg?token={token}'
-        return f'https://codecov.io/gh/{repo}/graph/badge.svg?token={token}'
+            return f'https://codecov.io/gh/{repo}/branch/{branch}/graph/badge.svg?token={token}{flag_qs}'
+        return f'https://codecov.io/gh/{repo}/graph/badge.svg?token={token}{flag_qs}'
 
     def codecov_badge_link(self) -> str:
         """Return Codecov dashboard URL for the repository.
