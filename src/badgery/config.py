@@ -258,6 +258,13 @@ def build_metrics_from_config(  # noqa: C901 - acceptable complexity
             return (None, None)
         if title:
             metric.label = title
+        # Special handling: allow Codecov card to accept an optional
+        # flag (e.g., flag: unittests) to filter coverage badges per
+        # Codecov docs.
+        if isinstance(metric, CodecovMetric):
+            flag_val = card.get('flag')
+            if isinstance(flag_val, str) and flag_val.strip():
+                metric.flag = flag_val.strip()
         return (metric, (metric.key, metric.label or title, icon))
 
     for card in cards:
