@@ -394,7 +394,7 @@ class HTMLDashboardRenderer:
 
     def _status_codecov(self, value: object, branch: str) -> tuple[str, str]:
         # Resolve optional flag from the Codecov metric
-        metric = self.metric_by_key.get('codecov')
+        metric = self.metric_by_key.get(CodecovMetric.key)
         flag = getattr(metric, 'flag', None) if isinstance(metric, CodecovMetric) else None
 
         def _parse_env(v: object) -> int | None:
