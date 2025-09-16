@@ -4,19 +4,19 @@ develop_branch: develop
 cards:
   - group: Tests
     type: gh_action
-    title: Test code and package (GitHub.com)
+    title: Code/package tests (GitHub)
     file: test.yaml
     enabled: true
 
   - group: Tests
     type: gh_action
-    title: Test package (PyPI.org)
+    title: Package tests (PyPI)
     file: test-pypi.yaml
     enabled: true
 
   - group: Code Quality
     type: codefactor
-    title: Code quality (CodeFactor.io)
+    title: Code quality (CodeFactor)
     enabled: true
 
   - group: Code Quality
@@ -45,7 +45,8 @@ cards:
 
   - group: Coverage
     type: codecov
-    title: Unit test coverage (Codecov.io)
+    title: Unit test coverage (Codecov)
+    flag: unittests
     enabled: true
 
   - group: Coverage
@@ -56,12 +57,12 @@ cards:
 
   - group: Security
     type: gh_action
-    title: Scan security (GitHub.com)
+    title: Security scan (GitHub)
     workflow: security.yaml
     enabled: true
 
   - group: Build & Release
     type: gh_action
-    title: Publish (PyPI.org)
+    title: Publishing (PyPI)
     workflow: publish-pypi.yaml
     enabled: true
