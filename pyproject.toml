@@ -19,8 +19,9 @@ classifiers = [
   'Programming Language :: Python :: 3.11',
   'Programming Language :: Python :: 3.12',
   'Programming Language :: Python :: 3.13',
+  'Programming Language :: Python :: 3.14',
 ]
-requires-python = '>=3.11,<3.14'
+requires-python = '>=3.11'
 dependencies = []
 
 [project.optional-dependencies]
@@ -179,7 +180,7 @@ select = [
   'S',      # Security-related issues (e.g., use of insecure functions or libraries)
   'SIM',    # Simplification issues (e.g., redundant code, unnecessary constructs)
   'SLF',    # Self argument-related issues (e.g., missing or misused self)
-  'T20',    # Flake8-print-specific checks (e.g., print statements left in code) 
+  'T20',    # Flake8-print-specific checks (e.g., print statements left in code)
   'TCH',    # Type checking issues (e.g., incompatible types, missing type annotations)
   'TD',     # Type definition issues (e.g., incorrect or missing type definitions)
   'TID252', # Enforces absolute imports over relative imports
