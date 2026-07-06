@@ -14,7 +14,7 @@ every artifact of it in one sweep.
 
 | Task | Status | What |
 |---|:--:|---|
-| B01-T01 | ⬜ | **Delete the live remote `develop` branch** and its "develop branch protection" ruleset; prune stale merged branches (`audit`, `codecov-flags`, `more-lint-fixes`, `py314`, …) and their orphaned dashboard output dirs (AUD-05/14) |
+| B01-T01 | 🟡 | **Delete the live remote `develop` branch** and its ruleset; prune stale merged branches — *2026-07-06: done (develop's one unique commit — py3.14 pyproject — verified already in `main`; develop-protection ruleset deleted; `audit`/`codecov-flags`/`more-lint-fixes`/`py314` deleted after merge verification; repo is `main`-only; `delete_branch_on_merge` on).* **Remaining:** the orphaned per-branch output dirs in `dashboard` (AUD-14, with ORG-T30) |
 | B01-T02 | ⬜ | **Remove `backmerge-pr.yml` and `release-pr.yml`**; realign the release flow to ORG-0004 (drafterino draft on `main` pushes → owner publishes → tag-driven post-release) (AUD-05) |
 | B01-T03 | ⬜ | **Workflow hygiene**: top-level `permissions:` for `dashboard.yml`/`quality.yml`/`security.yaml` (AUD-09); pin `github/ossar-action@main` → release/SHA (AUD-06); SHA-pin the rest (AUD-07, ORG-0024); keep the main ruleset, add required checks when ORG-T06 ships |
 
